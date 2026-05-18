@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Icebreaker Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --line: #262d38;
+    --ink: #e8eaed;
+    --muted: #828c9b;
+    --accent: #f0a830;       /* signal amber */
+    --go: #4cc38a;           /* introduced green */
+    --dim: #3a424f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    background:
+      radial-gradient(900px 600px at 80% -10%, rgba(240,168,48,.10), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(76,195,138,.07), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 4vh 5vw;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  header {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 22px;
+    margin-bottom: 28px;
+  }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600; font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.02; letter-spacing: -.01em;
+  }
+  .meta {
+    margin-top: 12px; color: var(--muted); font-size: 13px;
+    display: flex; gap: 22px; flex-wrap: wrap;
+  }
+  .meta b { color: var(--ink); font-weight: 600; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-bottom: 26px;
+  }
+  .stat {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .stat .n {
+    font-family: "Fraunces", serif; font-size: 40px; font-weight: 600;
+    line-height: 1;
+  }
+  .stat.go .n { color: var(--go); }
+  .stat.wait .n { color: var(--accent); }
+  .stat .l {
+    margin-top: 8px; font-size: 11px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  .roster { display: flex; flex-direction: column; gap: 8px; }
+  .row {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 18px;
+    animation: rise .35s ease both;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+  .row.left { opacity: .45; }
+  .row.done { border-color: rgba(76,195,138,.45); }
+  .name {
+    flex: 1; font-size: 17px; font-weight: 500;
+    display: flex; align-items: center; gap: 10px; min-width: 0;
+  }
+  .name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag {
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--dim);
+    padding: 3px 7px; border-radius: 999px; flex: none;
+  }
+  .when { color: var(--muted); font-size: 12px; flex: none; text-align: right; }
+  .toggle {
+    flex: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; font-weight: 600; letter-spacing: .04em;
+    padding: 10px 16px; border-radius: 9px;
+    border: 1px solid var(--dim); background: transparent; color: var(--muted);
+    transition: all .15s ease;
+  }
+  .toggle:hover { border-color: var(--accent); color: var(--ink); }
+  .toggle.on {
+    background: var(--go); border-color: var(--go); color: #06231a;
+  }
+  .x {
+    flex: none; background: none; border: none; color: var(--dim);
+    cursor: pointer; font-family: inherit; font-size: 16px; padding: 4px 6px;
+  }
+  .x:hover { color: var(--accent); }
+
+  .waiting {
+    margin-top: 24px; padding: 16px 20px; border-radius: 12px;
+    background: rgba(240,168,48,.07); border: 1px solid rgba(240,168,48,.25);
+    font-size: 14px; line-height: 1.6;
+  }
+  .waiting b { color: var(--accent); }
+  .empty { color: var(--muted); padding: 40px 0; text-align: center; font-size: 14px; }
+
+  footer {
+    margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line);
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  }
+  input {
+    font-family: inherit; font-size: 14px; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--line);
+    padding: 11px 14px; border-radius: 9px; flex: 1; min-width: 180px;
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+  .btn {
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    padding: 11px 18px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.ghost { color: var(--muted); }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--go);
+    box-shadow: 0 0 0 0 rgba(76,195,138,.6); animation: pulse 2s infinite;
+    flex: none;
+  }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(76,195,138,0); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Meeting Icebreaker</div>
+    <h1>Who's gone yet?</h1>
+    <div class="meta">
+      <div><span class="dot" style="display:inline-block;vertical-align:middle"></span> <b id="live">live</b></div>
+      <div>Tracking since <b id="since">··</b></div>
+      <div id="mtg"></div>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="s-present">0</div><div class="l">In the room</div></div>
+    <div class="stat go"><div class="n" id="s-done">0</div><div class="l">Introduced</div></div>
+    <div class="stat wait"><div class="n" id="s-wait">0</div><div class="l">Still to go</div></div>
+  </div>
+
+  <div class="roster" id="roster"></div>
+  <div id="waitingBox"></div>
+
+  <footer>
+    <input id="addName" placeholder="Add someone manually…" />
+    <button class="btn" id="addBtn">Add</button>
+    <button class="btn ghost" id="resetBtn">Reset session</button>
+  </footer>
+</div>
+
+<script>
+  const fmtTime = ts =>
+    new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const ago = ts => {
+    const m = Math.round((Date.now() - ts) / 60000);
+    if (m < 1) return "just now";
+    if (m === 1) return "1 min ago";
+    return m + " min ago";
+  };
+
+  function render(state) {
+    document.getElementById("since").textContent = fmtTime(state.startedAt);
+    document.getElementById("mtg").innerHTML = state.meetingTopic
+      ? "Meeting <b>" + state.meetingTopic + "</b>"
+      : (state.meetingId ? "Meeting <b>" + state.meetingId + "</b>" : "");
+
+    const present = state.participants.filter(p => p.present);
+    const done = state.participants.filter(p => p.introduced);
+    const waiting = present.filter(p => !p.introduced);
+
+    document.getElementById("s-present").textContent = present.length;
+    document.getElementById("s-done").textContent = done.length;
+    document.getElementById("s-wait").textContent = waiting.length;
+
+    const roster = document.getElementById("roster");
+    if (!state.participants.length) {
+      roster.innerHTML =
+        '<div class="empty">No one yet. Joins will appear automatically, or add people below.</div>';
+    } else {
+      roster.innerHTML = state.participants.map(p => `
+        <div class="row ${p.present ? "" : "left"} ${p.introduced ? "done" : ""}">
+          <div class="name">
+            <span>${escapeHtml(p.name)}</span>
+            ${p.present ? "" : '<span class="tag">left</span>'}
+          </div>
+          <div class="when">${fmtTime(p.joinTime)} · ${ago(p.joinTime)}</div>
+          <button class="toggle ${p.introduced ? "on" : ""}"
+            onclick="toggle('${p.id}', ${!p.introduced})">
+            ${p.introduced ? "✓ Introduced" : "Mark introduced"}
+          </button>
+          <button class="x" title="Remove" onclick="removeP('${p.id}')">✕</button>
+        </div>`).join("");
+    }
+
+    const box = document.getElementById("waitingBox");
+    box.innerHTML = waiting.length
+      ? `<div class="waiting">Still waiting on <b>${waiting
+          .map(p => escapeHtml(p.name))
+          .join(", ")}</b></div>`
+      : (present.length
+          ? '<div class="waiting" style="background:rgba(76,195,138,.07);border-color:rgba(76,195,138,.3)">Everyone present has introduced themselves. 🎉</div>'
+          : "");
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  async function toggle(id, val) {
+    await fetch(`/api/participant/${id}/introduced`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ introduced: val }),
+    });
+  }
+  async function removeP(id) {
+    await fetch(`/api/participant/${id}/remove`, { method: "POST" });
+  }
+
+  document.getElementById("addBtn").onclick = addPerson;
+  document.getElementById("addName").addEventListener("keydown", e => {
+    if (e.key === "Enter") addPerson();
+  });
+  async function addPerson() {
+    const i = document.getElementById("addName");
+    const name = i.value.trim();
+    if (!name) return;
+    i.value = "";
+    await fetch("/api/participant", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+  }
+  document.getElementById("resetBtn").onclick = async () => {
+    if (confirm("Clear all participants and restart the session?"))
+      await fetch("/api/reset", { method: "POST" });
+  };
+
+  // Live stream
+  let last = null;
+  const es = new EventSource("/events");
+  es.onmessage = e => { last = JSON.parse(e.data); render(last); };
+  es.onerror = () => { document.getElementById("live").textContent = "reconnecting…"; };
+  es.onopen = () => { document.getElementById("live").textContent = "live"; };
+  // Refresh relative "x min ago" labels without a server event.
+  setInterval(() => { if (last) render(last); }, 30000);
+</script>
+</body>
+</html>

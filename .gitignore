@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# uv
+.python-version
+
+# pre-commit / tooling caches
+.pre-commit-cache/
+.ruff_cache/

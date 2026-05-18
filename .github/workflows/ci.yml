@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Sync dependencies
+        run: uv sync --dev
+
+      - name: ruff check
+        run: uv run ruff check .
+
+      - name: ruff format check
+        run: uv run ruff format --check .
+
+      - name: bandit
+        run: uv run bandit -r tracker.py ax_dump.py -c pyproject.toml
+
+      - name: lizard
+        run: uv run lizard tracker.py ax_dump.py --CCN 10 --length 100 -w
+
+      - name: pymarkdown
+        run: uv run pymarkdown -d md013 scan README.md
+
+      - name: pre-commit
+        run: uv run pre-commit run --all-files --show-diff-on-failure
