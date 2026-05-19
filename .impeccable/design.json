@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-18T00:00:00Z",
+  "title": "Design System: Zoom Icebreaker Tracker",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(98% 0.005 50)",
+        "tonalRamp": [
+          "oklch(20% 0.022 40)",
+          "oklch(30% 0.020 40)",
+          "oklch(42% 0.018 45)",
+          "oklch(55% 0.016 45)",
+          "oklch(68% 0.014 48)",
+          "oklch(80% 0.012 50)",
+          "oklch(90% 0.010 50)",
+          "oklch(98% 0.005 50)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "oklch(96% 0.008 50)",
+        "tonalRamp": [
+          "oklch(22% 0.022 42)",
+          "oklch(32% 0.020 42)",
+          "oklch(45% 0.018 45)",
+          "oklch(58% 0.016 48)",
+          "oklch(72% 0.014 50)",
+          "oklch(84% 0.012 50)",
+          "oklch(92% 0.010 50)",
+          "oklch(96% 0.008 50)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(88% 0.012 50)",
+        "tonalRamp": [
+          "oklch(25% 0.020 45)",
+          "oklch(38% 0.018 45)",
+          "oklch(50% 0.016 48)",
+          "oklch(62% 0.014 48)",
+          "oklch(74% 0.013 50)",
+          "oklch(82% 0.013 50)",
+          "oklch(88% 0.012 50)",
+          "oklch(94% 0.010 50)"
+        ]
+      },
+      "soft-line": {
+        "role": "neutral",
+        "displayName": "Soft Line",
+        "canonical": "oklch(80% 0.015 50)"
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "oklch(50% 0.02 50)"
+      },
+      "dim-ink": {
+        "role": "neutral",
+        "displayName": "Dim Ink",
+        "canonical": "oklch(35% 0.018 40)"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(20% 0.022 40)"
+      },
+      "clay": {
+        "role": "primary",
+        "displayName": "Clay",
+        "canonical": "oklch(58% 0.14 38)",
+        "tonalRamp": [
+          "oklch(22% 0.06 38)",
+          "oklch(32% 0.09 38)",
+          "oklch(42% 0.12 38)",
+          "oklch(48% 0.14 38)",
+          "oklch(58% 0.14 38)",
+          "oklch(68% 0.12 38)",
+          "oklch(80% 0.08 38)",
+          "oklch(92% 0.04 38)"
+        ]
+      },
+      "clay-deep": {
+        "role": "primary",
+        "displayName": "Clay Deep",
+        "canonical": "oklch(48% 0.14 38)"
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page title only. One per page." },
+      "headline": { "displayName": "Headline", "purpose": "Lead phrases that need to sit between display and body, e.g. callout intros." },
+      "body": { "displayName": "Body", "purpose": "Roster names, waiting list copy, default non-numeric text." },
+      "label": { "displayName": "Label", "purpose": "Small role text on stat tiles, tags, buttons, badges." },
+      "numeric": { "displayName": "Numeric", "purpose": "Live-updating counts and tabular figures. Geist Mono with font-feature 'tnum'." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-out-quart", "value": "cubic-bezier(0.165, 0.84, 0.44, 1)", "purpose": "Default easing for state transitions (opacity, color, transform)." },
+      { "name": "duration-state", "value": "180ms", "purpose": "Default duration for hover, focus, and toggle state changes." },
+      { "name": "duration-pulse", "value": "2000ms", "purpose": "Live-dot halo pulse. Decorative ambient motion, suppressed under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "960px" },
+      { "name": "lg", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Roster Row (default)",
+      "kind": "custom",
+      "refersTo": "roster-row",
+      "description": "One participant, not yet introduced. The signature component.",
+      "html": "<div class=\"ds-row\"><span class=\"ds-row-name\">Alex Rivera</span><span class=\"ds-row-when\">10:04 · just now</span><button class=\"ds-toggle\">Mark introduced</button></div>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 16px; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 10px; padding: 14px 18px; font-family: Geist, Inter, system-ui, sans-serif; } .ds-row-name { flex: 1; font-size: 0.9375rem; font-weight: 500; color: #28201a; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-row-when { font-size: 0.75rem; color: #807666; font-family: 'Geist Mono', ui-monospace, monospace; font-feature-settings: 'tnum'; } .ds-toggle { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #807666; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: color 180ms cubic-bezier(0.165, 0.84, 0.44, 1), border-color 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-toggle:hover { color: #28201a; border-color: #c8bca6; } .ds-toggle:focus-visible { outline: 2px solid #c9573a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Roster Row (introduced)",
+      "kind": "custom",
+      "refersTo": "roster-row-introduced",
+      "description": "A participant who has been marked introduced. Tonal shift + checkmark + weight; no color signal.",
+      "html": "<div class=\"ds-row-done\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span class=\"ds-row-name-done\">Alex Rivera</span><span class=\"ds-row-when-done\">10:04 · 6 min ago</span><button class=\"ds-toggle-on\">Introduced</button></div>",
+      "css": ".ds-row-done { display: flex; align-items: center; gap: 16px; background: #f3eee5; border: 1px solid #ddd3c2; border-radius: 10px; padding: 14px 18px; font-family: Geist, Inter, system-ui, sans-serif; } .ds-check { width: 16px; height: 16px; color: #807666; flex: none; } .ds-row-name-done { flex: 1; font-size: 0.9375rem; font-weight: 400; color: #807666; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-row-when-done { font-size: 0.75rem; color: #807666; font-family: 'Geist Mono', ui-monospace, monospace; font-feature-settings: 'tnum'; } .ds-toggle-on { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #faf7f2; background: #28201a; border: 1px solid #28201a; border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: background 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-toggle-on:hover { background: #4a4036; }"
+    },
+    {
+      "name": "Stat Tile",
+      "kind": "card",
+      "refersTo": "stat-tile",
+      "description": "One of three tiles at the top: present count, introduced count, still-to-go count.",
+      "html": "<div class=\"ds-stat\"><div class=\"ds-stat-n\">7</div><div class=\"ds-stat-l\">In the room</div></div>",
+      "css": ".ds-stat { background: #f3eee5; border-radius: 10px; padding: 16px 20px; font-family: Geist, Inter, system-ui, sans-serif; } .ds-stat-n { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 2.25rem; font-weight: 500; line-height: 1; color: #28201a; letter-spacing: -0.01em; font-feature-settings: 'tnum'; } .ds-stat-l { margin-top: 8px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #807666; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default action button (Add, Reset). Ink fill, paper text.",
+      "html": "<button class=\"ds-btn-primary\">Add</button>",
+      "css": ".ds-btn-primary { font-family: Geist, Inter, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #faf7f2; background: #28201a; border: 1px solid #28201a; border-radius: 6px; padding: 10px 16px; cursor: pointer; transition: background 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-primary:hover { background: #4a4036; } .ds-btn-primary:focus-visible { outline: 2px solid #c9573a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-emphasis button (Reset session). Paper background, dim-ink text, hairline border.",
+      "html": "<button class=\"ds-btn-ghost\">Reset session</button>",
+      "css": ".ds-btn-ghost { font-family: Geist, Inter, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #4a4036; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 6px; padding: 10px 16px; cursor: pointer; transition: background 180ms cubic-bezier(0.165, 0.84, 0.44, 1), color 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-ghost:hover { background: #f3eee5; color: #28201a; } .ds-btn-ghost:focus-visible { outline: 2px solid #c9573a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Text input (Add someone manually). Paper background, hairline border, clay focus.",
+      "html": "<input class=\"ds-input\" placeholder=\"Add someone manually\" />",
+      "css": ".ds-input { font-family: Geist, Inter, system-ui, sans-serif; font-size: 0.9375rem; color: #28201a; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 6px; padding: 10px 14px; transition: border-color 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-input::placeholder { color: #807666; } .ds-input:focus { outline: none; border-color: #c9573a; }"
+    },
+    {
+      "name": "Waiting Callout",
+      "kind": "custom",
+      "refersTo": "callout-waiting",
+      "description": "The 'coming up' prompt to the host. Neutral tone; never spotlights people listed.",
+      "html": "<div class=\"ds-waiting\"><span class=\"ds-waiting-lead\">Coming up:</span> <span class=\"ds-waiting-names\">Priya Shah, Marcus Tan, Devi Kapoor</span></div>",
+      "css": ".ds-waiting { background: #f3eee5; border-radius: 10px; padding: 14px 18px; font-family: Geist, Inter, system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: #4a4036; } .ds-waiting-lead { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.01em; color: #28201a; display: block; margin-bottom: 4px; } .ds-waiting-names { font-weight: 500; color: #28201a; }"
+    },
+    {
+      "name": "Live Dot",
+      "kind": "custom",
+      "refersTo": "live-dot",
+      "description": "Pulsing clay indicator showing the SSE feed is connected. The only ambient motion in the system.",
+      "html": "<span class=\"ds-dot\" aria-hidden=\"true\"></span><span class=\"ds-dot-label\">live</span>",
+      "css": ".ds-dot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: #c9573a; box-shadow: 0 0 0 0 rgba(201, 87, 58, 0.5); animation: ds-pulse 2000ms cubic-bezier(0.165, 0.84, 0.44, 1) infinite; vertical-align: middle; margin-right: 6px; } @keyframes ds-pulse { 0% { box-shadow: 0 0 0 0 rgba(201, 87, 58, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(201, 87, 58, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 87, 58, 0); } } @media (prefers-reduced-motion: reduce) { .ds-dot { animation: none; } } .ds-dot-label { font-family: Geist, Inter, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: #28201a; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Operator",
+    "overview": "A small, considered utility that helps the host of a meeting without performing. Every choice on the page is in service of two simultaneous audiences: the host clicking up close, and the whole room watching the screen-share from across a Zoom feed. Nothing is decorative; nothing competes with the conversation in the room. The system is light, warm, and restrained. Paper-coded neutrals carry the canvas. A single sans-serif (Geist) handles every text role; tabular numerics use the matching mono. One accent, clay terracotta, exists for moments of attention and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. This system explicitly rejects the gravitational pulls of its category: the dark-navy-and-amber dashboard look the current tracker shipped with, the gamified leaderboard chrome, and the generic SaaS hero-metric template. It also rejects the obvious icebreaker-orange reflex; the warm accent here is clay, not pumpkin.",
+    "keyCharacteristics": [
+      "Light theme, warm paper neutrals, never #fff",
+      "Single sans family (Geist), single mono (Geist Mono) for numerics",
+      "One accent (clay), used sparingly and never as a state carrier",
+      "Flat by default: no shadows, tonal layering only",
+      "Restrained motion: state transitions only, never decorative",
+      "Screen-share legibility is the design's first audience"
+    ],
+    "rules": [
+      { "name": "The Restrained Accent Rule", "body": "Clay covers ≤10% of any rendered screen. If you find yourself reaching for a second accent, you're solving the wrong problem. Add weight, label, or tone instead.", "section": "colors" },
+      { "name": "The Tinted-Neutral Rule", "body": "Every neutral has chroma between 0.005 and 0.022 in the clay hue family. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent.", "section": "colors" },
+      { "name": "The No-Hue-Borne-State Rule", "body": "Introduced vs. waiting is never carried by hue alone. State pairs fill density (paper vs. surface), weight (regular vs. medium), and an explicit icon. A deuteranopic viewer must distinguish the two on first glance.", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Geist (plus Geist Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight.", "section": "typography" },
+      { "name": "The Tabular Numerics Rule", "body": "Every number that updates live (counts on stat tiles, the joined-at timestamp) is rendered in Geist Mono with font-feature-settings 'tnum'. Numbers must not reflow their container when they tick.", "section": "typography" },
+      { "name": "The Screen-Share Floor Rule", "body": "Body type never goes below 15px. Labels never go below 12px. Anything smaller dies in the 1080p video pipeline. Test by downsampling a screenshot to 1280×720 and reading from 2m away.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. If something needs to read as raised, switch its background from paper to surface (tonal layering), don't apply a shadow.", "section": "elevation" },
+      { "name": "The No-Decorative-Glow Rule", "body": "Backdrop blurs, soft radial-gradient bloom behind hero text, glow-on-hover effects: forbidden. They survive a Figma file; they don't survive a screen-share.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Paper (#faf7f2) for the canvas and default row; Surface (#f3eee5) as the only second tonal layer.",
+      "Do carry the introduced-vs-waiting distinction in fill density + weight + icon. State must be legible on a deuteranopic monitor.",
+      "Do keep Clay accent under 10% of any rendered screen. Use it for the live dot, focus outlines, and the host identity label only.",
+      "Do render every live-updating number in Geist Mono with font-feature-settings 'tnum'.",
+      "Do test every screen by downsampling a screenshot to 1280×720 and reading it from 2m away.",
+      "Do treat reduced-motion as a hard mode switch: live dot stops pulsing, transitions drop to opacity-only, roster updates without animation."
+    ],
+    "donts": [
+      "Don't ship a dark theme variant. The page is screen-shared into lit conference rooms.",
+      "Don't use #fff or #000. Every neutral is tinted toward the clay hue.",
+      "Don't use the green-vs-amber state vocabulary the previous tracker shipped with. Color-blind viewers can't distinguish them.",
+      "Don't reach for the generic SaaS dashboard idioms: hero-metric tiles with gradient accents, identical card grids, navy-and-indigo palette.",
+      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, ordering by speed.",
+      "Don't mimic Zoom or Slack chrome. The page is shared inside Zoom; it should feel like a separate, calmer artifact.",
+      "Don't use border-left or border-right greater than 1px as a colored stripe.",
+      "Don't put the 'still to go' people in a warning-colored frame.",
+      "Don't animate layout properties. Transitions are opacity, color, and transform only, ease-out-quart 150–200ms.",
+      "Don't add an icon font, decorative SVG illustration, or hero image."
+    ]
+  }
+}

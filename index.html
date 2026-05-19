@@ -3,270 +3,694 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Icebreaker Tracker</title>
+<title>Icebreaker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #0e1116;
-    --panel: #161b22;
-    --line: #262d38;
-    --ink: #e8eaed;
-    --muted: #828c9b;
-    --accent: #f0a830;       /* signal amber */
-    --go: #4cc38a;           /* introduced green */
-    --dim: #3a424f;
+    --paper:     #faf7f2;
+    --surface:   #f3eee5;
+    --hairline:  #ddd3c2;
+    --soft-line: #c8bca6;
+    --muted-ink: #807666;
+    --dim-ink:   #4a4036;
+    --ink:       #28201a;
+    --clay:      #c9573a;
+    --clay-deep: #a44128;
+
+    --rounded-xs: 6px;
+    --rounded-sm: 10px;
+
+    --t-fast:   140ms cubic-bezier(0.22, 1, 0.36, 1);
+    --t-medium: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+
+    font-family: "Geist", "Inter", system-ui, sans-serif;
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { background: var(--paper); }
   body {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    background:
-      radial-gradient(900px 600px at 80% -10%, rgba(240,168,48,.10), transparent 60%),
-      radial-gradient(700px 500px at -10% 110%, rgba(76,195,138,.07), transparent 55%),
-      var(--bg);
     color: var(--ink);
     min-height: 100vh;
-    padding: 4vh 5vw;
+    padding: 5vh 5vw;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
   .wrap { max-width: 880px; margin: 0 auto; }
 
-  header {
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 22px;
-    margin-bottom: 28px;
-  }
-  .eyebrow {
-    font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 10px;
-  }
-  h1 {
-    font-family: "Fraunces", Georgia, serif;
-    font-weight: 600; font-size: clamp(34px, 5vw, 54px);
-    line-height: 1.02; letter-spacing: -.01em;
-  }
-  .meta {
-    margin-top: 12px; color: var(--muted); font-size: 13px;
-    display: flex; gap: 22px; flex-wrap: wrap;
-  }
-  .meta b { color: var(--ink); font-weight: 600; }
+  /* Header --------------------------------------------------------- */
+  header { margin-bottom: 40px; }
 
+  .meta {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 0.8125rem; color: var(--muted-ink);
+    margin-bottom: 22px;
+  }
+  .meta b { color: var(--dim-ink); font-weight: 500; }
+  .meta .sep { color: var(--hairline); }
+
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--clay); flex: none;
+    box-shadow: 0 0 0 0 rgba(201, 87, 58, .45);
+    animation: pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  @keyframes pulse {
+    70% { box-shadow: 0 0 0 9px rgba(201, 87, 58, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(201, 87, 58, 0); }
+  }
+
+  .prompt {
+    display: block; width: 100%;
+    font-family: inherit;
+    font-size: clamp(2rem, 3.4vw, 2.75rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    background: transparent;
+    border: 0; padding: 0; margin: 0;
+    resize: none; overflow: hidden;
+    outline: none;
+  }
+  .prompt::placeholder { color: var(--soft-line); font-weight: 500; }
+  .prompt:focus-visible {
+    outline: 2px solid var(--clay);
+    outline-offset: 6px;
+    border-radius: 2px;
+  }
+
+  /* Stats ---------------------------------------------------------- */
   .stats {
     display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 14px; margin-bottom: 26px;
+    gap: 14px; margin-bottom: 28px;
   }
   .stat {
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 12px; padding: 18px 20px;
+    background: var(--surface);
+    border-radius: var(--rounded-sm);
+    padding: 16px 20px;
   }
   .stat .n {
-    font-family: "Fraunces", serif; font-size: 40px; font-weight: 600;
-    line-height: 1;
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 2.25rem; font-weight: 500;
+    line-height: 1; letter-spacing: -0.01em;
+    font-feature-settings: 'tnum' 1;
+    color: var(--ink);
   }
-  .stat.go .n { color: var(--go); }
-  .stat.wait .n { color: var(--accent); }
   .stat .l {
-    margin-top: 8px; font-size: 11px; letter-spacing: .18em;
-    text-transform: uppercase; color: var(--muted);
+    margin-top: 10px;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--muted-ink);
   }
 
+  /* Coming-up callout ---------------------------------------------- */
+  .callout {
+    background: var(--surface);
+    border-radius: var(--rounded-sm);
+    padding: 14px 20px; margin-bottom: 22px;
+    font-size: 1rem; line-height: 1.5;
+    color: var(--dim-ink);
+  }
+  .callout b { color: var(--ink); font-weight: 500; }
+  .callout .lead {
+    color: var(--muted-ink); font-weight: 500;
+    margin-right: 4px;
+  }
+
+  /* Roster --------------------------------------------------------- */
   .roster { display: flex; flex-direction: column; gap: 8px; }
+
   .row {
-    display: flex; align-items: center; gap: 16px;
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 12px; padding: 14px 18px;
-    animation: rise .35s ease both;
+    position: relative;
+    display: grid;
+    grid-template-columns: 40px 1fr auto auto auto;
+    align-items: center; gap: 14px;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: var(--rounded-sm);
+    padding: 14px 18px;
+    transition: background var(--t-fast), border-color var(--t-fast),
+                color var(--t-fast), transform var(--t-medium);
+    outline: none;
   }
-  @keyframes rise { from { opacity: 0; transform: translateY(6px); } }
-  .row.left { opacity: .45; }
-  .row.done { border-color: rgba(76,195,138,.45); }
+  .row[draggable="true"] { cursor: grab; }
+  .row.dragging { opacity: 0.4; cursor: grabbing; }
+  .row:focus-visible {
+    outline: 2px solid var(--clay);
+    outline-offset: 2px;
+  }
+
+  .row.host {
+    border-color: var(--soft-line);
+    cursor: default;
+  }
+
+  .row.introduced {
+    background: var(--surface);
+    color: var(--muted-ink);
+  }
+
+  .row.left { color: var(--dim-ink); }
+
+  /* Drop indicators (insertion line) */
+  .row::before {
+    content: "";
+    position: absolute; left: 0; right: 0;
+    height: 2px; background: var(--clay);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--t-fast);
+  }
+  .row.drop-before::before { top: -5px; opacity: 1; }
+  .row.drop-after::before { bottom: -5px; opacity: 1; }
+
+  .pos {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 1.125rem; font-weight: 500;
+    color: var(--muted-ink);
+    font-feature-settings: 'tnum' 1;
+    text-align: right;
+    user-select: none;
+  }
+  .row.introduced .pos { color: var(--soft-line); }
+  .pos.left-mark { color: var(--soft-line); }
+
   .name {
-    flex: 1; font-size: 17px; font-weight: 500;
-    display: flex; align-items: center; gap: 10px; min-width: 0;
+    display: flex; align-items: baseline; gap: 10px;
+    min-width: 0;
+    font-size: 1.0625rem; font-weight: 500;
+    color: inherit;
   }
-  .name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tag {
-    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--muted); border: 1px solid var(--dim);
-    padding: 3px 7px; border-radius: 999px; flex: none;
+  .row:not(.introduced) .name { color: var(--ink); }
+  .name .who {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .when { color: var(--muted); font-size: 12px; flex: none; text-align: right; }
-  .toggle {
-    flex: none; cursor: pointer; font-family: inherit;
-    font-size: 13px; font-weight: 600; letter-spacing: .04em;
-    padding: 10px 16px; border-radius: 9px;
-    border: 1px solid var(--dim); background: transparent; color: var(--muted);
-    transition: all .15s ease;
-  }
-  .toggle:hover { border-color: var(--accent); color: var(--ink); }
-  .toggle.on {
-    background: var(--go); border-color: var(--go); color: #06231a;
-  }
-  .x {
-    flex: none; background: none; border: none; color: var(--dim);
-    cursor: pointer; font-family: inherit; font-size: 16px; padding: 4px 6px;
-  }
-  .x:hover { color: var(--accent); }
 
-  .waiting {
-    margin-top: 24px; padding: 16px 20px; border-radius: 12px;
-    background: rgba(240,168,48,.07); border: 1px solid rgba(240,168,48,.25);
-    font-size: 14px; line-height: 1.6;
+  .host-pill {
+    flex: none;
+    font-family: inherit; font-size: 0.6875rem; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: lowercase;
+    background: none; border: 0; padding: 4px 6px;
+    border-radius: var(--rounded-xs); cursor: pointer;
+    transition: opacity var(--t-fast), color var(--t-fast),
+                background var(--t-fast);
   }
-  .waiting b { color: var(--accent); }
-  .empty { color: var(--muted); padding: 40px 0; text-align: center; font-size: 14px; }
+  .host-pill.active { color: var(--clay); }
+  .host-pill.inactive {
+    color: var(--muted-ink); opacity: 0;
+  }
+  .row:hover .host-pill.inactive,
+  .row:focus-within .host-pill.inactive,
+  .host-pill.inactive:focus-visible { opacity: 1; }
+  .host-pill:hover { background: var(--surface); color: var(--ink); }
+  .host-pill:focus-visible {
+    outline: 2px solid var(--clay); outline-offset: 2px;
+  }
 
-  footer {
-    margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line);
-    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+  .check {
+    width: 14px; height: 14px;
+    flex: none; color: var(--muted-ink);
   }
-  input {
-    font-family: inherit; font-size: 14px; color: var(--ink);
-    background: var(--panel); border: 1px solid var(--line);
-    padding: 11px 14px; border-radius: 9px; flex: 1; min-width: 180px;
-  }
-  input:focus { outline: none; border-color: var(--accent); }
-  .btn {
-    font-family: inherit; font-size: 13px; font-weight: 600;
-    padding: 11px 18px; border-radius: 9px; cursor: pointer;
-    border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-  }
-  .btn:hover { border-color: var(--accent); }
-  .btn.ghost { color: var(--muted); }
-  .dot {
-    width: 7px; height: 7px; border-radius: 50%; background: var(--go);
-    box-shadow: 0 0 0 0 rgba(76,195,138,.6); animation: pulse 2s infinite;
+
+  .when {
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.8125rem; color: var(--muted-ink);
+    font-feature-settings: 'tnum' 1;
     flex: none;
   }
-  @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(76,195,138,0); } }
+  .row.introduced .when { color: var(--soft-line); }
+
+  .tag {
+    font-size: 0.6875rem; letter-spacing: 0.06em;
+    color: var(--muted-ink);
+    border: 1px solid var(--hairline);
+    padding: 2px 8px; border-radius: 999px;
+    flex: none;
+  }
+
+  .toggle {
+    flex: none;
+    font-family: inherit;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 8px 14px;
+    border-radius: var(--rounded-xs);
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+    color: var(--muted-ink);
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background var(--t-fast), color var(--t-fast),
+                border-color var(--t-fast);
+  }
+  .toggle:hover { border-color: var(--soft-line); color: var(--ink); }
+  .toggle.on {
+    background: var(--ink); color: var(--paper);
+    border-color: var(--ink);
+  }
+  .toggle.on:hover { background: var(--dim-ink); border-color: var(--dim-ink); }
+  .toggle.on .check { color: var(--paper); }
+  .toggle:focus-visible {
+    outline: 2px solid var(--clay); outline-offset: 2px;
+  }
+
+  .x {
+    flex: none;
+    background: none; border: 0; padding: 6px;
+    color: var(--soft-line); cursor: pointer;
+    display: inline-flex; align-items: center;
+    border-radius: var(--rounded-xs);
+    transition: color var(--t-fast), background var(--t-fast);
+  }
+  .x:hover { color: var(--clay-deep); background: var(--surface); }
+  .x:focus-visible {
+    outline: 2px solid var(--clay); outline-offset: 2px;
+  }
+
+  .empty {
+    color: var(--muted-ink); padding: 56px 0;
+    text-align: center; font-size: 0.9375rem;
+    border: 1px dashed var(--hairline);
+    border-radius: var(--rounded-sm);
+  }
+
+  /* Footer --------------------------------------------------------- */
+  footer {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center; gap: 20px;
+  }
+  .add-row {
+    display: flex; align-items: center; gap: 8px;
+    min-width: 0;
+  }
+  .footer-actions {
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap; justify-content: flex-end;
+  }
+
+  input {
+    font-family: inherit; font-size: 0.9375rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 10px 14px; border-radius: var(--rounded-xs);
+    flex: 1; min-width: 0;
+    transition: border-color var(--t-fast);
+  }
+  input::placeholder { color: var(--muted-ink); }
+  input:focus { outline: none; border-color: var(--clay); }
+
+  .btn {
+    font-family: inherit;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 10px 16px;
+    border-radius: var(--rounded-xs);
+    border: 1px solid var(--ink);
+    background: var(--ink); color: var(--paper);
+    cursor: pointer;
+    transition: background var(--t-fast), border-color var(--t-fast),
+                color var(--t-fast);
+  }
+  .btn:hover { background: var(--dim-ink); border-color: var(--dim-ink); }
+  .btn:focus-visible {
+    outline: 2px solid var(--clay); outline-offset: 2px;
+  }
+
+  .btn.ghost {
+    background: var(--paper); color: var(--dim-ink);
+    border-color: var(--hairline);
+  }
+  .btn.ghost:hover {
+    background: var(--surface); color: var(--ink);
+    border-color: var(--soft-line);
+  }
+
+  /* Reduced motion ------------------------------------------------- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+    .dot { animation: none; box-shadow: none; }
+  }
+
+  /* Narrow screens ------------------------------------------------- */
+  @media (max-width: 640px) {
+    body { padding: 4vh 4vw; }
+    .stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat { padding: 12px 14px; }
+    .stat .n { font-size: 1.75rem; }
+    .row {
+      grid-template-columns: 28px 1fr auto auto;
+      gap: 10px;
+      padding: 12px 14px;
+    }
+    .row .when, .row .host-pill.inactive { display: none; }
+    .row .x { padding: 4px; }
+    .toggle { padding: 7px 10px; }
+    .pos { font-size: 1rem; }
+    footer { grid-template-columns: 1fr; gap: 12px; }
+    .footer-actions { justify-content: flex-start; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Meeting Icebreaker</div>
-    <h1>Who's gone yet?</h1>
     <div class="meta">
-      <div><span class="dot" style="display:inline-block;vertical-align:middle"></span> <b id="live">live</b></div>
-      <div>Tracking since <b id="since">··</b></div>
-      <div id="mtg"></div>
+      <span class="dot" aria-hidden="true"></span>
+      <span id="live">live</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Started <b id="since">··</b></span>
     </div>
+    <textarea
+      id="prompt"
+      class="prompt"
+      rows="1"
+      maxlength="240"
+      placeholder="Set an icebreaker prompt&hellip;"
+      aria-label="Icebreaker prompt"
+      spellcheck="true"
+    ></textarea>
   </header>
 
-  <div class="stats">
-    <div class="stat"><div class="n" id="s-present">0</div><div class="l">In the room</div></div>
-    <div class="stat go"><div class="n" id="s-done">0</div><div class="l">Introduced</div></div>
-    <div class="stat wait"><div class="n" id="s-wait">0</div><div class="l">Still to go</div></div>
+  <div class="stats" aria-label="Counts">
+    <div class="stat">
+      <div class="n" id="s-present">0</div>
+      <div class="l">In the room</div>
+    </div>
+    <div class="stat">
+      <div class="n" id="s-done">0</div>
+      <div class="l">Introduced</div>
+    </div>
+    <div class="stat">
+      <div class="n" id="s-wait">0</div>
+      <div class="l">Still to go</div>
+    </div>
   </div>
 
-  <div class="roster" id="roster"></div>
-  <div id="waitingBox"></div>
+  <div id="calloutBox"></div>
+
+  <div class="roster" id="roster" aria-live="polite"></div>
 
   <footer>
-    <input id="addName" placeholder="Add someone manually…" />
-    <button class="btn" id="addBtn">Add</button>
-    <button class="btn ghost" id="resetBtn">Reset session</button>
+    <form class="add-row" id="addForm" autocomplete="off">
+      <input id="addName" placeholder="Add someone manually&hellip;" aria-label="Add participant by name" />
+      <button class="btn" type="submit">Add</button>
+    </form>
+    <div class="footer-actions">
+      <button class="btn ghost" id="randomBtn" type="button">Randomize order</button>
+      <button class="btn ghost" id="resetBtn" type="button">Reset session</button>
+    </div>
   </footer>
 </div>
 
 <script>
+  // ---- icons (inline so a single file ships) -----------------------
+  const ICON_CHECK = `<svg class="check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>`;
+  const ICON_X = `<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>`;
+
+  // ---- formatters --------------------------------------------------
   const fmtTime = ts =>
     new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  const ago = ts => {
-    const m = Math.round((Date.now() - ts) / 60000);
-    if (m < 1) return "just now";
-    if (m === 1) return "1 min ago";
-    return m + " min ago";
-  };
-
-  function render(state) {
-    document.getElementById("since").textContent = fmtTime(state.startedAt);
-    document.getElementById("mtg").innerHTML = state.meetingTopic
-      ? "Meeting <b>" + state.meetingTopic + "</b>"
-      : (state.meetingId ? "Meeting <b>" + state.meetingId + "</b>" : "");
-
-    const present = state.participants.filter(p => p.present);
-    const done = state.participants.filter(p => p.introduced);
-    const waiting = present.filter(p => !p.introduced);
-
-    document.getElementById("s-present").textContent = present.length;
-    document.getElementById("s-done").textContent = done.length;
-    document.getElementById("s-wait").textContent = waiting.length;
-
-    const roster = document.getElementById("roster");
-    if (!state.participants.length) {
-      roster.innerHTML =
-        '<div class="empty">No one yet. Joins will appear automatically, or add people below.</div>';
-    } else {
-      roster.innerHTML = state.participants.map(p => `
-        <div class="row ${p.present ? "" : "left"} ${p.introduced ? "done" : ""}">
-          <div class="name">
-            <span>${escapeHtml(p.name)}</span>
-            ${p.present ? "" : '<span class="tag">left</span>'}
-          </div>
-          <div class="when">${fmtTime(p.joinTime)} · ${ago(p.joinTime)}</div>
-          <button class="toggle ${p.introduced ? "on" : ""}"
-            onclick="toggle('${p.id}', ${!p.introduced})">
-            ${p.introduced ? "✓ Introduced" : "Mark introduced"}
-          </button>
-          <button class="x" title="Remove" onclick="removeP('${p.id}')">✕</button>
-        </div>`).join("");
-    }
-
-    const box = document.getElementById("waitingBox");
-    box.innerHTML = waiting.length
-      ? `<div class="waiting">Still waiting on <b>${waiting
-          .map(p => escapeHtml(p.name))
-          .join(", ")}</b></div>`
-      : (present.length
-          ? '<div class="waiting" style="background:rgba(76,195,138,.07);border-color:rgba(76,195,138,.3)">Everyone present has introduced themselves. 🎉</div>'
-          : "");
-  }
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   }
 
-  async function toggle(id, val) {
-    await fetch(`/api/participant/${id}/introduced`, {
+  // ---- state cache & helpers --------------------------------------
+  let state = { participants: [], prompt: "", startedAt: Date.now() };
+  let lastFocusPid = null;          // re-focus this row after the next render
+  let dragPid = null;
+  let dropTargetPid = null;
+  let dropBefore = true;
+
+  const $ = id => document.getElementById(id);
+  const stateById = pid => state.participants.find(p => p.id === pid);
+  const hostFirst = () => state.participants[0] && state.participants[0].is_host;
+
+  // ---- API ---------------------------------------------------------
+  async function post(url, body) {
+    return fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ introduced: val }),
+      headers: body ? { "Content-Type": "application/json" } : {},
+      body: body ? JSON.stringify(body) : undefined,
     });
   }
-  async function removeP(id) {
-    await fetch(`/api/participant/${id}/remove`, { method: "POST" });
-  }
+  const postOrder = order => post("/api/order", { order });
+  const setIntroduced = (id, v) => post(`/api/participant/${id}/introduced`, { introduced: v });
+  const setHost = (id, v) => post(`/api/participant/${id}/host`, { host: v });
+  const removeP = id => post(`/api/participant/${id}/remove`);
+  const sendPrompt = prompt => post("/api/prompt", { prompt });
+  const randomize = () => post("/api/randomize");
+  const resetSession = () => post("/api/reset");
+  const addPerson = name => post("/api/participant", { name });
 
-  document.getElementById("addBtn").onclick = addPerson;
-  document.getElementById("addName").addEventListener("keydown", e => {
-    if (e.key === "Enter") addPerson();
+  // ---- prompt textarea --------------------------------------------
+  const promptEl = $("prompt");
+  function autosize(el) {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }
+  promptEl.addEventListener("input", () => autosize(promptEl));
+  promptEl.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); promptEl.blur(); }
+    if (e.key === "Escape") {
+      promptEl.value = state.prompt || "";
+      autosize(promptEl);
+      promptEl.blur();
+    }
   });
-  async function addPerson() {
-    const i = document.getElementById("addName");
-    const name = i.value.trim();
-    if (!name) return;
-    i.value = "";
-    await fetch("/api/participant", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-  }
-  document.getElementById("resetBtn").onclick = async () => {
-    if (confirm("Clear all participants and restart the session?"))
-      await fetch("/api/reset", { method: "POST" });
-  };
+  promptEl.addEventListener("blur", () => {
+    const next = promptEl.value.trim();
+    if (next === (state.prompt || "").trim()) return;
+    sendPrompt(next);
+  });
+  window.addEventListener("resize", () => autosize(promptEl));
 
-  // Live stream
+  // ---- render ------------------------------------------------------
+  function render(s) {
+    state = s;
+
+    $("since").textContent = fmtTime(s.startedAt);
+
+    if (document.activeElement !== promptEl) {
+      promptEl.value = s.prompt || "";
+      autosize(promptEl);
+    }
+
+    const present = s.participants.filter(p => p.present);
+    const done = s.participants.filter(p => p.introduced && p.present);
+    const waiting = present.filter(p => !p.introduced);
+
+    $("s-present").textContent = present.length;
+    $("s-done").textContent = done.length;
+    $("s-wait").textContent = waiting.length;
+
+    // Coming-up callout
+    const callout = $("calloutBox");
+    if (waiting.length > 0) {
+      const lead = escapeHtml(waiting[0].name);
+      const rest = waiting.slice(1).map(p => escapeHtml(p.name));
+      let body;
+      if (rest.length === 0) body = `<b>${lead}</b>.`;
+      else if (rest.length === 1) body = `<b>${lead}</b>, then ${rest[0]}.`;
+      else body = `<b>${lead}</b>, then ${rest.join(", ")}.`;
+      callout.innerHTML =
+        `<div class="callout"><span class="lead">Coming up:</span>${body}</div>`;
+    } else if (present.length > 0) {
+      callout.innerHTML =
+        `<div class="callout">Everyone has introduced themselves.</div>`;
+    } else {
+      callout.innerHTML = "";
+    }
+
+    // Roster
+    const roster = $("roster");
+    if (!s.participants.length) {
+      roster.innerHTML =
+        `<div class="empty">No one yet. Joins will appear automatically, or add someone below.</div>`;
+    } else {
+      let pos = 0;
+      roster.innerHTML = s.participants.map(p => {
+        const num = p.present ? (++pos) : "";
+        const cls = [
+          "row",
+          p.is_host ? "host" : "",
+          p.introduced ? "introduced" : "",
+          p.present ? "" : "left",
+        ].filter(Boolean).join(" ");
+        const hostBit = p.is_host
+          ? `<button type="button" class="host-pill active"
+                     data-act="unhost" data-pid="${p.id}"
+                     title="Click to remove host">host</button>`
+          : `<button type="button" class="host-pill inactive"
+                     data-act="sethost" data-pid="${p.id}"
+                     aria-label="Set ${escapeHtml(p.name)} as host">set host</button>`;
+        const draggable = (!p.is_host && p.present) ? 'draggable="true"' : '';
+        const tabAttr = (!p.is_host && p.present) ? 'tabindex="0"' : '';
+        const toggleLabel = p.introduced
+          ? `${ICON_CHECK}<span>Introduced</span>`
+          : `<span>Mark introduced</span>`;
+        const leftTag = p.present ? "" : `<span class="tag">left</span>`;
+        return `
+          <div class="${cls}" data-pid="${p.id}" ${draggable} ${tabAttr}>
+            <div class="pos">${num}</div>
+            <div class="name">
+              <span class="who">${escapeHtml(p.name)}</span>
+              ${hostBit}
+              ${leftTag}
+            </div>
+            <div class="when">${fmtTime(p.joinTime)}</div>
+            <button class="toggle ${p.introduced ? "on" : ""}" type="button"
+                    data-act="toggle" data-pid="${p.id}" data-val="${!p.introduced}">
+              ${toggleLabel}
+            </button>
+            <button class="x" type="button" data-act="remove" data-pid="${p.id}"
+                    aria-label="Remove ${escapeHtml(p.name)}">${ICON_X}</button>
+          </div>`;
+      }).join("");
+    }
+
+    // Restore focus to row moved by keyboard
+    if (lastFocusPid) {
+      const el = document.querySelector(`.row[data-pid="${lastFocusPid}"]`);
+      if (el) el.focus();
+      lastFocusPid = null;
+    }
+  }
+
+  // ---- click delegation -------------------------------------------
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-act]");
+    if (!t) return;
+    const pid = t.dataset.pid;
+    switch (t.dataset.act) {
+      case "toggle":    setIntroduced(pid, t.dataset.val === "true"); break;
+      case "remove":    removeP(pid); break;
+      case "sethost":   setHost(pid, true); break;
+      case "unhost":    setHost(pid, false); break;
+    }
+  });
+  // ---- drag and drop ----------------------------------------------
+  const roster = $("roster");
+
+  function clearDropIndicators() {
+    document.querySelectorAll(".row.drop-before, .row.drop-after")
+      .forEach(el => el.classList.remove("drop-before", "drop-after"));
+  }
+
+  roster.addEventListener("dragstart", e => {
+    const row = e.target.closest(".row");
+    if (!row) return;
+    const pid = row.dataset.pid;
+    const p = stateById(pid);
+    if (!p || p.is_host || !p.present) { e.preventDefault(); return; }
+    dragPid = pid;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", pid);
+    row.classList.add("dragging");
+  });
+
+  roster.addEventListener("dragend", e => {
+    const row = e.target.closest(".row");
+    if (row) row.classList.remove("dragging");
+    clearDropIndicators();
+    dragPid = null;
+    dropTargetPid = null;
+  });
+
+  roster.addEventListener("dragover", e => {
+    if (!dragPid) return;
+    const row = e.target.closest(".row");
+    if (!row) return;
+    e.preventDefault();
+    const pid = row.dataset.pid;
+    if (pid === dragPid) return;
+    const target = stateById(pid);
+    if (!target) return;
+    clearDropIndicators();
+    // Dropping on the host row is always interpreted as "after host".
+    const rect = row.getBoundingClientRect();
+    const before = target.is_host
+      ? false
+      : e.clientY < rect.top + rect.height / 2;
+    row.classList.add(before ? "drop-before" : "drop-after");
+    dropTargetPid = pid;
+    dropBefore = before;
+  });
+
+  roster.addEventListener("drop", e => {
+    if (!dragPid) return;
+    e.preventDefault();
+    clearDropIndicators();
+    const targetPid = dropTargetPid;
+    const moving = dragPid;
+    dragPid = null;
+    dropTargetPid = null;
+    if (!targetPid) return;
+
+    const order = state.participants.map(p => p.id);
+    const fromIdx = order.indexOf(moving);
+    if (fromIdx < 0) return;
+    order.splice(fromIdx, 1);
+    let toIdx = order.indexOf(targetPid);
+    if (toIdx < 0) return;
+    order.splice(dropBefore ? toIdx : toIdx + 1, 0, moving);
+    postOrder(order);
+  });
+
+  // ---- keyboard reorder -------------------------------------------
+  roster.addEventListener("keydown", e => {
+    if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+    const row = e.target.closest(".row");
+    if (!row || row !== e.target) return;
+    const pid = row.dataset.pid;
+    const p = stateById(pid);
+    if (!p || p.is_host) return;
+    e.preventDefault();
+    const order = state.participants.map(x => x.id);
+    const fromIdx = order.indexOf(pid);
+    const toIdx = e.key === "ArrowUp" ? fromIdx - 1 : fromIdx + 1;
+    const minIdx = hostFirst() ? 1 : 0;
+    if (toIdx < minIdx || toIdx >= order.length) return;
+    order.splice(fromIdx, 1);
+    order.splice(toIdx, 0, pid);
+    lastFocusPid = pid;
+    postOrder(order);
+  });
+
+  // ---- footer actions ---------------------------------------------
+  $("addForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const input = $("addName");
+    const name = input.value.trim();
+    if (!name) return;
+    input.value = "";
+    await addPerson(name);
+  });
+  $("randomBtn").addEventListener("click", () => randomize());
+  $("resetBtn").addEventListener("click", () => {
+    if (confirm("Clear all participants and start over? The prompt is kept."))
+      resetSession();
+  });
+
+  // ---- live stream -------------------------------------------------
   let last = null;
   const es = new EventSource("/events");
   es.onmessage = e => { last = JSON.parse(e.data); render(last); };
-  es.onerror = () => { document.getElementById("live").textContent = "reconnecting…"; };
-  es.onopen = () => { document.getElementById("live").textContent = "live"; };
-  // Refresh relative "x min ago" labels without a server event.
-  setInterval(() => { if (last) render(last); }, 30000);
+  es.onerror = () => { $("live").textContent = "reconnecting"; };
+  es.onopen  = () => { $("live").textContent = "live"; };
 </script>
 </body>
 </html>

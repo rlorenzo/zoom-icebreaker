@@ -1,6 +1,6 @@
 [project]
 name = "zoom-icebreaker"
-version = "0.1.0"
+version = "1.0.0"
 description = "Live tracker for who has introduced themselves in a Zoom meeting"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,6 +17,7 @@ dev = [
     "lizard>=1.17",
     "pymarkdownlnt>=0.9",
     "pre-commit>=3.7",
+    "pytest>=8.0",
 ]
 
 # --- Tool configuration ---------------------------------------------------
@@ -44,11 +45,18 @@ ignore = [
 quote-style = "double"
 
 [tool.bandit]
-exclude_dirs = [".venv", ".git"]
+exclude_dirs = [".venv", ".git", "tests"]
 # B104: binding to 0.0.0.0 — we explicitly bind to 127.0.0.1 only, so no issue
 # B311: pseudo-random — not used cryptographically
+# tests/ excluded: `assert` (B101) is required by pytest; urlopen against the
+# local test server (B310) and random for shuffling are safe in test context.
 
 [tool.pymarkdown]
+extensions.front-matter.enabled = true
 plugins.line-length.line_length = 100
 plugins.no-inline-html.enabled = false
 plugins.first-line-heading.enabled = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

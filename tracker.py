@@ -25,6 +25,7 @@ import hashlib
 import json
 import os
 import queue
+import random
 import re
 import sys
 import threading
@@ -55,6 +56,8 @@ ANNOT = re.compile(
     re.IGNORECASE,
 )
 ROLEWORD = re.compile(r"\b(host|co-?host|guest|me|you)\b\s*$", re.IGNORECASE)
+# Detects the primary host (not cohost): "(host)" or "(host, me)".
+HOST_DETECT = re.compile(r"\(host(?:\s*,\s*me)?\)", re.IGNORECASE)
 
 DEFAULT_EXCLUDE = [
     "mute",
@@ -181,7 +184,12 @@ def _collect_texts(el, out, depth=0, counter=None):
         _collect_texts(c, out, depth + 1, counter)
 
 
-def read_zoom_names(bundle, anchor_regex, exclude_re, min_len, debug=False):
+def read_zoom_participants(bundle, anchor_regex, exclude_re, min_len, debug=False):
+    """Return list of {"name": str, "is_host": bool} or None if Zoom isn't running.
+
+    Host detection runs on the raw AX text BEFORE cleaning, since the
+    "(host)" / "(host, me)" annotations are stripped by clean_name.
+    """
     pid = _find_pid(bundle)
     if pid is None:
         return None  # Zoom not running
@@ -195,13 +203,14 @@ def read_zoom_names(bundle, anchor_regex, exclude_re, min_len, debug=False):
         _collect_texts(r, raw)
     if debug:
         sys.stderr.write(f"[debug] {len(anchors)} anchor(s), {len(raw)} raw nodes\n")
-    names, seen = [], set()
+    people, seen = [], set()
     for t in raw:
+        is_host = bool(HOST_DETECT.search(t))
         n = clean_name(t)
         if looks_like_name(n, exclude_re, min_len) and n.lower() not in seen:
             seen.add(n.lower())
-            names.append(n)
-    return names
+            people.append({"name": n, "is_host": is_host})
+    return people
 
 
 # --- State -----------------------------------------------------------------
@@ -210,6 +219,8 @@ class State:
         self.lock = threading.Lock()
         self.started_at = time.time() * 1000
         self.participants = {}  # id -> dict
+        self.order = []  # list of pids in display order
+        self.prompt = ""  # the icebreaker question shown as page title
         self.clients = set()  # queue.Queue per SSE client
 
     @staticmethod
@@ -218,6 +229,7 @@ class State:
         return prefix + h
 
     def _upsert(self, pid, name):
+        """Insert or refresh a participant. Order is appended to on first sight."""
         p = self.participants.get(pid)
         if p:
             changed = (
@@ -237,19 +249,56 @@ class State:
             "leftTime": None,
             "present": True,
             "introduced": False,
+            "is_host": False,
         }
+        if pid not in self.order:
+            self.order.append(pid)
         return True
+
+    def _current_host(self):
+        return next(
+            (pid for pid, p in self.participants.items() if p.get("is_host")),
+            None,
+        )
+
+    def _settle_host(self, host_pid):
+        """Promote `host_pid` to sole host (most-recent wins) and pin to order[0]."""
+        changed = False
+        for ppid, p in self.participants.items():
+            should_be = ppid == host_pid
+            if bool(p.get("is_host")) != should_be:
+                p["is_host"] = should_be
+                changed = True
+        if host_pid in self.order and self.order[0] != host_pid:
+            self.order.remove(host_pid)
+            self.order.insert(0, host_pid)
+            changed = True
+        return changed
+
+    def _mark_missing_as_left(self, seen_pids, now):
+        """Mark AX-tracked participants no longer in the panel as left."""
+        changed = False
+        for pid, p in self.participants.items():
+            if pid.startswith("a") and pid not in seen_pids and p["present"]:
+                p["present"] = False
+                p["leftTime"] = now
+                changed = True
+        return changed
 
     def snapshot(self):
         with self.lock:
+            by_id = {pid: dict(p) for pid, p in self.participants.items()}
+            ordered = [by_id[pid] for pid in self.order if pid in by_id]
+            # Defensive: include any participant not in order at the end.
+            for pid, p in by_id.items():
+                if pid not in self.order:
+                    ordered.append(p)
             return {
                 "startedAt": self.started_at,
+                "prompt": self.prompt,
                 "meetingId": None,
                 "meetingTopic": None,
-                "participants": sorted(
-                    (dict(p) for p in self.participants.values()),
-                    key=lambda x: x["joinTime"],
-                ),
+                "participants": ordered,
             }
 
     def broadcast(self):
@@ -263,24 +312,27 @@ class State:
             self._upsert(self._id("m", name + str(time.time())), name)
         self.broadcast()
 
-    def sync_names(self, names):
+    def sync_participants(self, people):
+        """`people` is a list of {"name": str, "is_host": bool}."""
         changed = False
         now = time.time() * 1000
         with self.lock:
             seen = set()
-            for raw in names:
-                nm = str(raw or "").strip()
+            host_pid = None
+            for entry in people:
+                nm = str(entry.get("name") or "").strip()
                 if not nm:
                     continue
                 pid = self._id("a", nm)
                 seen.add(pid)
+                if entry.get("is_host"):
+                    host_pid = pid
                 if self._upsert(pid, nm):
                     changed = True
-            for pid, p in self.participants.items():
-                if pid.startswith("a") and pid not in seen and p["present"]:
-                    p["present"] = False
-                    p["leftTime"] = now
-                    changed = True
+            if host_pid is not None and self._settle_host(host_pid):
+                changed = True
+            if self._mark_missing_as_left(seen, now):
+                changed = True
         if changed:
             self.broadcast()
         return changed
@@ -294,15 +346,72 @@ class State:
         self.broadcast()
         return True
 
+    def set_host(self, pid, val):
+        with self.lock:
+            if pid not in self.participants:
+                return False
+            if val:
+                self._settle_host(pid)
+            else:
+                self.participants[pid]["is_host"] = False
+        self.broadcast()
+        return True
+
+    def set_prompt(self, prompt):
+        with self.lock:
+            self.prompt = str(prompt or "").strip()
+        self.broadcast()
+
+    def _pin_host(self, order):
+        """Return a new list with the current host pinned to index 0."""
+        host_pid = self._current_host()
+        if host_pid is None:
+            return list(order)
+        return [host_pid] + [pid for pid in order if pid != host_pid]
+
+    def set_order(self, order_list):
+        """Apply a host-pinned order. Unknown ids drop; missing ids tack on."""
+        with self.lock:
+            # dict.fromkeys() filters to known pids and dedups in one pass.
+            filtered = dict.fromkeys(
+                pid for pid in order_list if pid in self.participants
+            )
+            for pid in self.participants:
+                filtered.setdefault(pid, None)
+            self.order = self._pin_host(filtered)
+        self.broadcast()
+        return True
+
+    def randomize(self):
+        """Shuffle still-to-go participants only; introduced people keep slots."""
+        with self.lock:
+            host_pid = self._current_host()
+            non_host = [pid for pid in self.order if pid != host_pid]
+            pool = [
+                pid for pid in non_host if not self.participants[pid].get("introduced")
+            ]
+            random.shuffle(pool)
+            it = iter(pool)
+            shuffled = [
+                pid if self.participants[pid].get("introduced") else next(it)
+                for pid in non_host
+            ]
+            self.order = ([host_pid] if host_pid else []) + shuffled
+        self.broadcast()
+
     def remove(self, pid):
         with self.lock:
             self.participants.pop(pid, None)
+            if pid in self.order:
+                self.order.remove(pid)
         self.broadcast()
 
     def reset(self):
+        """Clear participants and order; keep the prompt across rounds."""
         with self.lock:
             self.started_at = time.time() * 1000
             self.participants.clear()
+            self.order = []
         self.broadcast()
 
 
@@ -327,6 +436,8 @@ class Handler(BaseHTTPRequestHandler):
     def _read_json(self):
         try:
             n = int(self.headers.get("Content-Length", 0))
+            if n > 1024 * 1024:  # 1MB limit
+                return {}
             return json.loads(self.rfile.read(n) or b"{}")
         except Exception:
             return {}
@@ -373,36 +484,64 @@ class Handler(BaseHTTPRequestHandler):
 
         self._json(404, {"error": "not found"})
 
+    PARTICIPANT_ROUTE = re.compile(
+        r"^/api/participant/([^/]+)/(introduced|host|remove)$"
+    )
+
     def do_POST(self):
-        p = self.path
-        if p == "/api/participant":
-            name = str(self._read_json().get("name", "")).strip()
-            if not name:
-                return self._json(400, {"error": "name required"})
-            STATE.add_manual(name)
-            return self._json(200, {"ok": True})
-
-        if p == "/api/sync":
-            names = self._read_json().get("names", [])
-            STATE.sync_names(names if isinstance(names, list) else [])
-            return self._json(200, {"ok": True, "received": len(names)})
-
-        m = re.match(r"^/api/participant/([^/]+)/introduced$", p)
+        handler = self._STATIC_POST.get(self.path)
+        if handler:
+            return handler(self)
+        m = self.PARTICIPANT_ROUTE.match(self.path)
         if m:
-            val = bool(self._read_json().get("introduced"))
-            ok = STATE.set_introduced(m.group(1), val)
-            return self._json(200 if ok else 404, {"ok": ok})
-
-        m = re.match(r"^/api/participant/([^/]+)/remove$", p)
-        if m:
-            STATE.remove(m.group(1))
-            return self._json(200, {"ok": True})
-
-        if p == "/api/reset":
-            STATE.reset()
-            return self._json(200, {"ok": True})
-
+            return self._participant_action(m.group(1), m.group(2))
         self._json(404, {"error": "not found"})
+
+    def _post_add_participant(self):
+        name = str(self._read_json().get("name", "")).strip()
+        if not name:
+            return self._json(400, {"error": "name required"})
+        STATE.add_manual(name)
+        self._json(200, {"ok": True})
+
+    def _post_prompt(self):
+        STATE.set_prompt(str(self._read_json().get("prompt", "")))
+        self._json(200, {"ok": True})
+
+    def _post_randomize(self):
+        STATE.randomize()
+        self._json(200, {"ok": True})
+
+    def _post_order(self):
+        order = self._read_json().get("order", [])
+        if not isinstance(order, list):
+            return self._json(400, {"error": "order must be a list"})
+        STATE.set_order([str(x) for x in order])
+        self._json(200, {"ok": True})
+
+    def _post_reset(self):
+        STATE.reset()
+        self._json(200, {"ok": True})
+
+    def _participant_action(self, pid, action):
+        if action == "introduced":
+            ok = STATE.set_introduced(pid, bool(self._read_json().get("introduced")))
+        elif action == "host":
+            ok = STATE.set_host(pid, bool(self._read_json().get("host")))
+        else:  # remove
+            STATE.remove(pid)
+            ok = True
+        self._json(200 if ok else 404, {"ok": ok})
+
+
+# Bind route table after the class body so handlers exist as attributes.
+Handler._STATIC_POST = {
+    "/api/participant": Handler._post_add_participant,
+    "/api/prompt": Handler._post_prompt,
+    "/api/randomize": Handler._post_randomize,
+    "/api/order": Handler._post_order,
+    "/api/reset": Handler._post_reset,
+}
 
 
 # --- AX poller thread ------------------------------------------------------
@@ -410,19 +549,19 @@ def poller(args, exclude_re):
     pat_warned = False
     while True:
         try:
-            names = read_zoom_names(
+            people = read_zoom_participants(
                 args.bundle,
                 args.anchor_regex,
                 exclude_re,
                 args.min_len,
                 args.debug,
             )
-            if names is None and not pat_warned:
+            if people is None and not pat_warned:
                 sys.stderr.write("[ax] Zoom not running yet; will keep checking.\n")
                 pat_warned = True
-            elif names:
+            elif people:
                 pat_warned = False
-                STATE.sync_names(names)
+                STATE.sync_participants(people)
         except Exception as e:
             sys.stderr.write(f"[ax] read error: {e}\n")
         time.sleep(args.interval)
