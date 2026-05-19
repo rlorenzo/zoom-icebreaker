@@ -32,7 +32,11 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-# --- Optional macOS Accessibility support (degrades gracefully) ------------
+# --- Optional accessibility support (degrades gracefully) ------------------
+# macOS: pyobjc + ApplicationServices (AX*)
+# Windows: uiautomation (UI Automation / UIA)
+# Either backend is optional; if neither is available the app runs in
+# manual-only mode (still fully usable).
 AX_AVAILABLE = False
 try:
     from AppKit import NSWorkspace
@@ -46,7 +50,16 @@ try:
 except ImportError:
     pass
 
+UIA_AVAILABLE = False
+try:
+    import uiautomation as _uia  # type: ignore[import-not-found]
+
+    UIA_AVAILABLE = True
+except ImportError:
+    pass
+
 DEFAULT_BUNDLE = "us.zoom.xos"
+DEFAULT_WIN_PROCESS = "Zoom.exe"
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX_HTML = os.path.join(HERE, "index.html")
 
@@ -184,25 +197,12 @@ def _collect_texts(el, out, depth=0, counter=None):
         _collect_texts(c, out, depth + 1, counter)
 
 
-def read_zoom_participants(bundle, anchor_regex, exclude_re, min_len, debug=False):
-    """Return list of {"name": str, "is_host": bool} or None if Zoom isn't running.
+def _filter_and_dedupe(raw, exclude_re, min_len):
+    """Common post-processing: clean names, detect host, dedupe.
 
-    Host detection runs on the raw AX text BEFORE cleaning, since the
+    Host detection runs on the raw text BEFORE cleaning, since the
     "(host)" / "(host, me)" annotations are stripped by clean_name.
     """
-    pid = _find_pid(bundle)
-    if pid is None:
-        return None  # Zoom not running
-    app_el = AXUIElementCreateApplication(pid)
-    pat = re.compile(anchor_regex, re.IGNORECASE)
-    anchors = []
-    _collect_anchors(app_el, pat, anchors)
-    roots = anchors if anchors else [app_el]
-    raw = []
-    for r in roots:
-        _collect_texts(r, raw)
-    if debug:
-        sys.stderr.write(f"[debug] {len(anchors)} anchor(s), {len(raw)} raw nodes\n")
     people, seen = [], set()
     for t in raw:
         is_host = bool(HOST_DETECT.search(t))
@@ -211,6 +211,128 @@ def read_zoom_participants(bundle, anchor_regex, exclude_re, min_len, debug=Fals
             seen.add(n.lower())
             people.append({"name": n, "is_host": is_host})
     return people
+
+
+def _read_zoom_participants_ax(args, exclude_re):
+    """macOS reader. Returns list[dict] or None if Zoom isn't running."""
+    pid = _find_pid(args.bundle)
+    if pid is None:
+        return None
+    app_el = AXUIElementCreateApplication(pid)
+    pat = re.compile(args.anchor_regex, re.IGNORECASE)
+    anchors = []
+    _collect_anchors(app_el, pat, anchors)
+    roots = anchors if anchors else [app_el]
+    raw = []
+    for r in roots:
+        _collect_texts(r, raw)
+    if args.debug:
+        sys.stderr.write(f"[ax] {len(anchors)} anchor(s), {len(raw)} raw nodes\n")
+    return _filter_and_dedupe(raw, exclude_re, args.min_len)
+
+
+# --- Windows UI Automation reading -----------------------------------------
+# UIA control types whose Name is typically a participant or text label.
+UIA_TEXT_TYPES = {
+    "TextControl",
+    "ListItemControl",
+    "DataItemControl",
+    "ButtonControl",
+    "EditControl",
+}
+
+
+def _uia_zoom_windows():
+    """Return top-level Zoom windows. Empty if Zoom isn't running."""
+    try:
+        desktop = _uia.GetRootControl()
+    except Exception:
+        return []
+    found = []
+    for w in desktop.GetChildren():
+        try:
+            cls = (w.ClassName or "").lower()
+            name = (w.Name or "").lower()
+            if "zoom" in cls or "zoom" in name:
+                found.append(w)
+        except Exception:  # nosec B112 — UIA/COM can raise on some windows; skip them
+            continue
+    return found
+
+
+def _uia_node_text(el):
+    """Best-effort text extraction from a UIA element."""
+    for attr in ("Name", "AutomationId"):
+        v = getattr(el, attr, None)
+        if v and str(v).strip():
+            return str(v).strip()
+    return ""
+
+
+def _uia_collect_anchors(el, pat, found, depth=0, counter=None):
+    counter = counter or [0]
+    if counter[0] >= 8000 or depth > 40:
+        return
+    counter[0] += 1
+    hay = " ".join(
+        str(getattr(el, a, "") or "")
+        for a in ("Name", "LocalizedControlType", "AutomationId", "HelpText")
+    )
+    if pat.search(hay):
+        found.append(el)
+        return
+    try:
+        children = el.GetChildren()
+    except Exception:
+        return
+    for c in children:
+        _uia_collect_anchors(c, pat, found, depth + 1, counter)
+
+
+def _uia_collect_texts(el, out, depth=0, counter=None):
+    counter = counter or [0]
+    if counter[0] >= 6000 or depth > 40:
+        return
+    counter[0] += 1
+    ctrl_type = getattr(el, "ControlTypeName", "") or ""
+    if ctrl_type in UIA_TEXT_TYPES:
+        t = _uia_node_text(el)
+        if t:
+            out.append(t)
+    try:
+        children = el.GetChildren()
+    except Exception:
+        return
+    for c in children:
+        _uia_collect_texts(c, out, depth + 1, counter)
+
+
+def _read_zoom_participants_uia(args, exclude_re):
+    """Windows reader. Returns list[dict] or None if Zoom isn't running."""
+    windows = _uia_zoom_windows()
+    if not windows:
+        return None
+    pat = re.compile(args.anchor_regex, re.IGNORECASE)
+    anchors = []
+    for w in windows:
+        _uia_collect_anchors(w, pat, anchors)
+    roots = anchors if anchors else windows
+    raw = []
+    for r in roots:
+        _uia_collect_texts(r, raw)
+    if args.debug:
+        sys.stderr.write(f"[uia] {len(anchors)} anchor(s), {len(raw)} raw nodes\n")
+    return _filter_and_dedupe(raw, exclude_re, args.min_len)
+
+
+# --- Reader dispatch -------------------------------------------------------
+def read_zoom_participants(args, exclude_re):
+    """Dispatch to the right backend based on platform. None == Zoom not running."""
+    if sys.platform == "darwin" and AX_AVAILABLE:
+        return _read_zoom_participants_ax(args, exclude_re)
+    if sys.platform == "win32" and UIA_AVAILABLE:
+        return _read_zoom_participants_uia(args, exclude_re)
+    return None
 
 
 # --- State -----------------------------------------------------------------
@@ -544,50 +666,62 @@ Handler._STATIC_POST = {
 }
 
 
-# --- AX poller thread ------------------------------------------------------
+# --- Reader poller thread --------------------------------------------------
 def poller(args, exclude_re):
     pat_warned = False
     while True:
         try:
-            people = read_zoom_participants(
-                args.bundle,
-                args.anchor_regex,
-                exclude_re,
-                args.min_len,
-                args.debug,
-            )
+            people = read_zoom_participants(args, exclude_re)
             if people is None and not pat_warned:
-                sys.stderr.write("[ax] Zoom not running yet; will keep checking.\n")
+                sys.stderr.write("[reader] Zoom not running yet; will keep checking.\n")
                 pat_warned = True
             elif people:
                 pat_warned = False
                 STATE.sync_participants(people)
         except Exception as e:
-            sys.stderr.write(f"[ax] read error: {e}\n")
+            sys.stderr.write(f"[reader] read error: {e}\n")
         time.sleep(args.interval)
 
 
-def _decide_ax_mode(no_ax):
+def _decide_reader_mode(no_ax):
+    """Decide whether to start the auto-reader thread.
+
+    Returns True if a per-platform accessibility backend is available and
+    permission has been granted; False (with a stderr explainer) otherwise.
+    """
     if no_ax:
         return False
-    if not AX_AVAILABLE:
-        sys.stderr.write(
-            "\n[ax] pyobjc not available (not on macOS or not installed). "
-            "Manual-only mode.\n"
-            "     For auto-reading: uv sync\n"
-        )
-        return False
-    if not AXIsProcessTrusted():
-        sys.stderr.write(
-            "\n[ax] Accessibility permission NOT granted. Running in "
-            "manual-only mode.\n"
-            "     Grant it in System Settings > Privacy & Security > "
-            "Accessibility\n"
-            "     to the app you run this from (Terminal/iTerm), then "
-            "reopen it.\n"
-        )
-        return False
-    return True
+    if sys.platform == "darwin":
+        if not AX_AVAILABLE:
+            sys.stderr.write(
+                "\n[ax] pyobjc not available. Manual-only mode.\n"
+                "     For auto-reading: uv sync\n"
+            )
+            return False
+        if not AXIsProcessTrusted():
+            sys.stderr.write(
+                "\n[ax] Accessibility permission NOT granted. Running in "
+                "manual-only mode.\n"
+                "     Grant it in System Settings > Privacy & Security > "
+                "Accessibility\n"
+                "     to the app you run this from (Terminal/iTerm), then "
+                "reopen it.\n"
+            )
+            return False
+        return True
+    if sys.platform == "win32":
+        if not UIA_AVAILABLE:
+            sys.stderr.write(
+                "\n[uia] uiautomation not available. Manual-only mode.\n"
+                "     For auto-reading: uv sync\n"
+            )
+            return False
+        return True
+    sys.stderr.write(
+        "\n[reader] Auto-read is only supported on macOS and Windows. "
+        "Running in manual-only mode.\n"
+    )
+    return False
 
 
 def main():
@@ -608,13 +742,13 @@ def main():
         DEFAULT_EXCLUDE + [x.strip() for x in args.exclude.split(",") if x.strip()]
     )
 
-    ax_on = _decide_ax_mode(args.no_ax)
-    if ax_on:
+    reader_on = _decide_reader_mode(args.no_ax)
+    if reader_on:
         threading.Thread(target=poller, args=(args, exclude_re), daemon=True).start()
 
     mode = (
         f"AUTO (reading Zoom every {args.interval:g}s) + manual"
-        if ax_on
+        if reader_on
         else "MANUAL only"
     )
     srv = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
