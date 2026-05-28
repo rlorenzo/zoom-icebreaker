@@ -1,9 +1,9 @@
 # Icebreaker Tracker
 
 A live webpage that tracks who has introduced themselves in a meeting. It
-reads the Zoom Participants panel automatically (macOS) and gives you a
-one-tap "introduced" toggle per person. Screen-share the page so everyone
-sees who still needs to go.
+reads the Zoom Participants panel automatically (macOS and Windows) and
+gives you a one-tap "introduced" toggle per person. Screen-share the page
+so everyone sees who still needs to go.
 
 One process, one command. No Node, no Zoom account, no credentials.
 
@@ -16,8 +16,9 @@ uv run tracker.py
 
 Open <http://localhost:3000> and screen-share that browser tab.
 
-- On macOS with Accessibility granted, it auto-reads Zoom's Participants
-  panel every few seconds and fills the roster for you.
+- On macOS with Accessibility granted, or on Windows with the UIA backend
+  installed, it auto-reads Zoom's Participants panel every few seconds and
+  fills the roster for you.
 - Anywhere else (or without permission) it runs in manual-only mode: type
   names in yourself. The webpage is identical either way.
 
@@ -51,6 +52,18 @@ uv run tracker.py --anchor-regex 'participants|attendees' --debug
 Known limitations: virtualized participant lists may only expose names that
 are currently scrolled into view, and dial-in users sometimes appear as
 phone numbers rather than names.
+
+## Auto-reading Zoom (Windows)
+
+Auto-read on Windows uses [UI Automation](https://learn.microsoft.com/en-us/windows/win32/winauto/entry-uiauto-win32)
+via the `uiautomation` Python package, which is installed automatically by
+`uv sync`. No additional permission prompt is required (UIA is part of the
+standard Windows accessibility stack).
+
+Start a meeting, open the Participants panel, then run `uv run tracker.py`.
+The same `--anchor-regex`, `--exclude`, and `--debug` flags work the same
+way as on macOS; the `--bundle` flag is macOS-only and is ignored on
+Windows (the reader finds the Zoom window by class/title).
 
 ## Options
 

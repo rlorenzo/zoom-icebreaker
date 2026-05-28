@@ -3,8 +3,10 @@
 import pytest
 
 from tracker import (
+    CHAT_HINT_RE,
     DEFAULT_EXCLUDE,
     HOST_DETECT,
+    _is_chat_anchor_uia,
     build_exclude_re,
     clean_name,
     looks_like_name,
@@ -39,6 +41,20 @@ class TestCleanName:
         # Only trailing role words are stripped.
         assert clean_name("Hosting Hostetler") == "Hosting Hostetler"
 
+    @pytest.mark.parametrize(
+        "raw,expected",
+        [
+            ("Joined (1)", "Joined"),
+            ("Joined (12)", "Joined"),
+            ("Not joined (0)", "Not joined"),
+            ("Alice (3)", "Alice"),
+        ],
+    )
+    def test_strips_trailing_paren_counts(self, raw, expected):
+        # Chat-panel section headers like "Joined (12)" carry a count
+        # in parens; strip it so the exclude list can catch the header.
+        assert clean_name(raw) == expected
+
     def test_trims_trailing_separators(self):
         assert clean_name("Alice,") == "Alice"
         assert clean_name("Alice - ") == "Alice"
@@ -67,6 +83,17 @@ class TestLooksLikeName:
         assert not looks_like_name("Mute", exclude_re, min_len=2)
         assert not looks_like_name("Participants", exclude_re, min_len=2)
         assert not looks_like_name("Start Video", exclude_re, min_len=2)
+
+    def test_rejects_chat_panel_chrome(self, exclude_re):
+        # These are post-COUNT_TAIL strings; the count strip happens in
+        # clean_name, but the chrome words themselves must also be excluded.
+        assert not looks_like_name("Joined", exclude_re, min_len=2)
+        assert not looks_like_name("Not joined", exclude_re, min_len=2)
+        assert not looks_like_name("Who can see your messages", exclude_re, min_len=2)
+        # Zoom's delivery indicator: "1 participant(s) sent..."
+        # `(` is a regex word boundary, so \bparticipant\b matches.
+        assert not looks_like_name("1 participant(s) sent...", exclude_re, min_len=2)
+        assert not looks_like_name("1 panelist sent", exclude_re, min_len=2)
 
     def test_rejects_excluded_as_substring_word(self, exclude_re):
         # "host" alone is excluded, but it must match as a whole word.
@@ -143,3 +170,41 @@ class TestHostDetect:
     )
     def test_does_not_match_non_host_markers(self, raw):
         assert not HOST_DETECT.search(raw)
+
+
+class _FakeUIAElement:
+    """Minimal stand-in for a UIA element: just the attrs the detector reads."""
+
+    def __init__(self, **attrs):
+        self.__dict__.update(attrs)
+
+
+class TestChatAnchorDetection:
+    @pytest.mark.parametrize(
+        "text",
+        ["Chat", "chat", "Meeting Chat", "Chat panel"],
+    )
+    def test_chat_hint_matches_whole_word(self, text):
+        assert CHAT_HINT_RE.search(text)
+
+    @pytest.mark.parametrize(
+        "text",
+        ["Participants", "Chatham House", "Chatterjee"],
+    )
+    def test_chat_hint_ignores_substrings_and_non_chat(self, text):
+        # \bchat\b must match "chat" as a word, not inside "Chatterjee".
+        assert not CHAT_HINT_RE.search(text)
+
+    def test_uia_anchor_flagged_when_any_attr_mentions_chat(self):
+        assert _is_chat_anchor_uia(_FakeUIAElement(Name="Chat"))
+        assert _is_chat_anchor_uia(_FakeUIAElement(AutomationId="meeting chat"))
+        assert _is_chat_anchor_uia(_FakeUIAElement(LocalizedControlType="chat list"))
+
+    def test_uia_anchor_camelcase_id_is_not_caught(self):
+        # CHAT_HINT_RE is \bchat\b, so identifier-style values with no word
+        # boundary ("ChatPanel") are NOT flagged — only "chat" as a word is.
+        assert not _is_chat_anchor_uia(_FakeUIAElement(AutomationId="ChatPanel"))
+
+    def test_uia_anchor_not_flagged_for_participant_panel(self):
+        el = _FakeUIAElement(Name="Participants (3)", AutomationId="ParticipantsList")
+        assert not _is_chat_anchor_uia(el)
