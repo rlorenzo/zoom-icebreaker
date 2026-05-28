@@ -19,6 +19,8 @@ If pyobjc is missing or Accessibility permission is not granted, it prints a
 notice and runs in manual-only mode. The web UI is fully usable either way.
 """
 
+from __future__ import annotations
+
 import argparse
 import contextlib
 import hashlib
@@ -30,7 +32,9 @@ import re
 import sys
 import threading
 import time
+from collections.abc import Callable, Iterable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Any, ClassVar, TypedDict
 
 # --- Optional accessibility support (degrades gracefully) ------------------
 # macOS: pyobjc + ApplicationServices (AX*)
@@ -52,11 +56,27 @@ except ImportError:
 
 UIA_AVAILABLE = False
 try:
-    import uiautomation as _uia  # type: ignore[import-not-found]
+    import uiautomation as _uia
 
     UIA_AVAILABLE = True
 except ImportError:
     pass
+
+
+class Person(TypedDict):
+    name: str
+    is_host: bool
+
+
+class Participant(TypedDict):
+    id: str
+    name: str
+    joinTime: float
+    leftTime: float | None
+    present: bool
+    introduced: bool
+    is_host: bool
+
 
 DEFAULT_BUNDLE = "us.zoom.xos"
 DEFAULT_WIN_PROCESS = "Zoom.exe"
@@ -69,6 +89,9 @@ ANNOT = re.compile(
     re.IGNORECASE,
 )
 ROLEWORD = re.compile(r"\b(host|co-?host|guest|me|you)\b\s*$", re.IGNORECASE)
+# Trailing "(N)" counts appear on chat panel section headers
+# ("Joined (1)", "Not joined (0)") — not on real names.
+COUNT_TAIL = re.compile(r"\s*\(\d+\)\s*$")
 # Detects the primary host (not cohost): "(host)" or "(host, me)".
 HOST_DETECT = re.compile(r"\(host(?:\s*,\s*me)?\)", re.IGNORECASE)
 
@@ -110,10 +133,24 @@ DEFAULT_EXCLUDE = [
     "pop out",
     "mute all",
     "unmute all",
+    # Zoom chat panel chrome that can leak in if the chat panel is
+    # adjacent to or shares a subtree with the participants panel.
+    "joined",
+    "not joined",
+    "who can see your messages",
+    "see your messages",
+    "in this meeting",
+    "send to",
+    # "participants" alone wouldn't catch "participant(s) sent" — Zoom's
+    # delivery indicator. The singular form does, because `(` is a word
+    # boundary in regex.
+    "participant",
+    "panelist",
+    "panelists",
 ]
 
 
-def build_exclude_re(terms):
+def build_exclude_re(terms: Iterable[str]) -> re.Pattern[str]:
     ordered = sorted(set(terms), key=len, reverse=True)
     return re.compile(
         r"\b(?:" + "|".join(re.escape(t) for t in ordered) + r")\b",
@@ -121,14 +158,15 @@ def build_exclude_re(terms):
     )
 
 
-def clean_name(raw):
+def clean_name(raw: str) -> str:
     s = raw.strip()
+    s = COUNT_TAIL.sub("", s)
     s = ANNOT.sub("", s)
     s = ROLEWORD.sub("", s).strip(" ,-")
     return s.strip()
 
 
-def looks_like_name(s, exclude_re, min_len):
+def looks_like_name(s: str, exclude_re: re.Pattern[str], min_len: int) -> bool:
     if len(s) < min_len:
         return False
     if exclude_re.search(s):
@@ -141,20 +179,26 @@ def looks_like_name(s, exclude_re, min_len):
 # --- Accessibility reading -------------------------------------------------
 TEXT_ROLES = {"AXStaticText", "AXCell", "AXButton", "AXRow", "AXTextField"}
 
+# Zoom's chat panel has a recipient picker that mentions "participants",
+# so it can match the participant anchor regex. We reject anchors that
+# look like chat so the harvester doesn't slurp up chat-panel labels
+# (e.g. "Joined (N)", "Who can see your messages") as participant names.
+CHAT_HINT_RE = re.compile(r"\bchat\b", re.IGNORECASE)
 
-def _attr(el, name):
+
+def _attr(el: Any, name: str) -> Any:
     err, val = AXUIElementCopyAttributeValue(el, name, None)
     return None if err != 0 else val
 
 
-def _find_pid(bundle_id):
+def _find_pid(bundle_id: str) -> int | None:
     for app in NSWorkspace.sharedWorkspace().runningApplications():
         if app.bundleIdentifier() == bundle_id:
-            return app.processIdentifier()
+            return int(app.processIdentifier())
     return None
 
 
-def _node_text(el):
+def _node_text(el: Any) -> str:
     for a in ("AXValue", "AXTitle", "AXDescription"):
         v = _attr(el, a)
         if v is not None and str(v).strip():
@@ -162,7 +206,21 @@ def _node_text(el):
     return ""
 
 
-def _collect_anchors(el, pat, found, depth=0, counter=None):
+def _is_chat_anchor_ax(el: Any) -> bool:
+    for a in ("AXTitle", "AXIdentifier", "AXRoleDescription"):
+        v = _attr(el, a)
+        if v and CHAT_HINT_RE.search(str(v)):
+            return True
+    return False
+
+
+def _collect_anchors(
+    el: Any,
+    pat: re.Pattern[str],
+    found: list[Any],
+    depth: int = 0,
+    counter: list[int] | None = None,
+) -> None:
     counter = counter or [0]
     if counter[0] >= 8000 or depth > 40:
         return
@@ -177,14 +235,19 @@ def _collect_anchors(el, pat, found, depth=0, counter=None):
             "AXIdentifier",
         )
     )
-    if pat.search(hay):
+    if pat.search(hay) and not _is_chat_anchor_ax(el):
         found.append(el)
         return
     for c in _attr(el, "AXChildren") or []:
         _collect_anchors(c, pat, found, depth + 1, counter)
 
 
-def _collect_texts(el, out, depth=0, counter=None):
+def _collect_texts(
+    el: Any,
+    out: list[str],
+    depth: int = 0,
+    counter: list[int] | None = None,
+) -> None:
     counter = counter or [0]
     if counter[0] >= 6000 or depth > 40:
         return
@@ -197,13 +260,16 @@ def _collect_texts(el, out, depth=0, counter=None):
         _collect_texts(c, out, depth + 1, counter)
 
 
-def _filter_and_dedupe(raw, exclude_re, min_len):
+def _filter_and_dedupe(
+    raw: Iterable[str], exclude_re: re.Pattern[str], min_len: int
+) -> list[Person]:
     """Common post-processing: clean names, detect host, dedupe.
 
     Host detection runs on the raw text BEFORE cleaning, since the
     "(host)" / "(host, me)" annotations are stripped by clean_name.
     """
-    people, seen = [], set()
+    people: list[Person] = []
+    seen: set[str] = set()
     for t in raw:
         is_host = bool(HOST_DETECT.search(t))
         n = clean_name(t)
@@ -213,17 +279,19 @@ def _filter_and_dedupe(raw, exclude_re, min_len):
     return people
 
 
-def _read_zoom_participants_ax(args, exclude_re):
-    """macOS reader. Returns list[dict] or None if Zoom isn't running."""
+def _read_zoom_participants_ax(
+    args: argparse.Namespace, exclude_re: re.Pattern[str]
+) -> list[Person] | None:
+    """macOS reader. Returns list[Person] or None if Zoom isn't running."""
     pid = _find_pid(args.bundle)
     if pid is None:
         return None
     app_el = AXUIElementCreateApplication(pid)
     pat = re.compile(args.anchor_regex, re.IGNORECASE)
-    anchors = []
+    anchors: list[Any] = []
     _collect_anchors(app_el, pat, anchors)
     roots = anchors if anchors else [app_el]
-    raw = []
+    raw: list[str] = []
     for r in roots:
         _collect_texts(r, raw)
     if args.debug:
@@ -242,13 +310,13 @@ UIA_TEXT_TYPES = {
 }
 
 
-def _uia_zoom_windows():
+def _uia_zoom_windows() -> list[Any]:
     """Return top-level Zoom windows. Empty if Zoom isn't running."""
     try:
         desktop = _uia.GetRootControl()
     except Exception:
         return []
-    found = []
+    found: list[Any] = []
     for w in desktop.GetChildren():
         try:
             cls = (w.ClassName or "").lower()
@@ -260,7 +328,7 @@ def _uia_zoom_windows():
     return found
 
 
-def _uia_node_text(el):
+def _uia_node_text(el: Any) -> str:
     """Best-effort text extraction from a UIA element."""
     for attr in ("Name", "AutomationId"):
         v = getattr(el, attr, None)
@@ -269,7 +337,21 @@ def _uia_node_text(el):
     return ""
 
 
-def _uia_collect_anchors(el, pat, found, depth=0, counter=None):
+def _is_chat_anchor_uia(el: Any) -> bool:
+    for a in ("Name", "AutomationId", "LocalizedControlType"):
+        v = getattr(el, a, None)
+        if v and CHAT_HINT_RE.search(str(v)):
+            return True
+    return False
+
+
+def _uia_collect_anchors(
+    el: Any,
+    pat: re.Pattern[str],
+    found: list[Any],
+    depth: int = 0,
+    counter: list[int] | None = None,
+) -> None:
     counter = counter or [0]
     if counter[0] >= 8000 or depth > 40:
         return
@@ -278,7 +360,7 @@ def _uia_collect_anchors(el, pat, found, depth=0, counter=None):
         str(getattr(el, a, "") or "")
         for a in ("Name", "LocalizedControlType", "AutomationId", "HelpText")
     )
-    if pat.search(hay):
+    if pat.search(hay) and not _is_chat_anchor_uia(el):
         found.append(el)
         return
     try:
@@ -289,7 +371,12 @@ def _uia_collect_anchors(el, pat, found, depth=0, counter=None):
         _uia_collect_anchors(c, pat, found, depth + 1, counter)
 
 
-def _uia_collect_texts(el, out, depth=0, counter=None):
+def _uia_collect_texts(
+    el: Any,
+    out: list[str],
+    depth: int = 0,
+    counter: list[int] | None = None,
+) -> None:
     counter = counter or [0]
     if counter[0] >= 6000 or depth > 40:
         return
@@ -307,17 +394,19 @@ def _uia_collect_texts(el, out, depth=0, counter=None):
         _uia_collect_texts(c, out, depth + 1, counter)
 
 
-def _read_zoom_participants_uia(args, exclude_re):
-    """Windows reader. Returns list[dict] or None if Zoom isn't running."""
+def _read_zoom_participants_uia(
+    args: argparse.Namespace, exclude_re: re.Pattern[str]
+) -> list[Person] | None:
+    """Windows reader. Returns list[Person] or None if Zoom isn't running."""
     windows = _uia_zoom_windows()
     if not windows:
         return None
     pat = re.compile(args.anchor_regex, re.IGNORECASE)
-    anchors = []
+    anchors: list[Any] = []
     for w in windows:
         _uia_collect_anchors(w, pat, anchors)
     roots = anchors if anchors else windows
-    raw = []
+    raw: list[str] = []
     for r in roots:
         _uia_collect_texts(r, raw)
     if args.debug:
@@ -326,7 +415,9 @@ def _read_zoom_participants_uia(args, exclude_re):
 
 
 # --- Reader dispatch -------------------------------------------------------
-def read_zoom_participants(args, exclude_re):
+def read_zoom_participants(
+    args: argparse.Namespace, exclude_re: re.Pattern[str]
+) -> list[Person] | None:
     """Dispatch to the right backend based on platform. None == Zoom not running."""
     if sys.platform == "darwin" and AX_AVAILABLE:
         return _read_zoom_participants_ax(args, exclude_re)
@@ -337,24 +428,24 @@ def read_zoom_participants(args, exclude_re):
 
 # --- State -----------------------------------------------------------------
 class State:
-    def __init__(self):
+    def __init__(self) -> None:
         self.lock = threading.Lock()
         self.started_at = time.time() * 1000
-        self.participants = {}  # id -> dict
-        self.order = []  # list of pids in display order
+        self.participants: dict[str, Participant] = {}  # id -> participant
+        self.order: list[str] = []  # list of pids in display order
         self.prompt = ""  # the icebreaker question shown as page title
-        self.clients = set()  # queue.Queue per SSE client
+        self.clients: set[queue.Queue[str]] = set()  # one Queue per SSE client
 
     @staticmethod
-    def _id(prefix, name):
+    def _id(prefix: str, name: str) -> str:
         h = hashlib.sha1(name.lower().encode(), usedforsecurity=False).hexdigest()[:12]
         return prefix + h
 
-    def _upsert(self, pid, name):
+    def _upsert(self, pid: str, name: str) -> bool:
         """Insert or refresh a participant. Order is appended to on first sight."""
         p = self.participants.get(pid)
         if p:
-            changed = (
+            changed = bool(
                 not p["present"]
                 or p["leftTime"] is not None
                 or (name and name != p["name"])
@@ -377,13 +468,13 @@ class State:
             self.order.append(pid)
         return True
 
-    def _current_host(self):
+    def _current_host(self) -> str | None:
         return next(
             (pid for pid, p in self.participants.items() if p.get("is_host")),
             None,
         )
 
-    def _settle_host(self, host_pid):
+    def _settle_host(self, host_pid: str) -> bool:
         """Promote `host_pid` to sole host (most-recent wins) and pin to order[0]."""
         changed = False
         for ppid, p in self.participants.items():
@@ -397,7 +488,7 @@ class State:
             changed = True
         return changed
 
-    def _mark_missing_as_left(self, seen_pids, now):
+    def _mark_missing_as_left(self, seen_pids: set[str], now: float) -> bool:
         """Mark AX-tracked participants no longer in the panel as left."""
         changed = False
         for pid, p in self.participants.items():
@@ -407,7 +498,7 @@ class State:
                 changed = True
         return changed
 
-    def snapshot(self):
+    def snapshot(self) -> dict[str, object]:
         with self.lock:
             by_id = {pid: dict(p) for pid, p in self.participants.items()}
             ordered = [by_id[pid] for pid in self.order if pid in by_id]
@@ -423,24 +514,24 @@ class State:
                 "participants": ordered,
             }
 
-    def broadcast(self):
+    def broadcast(self) -> None:
         data = "data: " + json.dumps(self.snapshot()) + "\n\n"
         for q in list(self.clients):
             with contextlib.suppress(Exception):
                 q.put_nowait(data)
 
-    def add_manual(self, name):
+    def add_manual(self, name: str) -> None:
         with self.lock:
             self._upsert(self._id("m", name + str(time.time())), name)
         self.broadcast()
 
-    def sync_participants(self, people):
+    def sync_participants(self, people: list[Person]) -> bool:
         """`people` is a list of {"name": str, "is_host": bool}."""
         changed = False
         now = time.time() * 1000
         with self.lock:
-            seen = set()
-            host_pid = None
+            seen: set[str] = set()
+            host_pid: str | None = None
             for entry in people:
                 nm = str(entry.get("name") or "").strip()
                 if not nm:
@@ -459,7 +550,7 @@ class State:
             self.broadcast()
         return changed
 
-    def set_introduced(self, pid, val):
+    def set_introduced(self, pid: str, val: bool) -> bool:
         with self.lock:
             p = self.participants.get(pid)
             if not p:
@@ -468,7 +559,7 @@ class State:
         self.broadcast()
         return True
 
-    def set_host(self, pid, val):
+    def set_host(self, pid: str, val: bool) -> bool:
         with self.lock:
             if pid not in self.participants:
                 return False
@@ -479,19 +570,19 @@ class State:
         self.broadcast()
         return True
 
-    def set_prompt(self, prompt):
+    def set_prompt(self, prompt: str) -> None:
         with self.lock:
             self.prompt = str(prompt or "").strip()
         self.broadcast()
 
-    def _pin_host(self, order):
+    def _pin_host(self, order: Iterable[str]) -> list[str]:
         """Return a new list with the current host pinned to index 0."""
         host_pid = self._current_host()
         if host_pid is None:
             return list(order)
         return [host_pid] + [pid for pid in order if pid != host_pid]
 
-    def set_order(self, order_list):
+    def set_order(self, order_list: list[str]) -> bool:
         """Apply a host-pinned order. Unknown ids drop; missing ids tack on."""
         with self.lock:
             # dict.fromkeys() filters to known pids and dedups in one pass.
@@ -504,7 +595,7 @@ class State:
         self.broadcast()
         return True
 
-    def randomize(self):
+    def randomize(self) -> None:
         """Shuffle still-to-go participants only; introduced people keep slots."""
         with self.lock:
             host_pid = self._current_host()
@@ -521,14 +612,14 @@ class State:
             self.order = ([host_pid] if host_pid else []) + shuffled
         self.broadcast()
 
-    def remove(self, pid):
+    def remove(self, pid: str) -> None:
         with self.lock:
             self.participants.pop(pid, None)
             if pid in self.order:
                 self.order.remove(pid)
         self.broadcast()
 
-    def reset(self):
+    def reset(self) -> None:
         """Clear participants and order; keep the prompt across rounds."""
         with self.lock:
             self.started_at = time.time() * 1000
@@ -541,13 +632,33 @@ STATE = State()
 
 
 # --- HTTP + SSE ------------------------------------------------------------
+class QuietHTTPServer(ThreadingHTTPServer):
+    """ThreadingHTTPServer that ignores benign client-disconnect errors.
+
+    Browsers refresh, SSE clients navigate away, and tabs close: any of
+    these can tear a socket while the server is mid-read. Python's stock
+    `BaseHTTPRequestHandler.handle_one_request` lets the resulting
+    ConnectionResetError / BrokenPipeError bubble up to the server's
+    error handler, which prints a noisy traceback. These aren't bugs.
+    """
+
+    def handle_error(self, request: Any, client_address: Any) -> None:
+        exc = sys.exc_info()[1]
+        if isinstance(exc, (ConnectionResetError, BrokenPipeError, TimeoutError)):
+            return
+        super().handle_error(request, client_address)
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
-    def log_message(self, *a):
+    # Bound after the class body (handlers must exist as attributes first).
+    _STATIC_POST: ClassVar[dict[str, Callable[[Handler], None]]]
+
+    def log_message(self, format: str, *args: Any) -> None:
         pass  # quiet
 
-    def _json(self, code, obj):
+    def _json(self, code: int, obj: object) -> None:
         body = json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
@@ -555,16 +666,17 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _read_json(self):
+    def _read_json(self) -> dict[str, Any]:
         try:
             n = int(self.headers.get("Content-Length", 0))
             if n > 1024 * 1024:  # 1MB limit
                 return {}
-            return json.loads(self.rfile.read(n) or b"{}")
+            data = json.loads(self.rfile.read(n) or b"{}")
+            return data if isinstance(data, dict) else {}
         except Exception:
             return {}
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         if self.path == "/" or self.path.startswith("/index"):
             try:
                 with open(INDEX_HTML, "rb") as f:
@@ -584,7 +696,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-cache")
             self.send_header("Connection", "keep-alive")
             self.end_headers()
-            q = queue.Queue()
+            q: queue.Queue[str] = queue.Queue()
             STATE.clients.add(q)
             try:
                 self.wfile.write(
@@ -610,7 +722,7 @@ class Handler(BaseHTTPRequestHandler):
         r"^/api/participant/([^/]+)/(introduced|host|remove)$"
     )
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         handler = self._STATIC_POST.get(self.path)
         if handler:
             return handler(self)
@@ -619,33 +731,33 @@ class Handler(BaseHTTPRequestHandler):
             return self._participant_action(m.group(1), m.group(2))
         self._json(404, {"error": "not found"})
 
-    def _post_add_participant(self):
+    def _post_add_participant(self) -> None:
         name = str(self._read_json().get("name", "")).strip()
         if not name:
             return self._json(400, {"error": "name required"})
         STATE.add_manual(name)
         self._json(200, {"ok": True})
 
-    def _post_prompt(self):
+    def _post_prompt(self) -> None:
         STATE.set_prompt(str(self._read_json().get("prompt", "")))
         self._json(200, {"ok": True})
 
-    def _post_randomize(self):
+    def _post_randomize(self) -> None:
         STATE.randomize()
         self._json(200, {"ok": True})
 
-    def _post_order(self):
+    def _post_order(self) -> None:
         order = self._read_json().get("order", [])
         if not isinstance(order, list):
             return self._json(400, {"error": "order must be a list"})
         STATE.set_order([str(x) for x in order])
         self._json(200, {"ok": True})
 
-    def _post_reset(self):
+    def _post_reset(self) -> None:
         STATE.reset()
         self._json(200, {"ok": True})
 
-    def _participant_action(self, pid, action):
+    def _participant_action(self, pid: str, action: str) -> None:
         if action == "introduced":
             ok = STATE.set_introduced(pid, bool(self._read_json().get("introduced")))
         elif action == "host":
@@ -667,7 +779,7 @@ Handler._STATIC_POST = {
 
 
 # --- Reader poller thread --------------------------------------------------
-def poller(args, exclude_re):
+def poller(args: argparse.Namespace, exclude_re: re.Pattern[str]) -> None:
     pat_warned = False
     while True:
         try:
@@ -683,7 +795,7 @@ def poller(args, exclude_re):
         time.sleep(args.interval)
 
 
-def _decide_reader_mode(no_ax):
+def _decide_reader_mode(no_ax: bool) -> bool:
     """Decide whether to start the auto-reader thread.
 
     Returns True if a per-platform accessibility backend is available and
@@ -724,7 +836,7 @@ def _decide_reader_mode(no_ax):
     return False
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=3000)
     ap.add_argument("--bundle", default=DEFAULT_BUNDLE)
@@ -751,7 +863,7 @@ def main():
         if reader_on
         else "MANUAL only"
     )
-    srv = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+    srv = QuietHTTPServer(("127.0.0.1", args.port), Handler)
     print(f"\n  Icebreaker tracker:  http://localhost:{args.port}")
     print(f"  Mode: {mode}")
     print("  Open the URL and screen-share that tab. Ctrl-C to stop.\n")
