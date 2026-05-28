@@ -527,7 +527,10 @@
   // Toggle a subtle hairline under the sticky prompt only when pinned.
   const promptSticky = $("promptSticky");
   const pinSentinel = document.createElement("div");
-  pinSentinel.style.cssText = "position:absolute;top:0;height:1px;width:1px;";
+  // Keep the sentinel in normal flow right before the sticky prompt so it
+  // leaves the viewport exactly when the prompt becomes stuck (top:0), rather
+  // than at the top of the document as an absolutely-positioned element would.
+  pinSentinel.style.cssText = "height:1px;";
   promptSticky.before(pinSentinel);
   new IntersectionObserver(
     ([entry]) => promptSticky.classList.toggle("is-pinned", !entry.isIntersecting),

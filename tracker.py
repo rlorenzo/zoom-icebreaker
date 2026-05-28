@@ -516,7 +516,11 @@ class State:
 
     def broadcast(self) -> None:
         data = "data: " + json.dumps(self.snapshot()) + "\n\n"
-        for q in list(self.clients):
+        # Copy under the lock: handler threads add/discard clients concurrently,
+        # so iterating the live set could raise "set changed size during iteration".
+        with self.lock:
+            clients = list(self.clients)
+        for q in clients:
             with contextlib.suppress(Exception):
                 q.put_nowait(data)
 
@@ -670,6 +674,9 @@ class Handler(BaseHTTPRequestHandler):
         try:
             n = int(self.headers.get("Content-Length", 0))
             if n > 1024 * 1024:  # 1MB limit
+                # Body is left unread; close the connection so the unconsumed
+                # bytes can't desync the next request on this keep-alive socket.
+                self.close_connection = True
                 return {}
             data = json.loads(self.rfile.read(n) or b"{}")
             return data if isinstance(data, dict) else {}
@@ -697,7 +704,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Connection", "keep-alive")
             self.end_headers()
             q: queue.Queue[str] = queue.Queue()
-            STATE.clients.add(q)
+            with STATE.lock:
+                STATE.clients.add(q)
             try:
                 self.wfile.write(
                     ("data: " + json.dumps(STATE.snapshot()) + "\n\n").encode()
@@ -713,7 +721,8 @@ class Handler(BaseHTTPRequestHandler):
             except (BrokenPipeError, ConnectionResetError, OSError):
                 pass
             finally:
-                STATE.clients.discard(q)
+                with STATE.lock:
+                    STATE.clients.discard(q)
             return
 
         self._json(404, {"error": "not found"})
