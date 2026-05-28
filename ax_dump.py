@@ -21,9 +21,12 @@ Tips:
        leads to the names. That chain is what ax_participants.py targets.
 """
 
+from __future__ import annotations
+
 import argparse
 import re
 import sys
+from typing import Any
 
 try:
     from AppKit import NSWorkspace
@@ -56,27 +59,27 @@ SHOW_ATTRS = [
 ]
 
 
-def get_attr(element, name):
+def get_attr(element: Any, name: str) -> Any:
     err, value = AXUIElementCopyAttributeValue(element, name, None)
     if err != 0:
         return None
     return value
 
 
-def find_pid(bundle_id):
+def find_pid(bundle_id: str) -> int | None:
     for app in NSWorkspace.sharedWorkspace().runningApplications():
         if app.bundleIdentifier() == bundle_id:
-            return app.processIdentifier()
+            return int(app.processIdentifier())
     return None
 
 
-def short(v, limit=120):
+def short(v: object, limit: int = 120) -> str:
     s = str(v).replace("\n", " ").strip()
     return s if len(s) <= limit else s[: limit - 1] + "…"
 
 
-def describe(element):
-    parts = []
+def describe(element: Any) -> str:
+    parts: list[str] = []
     for a in SHOW_ATTRS:
         v = get_attr(element, a)
         if v is not None and str(v).strip() != "":
@@ -84,7 +87,16 @@ def describe(element):
     return "  ".join(parts) if parts else "(no readable attributes)"
 
 
-def walk(element, depth, max_depth, counter, max_nodes, pattern, lines, prefix=""):
+def walk(
+    element: Any,
+    depth: int,
+    max_depth: int,
+    counter: list[int],
+    max_nodes: int,
+    pattern: re.Pattern[str] | None,
+    lines: list[tuple[int, str]],
+    prefix: str = "",
+) -> None:
     if counter[0] >= max_nodes or depth > max_depth:
         return
     counter[0] += 1
@@ -104,7 +116,7 @@ def walk(element, depth, max_depth, counter, max_nodes, pattern, lines, prefix="
         )
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--bundle", default=DEFAULT_BUNDLE)
     ap.add_argument("--depth", type=int, default=14)
@@ -134,10 +146,10 @@ def main():
         )
 
     app_el = AXUIElementCreateApplication(pid)
-    lines = []
+    lines: list[tuple[int, str]] = []
     walk(app_el, 0, args.depth, [0], args.max_nodes, None, lines)
 
-    pattern = None
+    pattern: re.Pattern[str] | None = None
     if args.grep:
         toks = list(args.grep)
         flags = 0

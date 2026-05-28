@@ -19,6 +19,9 @@ dev = [
     "pymarkdownlnt>=0.9",
     "pre-commit>=3.7",
     "pytest>=8.0",
+    "pylint>=3.0",
+    "mypy>=1.8",
+    "pip-audit>=2.7",
 ]
 
 # --- Tool configuration ---------------------------------------------------
@@ -51,6 +54,24 @@ exclude_dirs = [".venv", ".git", "tests"]
 # B311: pseudo-random — not used cryptographically
 # tests/ excluded: `assert` (B101) is required by pytest; urlopen against the
 # local test server (B310) and random for shuffling are safe in test context.
+
+[tool.mypy]
+python_version = "3.10"
+files = ["tracker.py", "ax_dump.py"]
+strict = true
+
+# pyobjc and uiautomation ship no type stubs (and uiautomation isn't even
+# installed off-Windows), so we can't type-check across these boundaries.
+[[tool.mypy.overrides]]
+module = ["AppKit", "ApplicationServices", "uiautomation"]
+ignore_missing_imports = true
+
+[tool.pylint.similarities]
+min-similarity-lines = 6
+ignore-comments = true
+ignore-docstrings = true
+ignore-imports = true
+ignore-signatures = true
 
 [tool.pymarkdown]
 extensions.front-matter.enabled = true

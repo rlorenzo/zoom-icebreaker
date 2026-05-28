@@ -23,6 +23,11 @@ repos:
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
 
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
   - repo: local
     hooks:
       - id: lizard
@@ -31,6 +36,35 @@ repos:
         language: system
         types: [python]
         pass_filenames: true
+
+      - id: mypy
+        name: mypy (strict)
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: pylint-duplicate-code
+        name: pylint (duplicate-code)
+        entry: uv run pylint --disable=all --enable=duplicate-code
+        language: system
+        types: [python]
+        pass_filenames: false
+        args: ["tracker.py", "ax_dump.py", "tests"]
+
+      - id: pytest
+        name: pytest
+        entry: uv run pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      - id: pip-audit
+        name: pip-audit (dependency CVEs)
+        entry: bash -c 'uv export --no-emit-project --format requirements-txt | uv run pip-audit -r /dev/stdin'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
 
   - repo: https://github.com/jackdewinter/pymarkdown
     rev: v0.9.37
