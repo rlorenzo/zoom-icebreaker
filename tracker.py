@@ -207,7 +207,15 @@ def _node_text(el: Any) -> str:
 
 
 def _is_chat_anchor_ax(el: Any) -> bool:
-    for a in ("AXTitle", "AXIdentifier", "AXRoleDescription"):
+    # Match the same attribute set _collect_anchors builds `hay` from, so a
+    # "chat" hint in AXDescription/AXHelp also rejects the anchor.
+    for a in (
+        "AXTitle",
+        "AXDescription",
+        "AXRoleDescription",
+        "AXHelp",
+        "AXIdentifier",
+    ):
         v = _attr(el, a)
         if v and CHAT_HINT_RE.search(str(v)):
             return True
@@ -338,7 +346,9 @@ def _uia_node_text(el: Any) -> str:
 
 
 def _is_chat_anchor_uia(el: Any) -> bool:
-    for a in ("Name", "AutomationId", "LocalizedControlType"):
+    # Match the same attribute set _uia_collect_anchors builds `hay` from, so a
+    # "chat" hint in HelpText also rejects the anchor.
+    for a in ("Name", "LocalizedControlType", "AutomationId", "HelpText"):
         v = getattr(el, a, None)
         if v and CHAT_HINT_RE.search(str(v)):
             return True
