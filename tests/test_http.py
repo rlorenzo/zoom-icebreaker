@@ -30,6 +30,15 @@ def server():
         t.join(timeout=2)
 
 
+def _open(req):
+    """urlopen, but only over http(s) so a stray file:/// or ftp:// URL can't
+    reach the local filesystem (the reason bandit flags urlopen as B310)."""
+    url = req.full_url if isinstance(req, urllib.request.Request) else req
+    if not url.startswith(("http://", "https://")):
+        raise ValueError(f"refusing non-http(s) URL: {url}")
+    return urllib.request.urlopen(req, timeout=5)  # nosec B310 — scheme checked above
+
+
 def _req(method, url, body=None):
     data = None
     headers = {}
@@ -38,7 +47,7 @@ def _req(method, url, body=None):
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=5) as resp:  # nosec B310
+        with _open(req) as resp:
             return resp.status, resp.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()
@@ -57,7 +66,7 @@ def _get(url):
 def _get_full(url):
     """GET returning (status, content-type, body) for asset/header checks."""
     req = urllib.request.Request(url, method="GET")
-    with urllib.request.urlopen(req, timeout=5) as resp:  # nosec B310
+    with _open(req) as resp:
         return resp.status, resp.headers.get("Content-Type"), resp.read()
 
 
