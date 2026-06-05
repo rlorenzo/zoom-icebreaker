@@ -752,7 +752,7 @@ class Handler(BaseHTTPRequestHandler):
         # sanitizer CodeQL's path-injection query recognizes.
         root = os.path.realpath(HERE)
         abspath = os.path.realpath(os.path.join(root, filename))
-        if not abspath.startswith(root + os.sep):
+        if not abspath.startswith(root):
             self._json(404, {"error": "not found"})
             return True
         self._serve_file(abspath, content_type, 404, "not found")
