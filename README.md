@@ -1,115 +1,161 @@
 # Icebreaker Tracker
 
-A live webpage that tracks who has introduced themselves in a meeting. It
-reads the Zoom Participants panel automatically (macOS and Windows) and
-gives you a one-tap "introduced" toggle per person. Screen-share the page
-so everyone sees who still needs to go.
+> A live roster of who has introduced themselves — for meetings where
+> everyone goes around the room.
 
-One process, one command. No Node, no Zoom account, no credentials.
+In meetings where everyone introduces themselves, somebody always asks
+*"wait, has Alex gone yet?"* and the room loses thirty seconds. Icebreaker
+Tracker puts the answer on screen for everyone: a live roster, who has been
+marked introduced, and who is coming up next.
 
-## Run it
+Screen-share the page so the whole room can self-pace. It reads Zoom's
+Participants panel automatically on macOS and Windows, or you type names in
+by hand — the page looks and works the same either way.
+
+One local process, one command. No Node, no Zoom account, no credentials,
+and nothing leaves your machine.
+
+<p align="center">
+  <img src="docs/screenshot-desktop.png"
+       alt="Icebreaker Tracker: a prompt headline, counts for in-the-room, introduced, and still-to-go, a 'coming up next' banner, and a roster where introduced people are dimmed with a checkmark."
+       width="760" />
+</p>
+
+## Quick start
 
 ```bash
-uv sync
+uv sync          # one-time: install dependencies
 uv run tracker.py
 ```
 
-Open <http://localhost:3000> and screen-share that browser tab.
+Open <http://localhost:3000> and screen-share that browser tab in Zoom.
+That's the whole setup — names start filling in (or add them yourself), and
+you tap one button per person as they speak.
 
-- On macOS with Accessibility granted, or on Windows with the UIA backend
-  installed, it auto-reads Zoom's Participants panel every few seconds and
-  fills the roster for you.
-- Anywhere else (or without permission) it runs in manual-only mode: type
-  names in yourself. The webpage is identical either way.
+> Don't have `uv`? It's a single-binary Python installer — see the
+> [uv install guide](https://docs.astral.sh/uv/getting-started/installation/).
 
-You can always mix both: let it auto-read and still add or remove people by
-hand. The "introduced" toggle is always manual, by design, because that is a
-judgement call only you can make as people speak.
+## What you get
 
-## Auto-reading Zoom (macOS)
+- **A live roster** that updates for everyone watching the share, no refresh.
+- **One-tap "introduced"** per person. The counts and the "coming up next"
+  banner update instantly.
+- **Automatic Zoom reading** on macOS and Windows — it fills the roster from
+  the Participants panel so you rarely type a name.
+- **Manual mode anywhere** — no permission or wrong OS? Type names in. The
+  page is identical.
+- **Private and ephemeral by design** — state lives in memory for the one
+  meeting and is gone when you stop the process. No account, no history, no
+  data sent anywhere.
 
-Auto-read needs pyobjc and macOS Accessibility permission. Install via
-[uv](https://docs.astral.sh/uv/):
+## Two views, one screen
 
-```bash
-uv sync
+<img src="docs/screenshot-mobile.png"
+     alt="The same roster on a narrow phone-width screen, stacking to a single column."
+     width="260" align="right" />
+
+The host and the room see the same page, and both matter:
+
+- **The host** runs the command, opens the page, and screen-shares it. They
+  are the only person who clicks anything — toggling "introduced" as each
+  person speaks, occasionally adding a name, hitting reset at the end.
+- **The room** watches over screen-share. They can't interact; they read.
+  They want to know who has gone, who hasn't, and whether they're up next —
+  on compressed video, often on a laptop, sometimes on a phone.
+
+So the layout stays legible on a shared screen and reflows cleanly down to
+phone width. The "introduced" toggle is always manual, by design: it's a
+judgement call only the host can make as people actually speak.
+
+You can always mix modes — let it auto-read and still add or remove people
+by hand.
+
+## Auto-reading Zoom
+
+Auto-read watches your screen's accessibility tree to list who is in the
+Participants panel. It never talks to Zoom's API or SDK, so it doesn't touch
+Zoom's terms — but it can break when Zoom redesigns the panel (see
+[troubleshooting](#troubleshooting)).
+
+### macOS
+
+Auto-read needs `pyobjc` (installed by `uv sync`) and macOS Accessibility
+permission. Grant permission to the app you run the command *from* (Terminal
+or iTerm) in **System Settings → Privacy & Security → Accessibility**, then
+reopen that terminal.
+
+Start your meeting, open the Participants panel, then run `uv run
+tracker.py`.
+
+### Windows
+
+Auto-read uses [UI Automation](https://learn.microsoft.com/en-us/windows/win32/winauto/entry-uiauto-win32)
+via the `uiautomation` package (also installed by `uv sync`). No extra
+permission prompt — UIA is part of the standard Windows accessibility stack.
+
+Start your meeting, open the Participants panel, then run `uv run
+tracker.py`. The `--anchor-regex`, `--exclude`, and `--debug` flags below
+work the same as on macOS; `--bundle` is macOS-only and ignored here.
+
+## Running a meeting
+
+1. `uv run tracker.py`, open the URL, and share that tab in Zoom.
+2. People appear automatically (or add them manually). "Started" shows when
+   you began the session.
+3. Tap **Mark introduced** after each person speaks. The counts and the
+   "coming up next" banner update live for everyone watching.
+4. **Reset session** clears it for the next meeting.
+
+## Command-line options
+
+```text
+--port N          port to serve on (default 3000)
+--interval N      seconds between Zoom reads (default 5)
+--no-ax           manual entry only, never read Zoom
+--anchor-regex    text identifying the participants container
+--exclude "a,b"   extra whole-word non-name terms to filter out
+--min-len N       minimum name length (default 2)
+--debug           print anchor / raw-node diagnostics
 ```
 
-Grant Accessibility permission to the app you run this FROM (Terminal or
-iTerm), in System Settings > Privacy & Security > Accessibility, then reopen
-that terminal. Start a meeting, open the Participants panel, then run
-`uv run tracker.py`.
+## Troubleshooting
 
-Zoom's accessibility tree is undocumented and changes between versions, so
-if names do not appear, run the recon tool to see what Zoom exposes and tune
-the matcher:
+Zoom's accessibility tree is undocumented and changes between versions. If
+names don't appear, see what Zoom is exposing and tune the matcher:
 
 ```bash
 uv run ax_dump.py --grep '(?i)participant'
 uv run tracker.py --anchor-regex 'participants|attendees' --debug
 ```
 
-Known limitations: virtualized participant lists may only expose names that
-are currently scrolled into view, and dial-in users sometimes appear as
-phone numbers rather than names.
+Known limitations:
 
-## Auto-reading Zoom (Windows)
-
-Auto-read on Windows uses [UI Automation](https://learn.microsoft.com/en-us/windows/win32/winauto/entry-uiauto-win32)
-via the `uiautomation` Python package, which is installed automatically by
-`uv sync`. No additional permission prompt is required (UIA is part of the
-standard Windows accessibility stack).
-
-Start a meeting, open the Participants panel, then run `uv run tracker.py`.
-The same `--anchor-regex`, `--exclude`, and `--debug` flags work the same
-way as on macOS; the `--bundle` flag is macOS-only and is ignored on
-Windows (the reader finds the Zoom window by class/title).
-
-## Options
-
-```text
---port N          default 3000
---interval N      seconds between Zoom reads (default 5)
---no-ax           manual entry only, never read Zoom
---anchor-regex    text identifying the participants container
---exclude "a,b"   extra whole-word non-name terms to filter
---min-len N       minimum name length (default 2)
---debug           print anchor/raw-node diagnostics
-```
-
-## During a meeting
-
-1. python3 tracker.py, open the URL, share that tab in Zoom.
-2. People appear automatically (or add them manually). "Tracking since" is
-   when you started the session.
-3. Tap "Mark introduced" after each person speaks. The counts and the
-   "still waiting on" banner update live for everyone watching the share.
-4. "Reset session" clears it for the next meeting.
-
-## Notes
-
-- State is in memory and resets when you stop the process. Intentional for
-  a per-meeting tool.
-- This only reads your screen's UI tree; it never interacts with Zoom, so
-  it does not touch Zoom's API or SDK terms. It can still break if Zoom
-  redesigns the panel; re-run ax_dump.py and adjust --anchor-regex.
-- Reads who is present, not who has spoken. For an automatic "who has
-  actually spoken" signal, a saved Zoom transcript is the better source;
-  ask if you want that ingest added.
+- Virtualized participant lists may only expose names currently scrolled
+  into view.
+- Dial-in users sometimes appear as phone numbers rather than names.
+- It reads who is *present*, not who has *spoken*. For an automatic
+  "who has actually spoken" signal, a saved Zoom transcript is the better
+  source — ask if you'd like that ingest added.
 
 ## Development
 
 ```bash
 uv sync --dev                # install dev tools
-uv run pre-commit install    # enable git hook
+uv run pre-commit install    # enable the git hook
 uv run pre-commit run --all  # run all checks once
 ```
 
 Tooling: ruff (lint + format), bandit (security), lizard (complexity),
-pymarkdown (markdown). The same checks run on every PR via
+pymarkdown (markdown), plus biome and html-validate for the web assets. The
+same checks run on every PR via
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 The web assets (`index.html`, `app.js`, `roster.js`, `styles.css`) are read
-into memory once at startup, so the server never opens a file in response to a
-request. The trade-off is that editing any of them requires restarting the
-server (Ctrl-C and re-run) to see the change.
+into memory once at startup, so the server never opens a file in response to
+a request. The trade-off: editing any of them requires restarting the server
+(Ctrl-C and re-run) to see the change.
+
+## Support
+
+If this saved your meeting a few awkward seconds, you can
+[sponsor the project on GitHub](https://github.com/sponsors/rlorenzo).
