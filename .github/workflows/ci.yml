@@ -52,9 +52,16 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6.0.3
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444  # v5.0.0
+        with:
+          node-version: 24
+      - name: Install web dev dependencies
+        run: npm ci
+      - name: vitest (unit + jsdom integration, with coverage)
+        run: npm run coverage
       - name: biome (js/css lint + format check)
         run: npx --yes @biomejs/biome@2.4.16 ci .
       - name: html-validate (html structure / a11y)
         run: npx --yes html-validate@11.5.2 index.html
-      - name: fallow (dead code, duplication, complexity)
-        run: npx --yes fallow@2.88.3 audit --base origin/main
+      - name: fallow (dead code, duplication, complexity; coverage-aware CRAP)
+        run: npx --yes fallow@2.88.3 audit --base origin/main --coverage coverage/coverage-final.json

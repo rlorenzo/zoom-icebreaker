@@ -108,3 +108,8 @@ uv run pre-commit run --all  # run all checks once
 Tooling: ruff (lint + format), bandit (security), lizard (complexity),
 pymarkdown (markdown). The same checks run on every PR via
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+The web assets (`index.html`, `app.js`, `roster.js`, `styles.css`) are read
+into memory once at startup, so the server never opens a file in response to a
+request. The trade-off is that editing any of them requires restarting the
+server (Ctrl-C and re-run) to see the change.

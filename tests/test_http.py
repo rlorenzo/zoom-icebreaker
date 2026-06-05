@@ -30,6 +30,15 @@ def server():
         t.join(timeout=2)
 
 
+def _open(req):
+    """urlopen, but only over http(s) so a stray file:/// or ftp:// URL can't
+    reach the local filesystem (the reason bandit flags urlopen as B310)."""
+    url = req.full_url if isinstance(req, urllib.request.Request) else req
+    if not url.startswith(("http://", "https://")):
+        raise ValueError(f"refusing non-http(s) URL: {url}")
+    return urllib.request.urlopen(req, timeout=5)  # nosec B310 — scheme checked above
+
+
 def _req(method, url, body=None):
     data = None
     headers = {}
@@ -38,7 +47,7 @@ def _req(method, url, body=None):
         headers["Content-Type"] = "application/json"
     req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=5) as resp:  # nosec B310
+        with _open(req) as resp:
             return resp.status, resp.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()
@@ -52,6 +61,13 @@ def _post(url, body=None):
 def _get(url):
     code, raw = _req("GET", url)
     return code, raw
+
+
+def _get_full(url):
+    """GET returning (status, content-type, body) for asset/header checks."""
+    req = urllib.request.Request(url, method="GET")
+    with _open(req) as resp:
+        return resp.status, resp.headers.get("Content-Type"), resp.read()
 
 
 class TestGetRoot:
@@ -68,12 +84,77 @@ class TestGetRoot:
         code, _ = _get(server + "/api/bogus")
         assert code == 404
 
-    def test_missing_index_html(self, server, monkeypatch, tmp_path):
-        # Point INDEX_HTML to a nonexistent file and verify the 500 response.
-        monkeypatch.setattr(tracker, "INDEX_HTML", str(tmp_path / "nope.html"))
+    def test_missing_index_html(self, server, monkeypatch):
+        # A missing index.html (no preloaded bytes) yields a controlled 500.
+        monkeypatch.setattr(tracker, "INDEX_BYTES", None)
         code, raw = _get(server + "/")
         assert code == 500
         assert b"index.html missing" in raw
+
+
+class TestStaticAssets:
+    def test_serves_app_js(self, server):
+        code, ctype, raw = _get_full(server + "/app.js")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw  # non-empty body
+
+    def test_serves_roster_js(self, server):
+        code, ctype, raw = _get_full(server + "/roster.js")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw
+
+    def test_serves_styles_css(self, server):
+        code, ctype, raw = _get_full(server + "/styles.css")
+        assert code == 200
+        assert "css" in ctype
+        assert raw
+
+    def test_missing_static_asset_returns_404(self, server, monkeypatch):
+        # A safelisted route whose asset failed to load (no bytes) 404s.
+        monkeypatch.setitem(tracker.PAGES, "/app.js", (None, tracker.JS_CONTENT_TYPE))
+        code, _ = _get(server + "/app.js")
+        assert code == 404
+
+    def test_only_exact_safelisted_paths_are_served(self, server):
+        # Dispatch is exact-match: source files and near-miss paths are never
+        # served, so there is no arbitrary-file-read surface.
+        for path in (
+            "/tracker.py",
+            "/ax_dump.py",
+            "/app.jsx",
+            "/styles.cssx",
+            "/roster",
+        ):
+            code, _ = _get(server + path)
+            assert code == 404, path
+
+    def test_serves_static_asset_with_query_string(self, server):
+        # Cache-busting query params must not bypass the static handler.
+        code, ctype, raw = _get_full(server + "/app.js?v=123")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw
+
+    def test_serves_index_with_query_string(self, server):
+        code, raw = _get(server + "/?v=1")
+        assert code == 200
+        assert b"<html" in raw.lower() or b"<!doctype" in raw.lower()
+
+    def test_loader_returns_none_on_io_error(self):
+        # _load_bytes degrades missing/unreadable files to None (served as a
+        # controlled 404/500) instead of raising. A directory triggers an
+        # OSError (IsADirectoryError); a nonexistent path a FileNotFoundError.
+        assert tracker._load_bytes(tracker.HERE) is None
+        assert tracker._load_bytes(tracker.HERE + "/does-not-exist.xyz") is None
+
+
+class TestPostQueryString:
+    def test_post_route_ignores_query_string(self, server):
+        code, body = _post(server + "/api/randomize?x=1")
+        assert code == 200
+        assert body == {"ok": True}
 
 
 class TestPostAddParticipant:

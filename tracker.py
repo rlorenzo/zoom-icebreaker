@@ -35,6 +35,7 @@ import time
 from collections.abc import Callable, Iterable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, ClassVar, TypedDict
+from urllib.parse import urlsplit
 
 # --- Optional accessibility support (degrades gracefully) ------------------
 # macOS: pyobjc + ApplicationServices (AX*)
@@ -82,6 +83,39 @@ DEFAULT_BUNDLE = "us.zoom.xos"
 DEFAULT_WIN_PROCESS = "Zoom.exe"
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX_HTML = os.path.join(HERE, "index.html")
+
+# Static assets referenced by index.html, by fixed module-constant absolute path.
+APP_JS = os.path.join(HERE, "app.js")
+ROSTER_JS = os.path.join(HERE, "roster.js")
+STYLES_CSS = os.path.join(HERE, "styles.css")
+JS_CONTENT_TYPE = "text/javascript; charset=utf-8"
+CSS_CONTENT_TYPE = "text/css; charset=utf-8"
+
+
+def _load_bytes(path: str) -> bytes | None:
+    """Read a file's bytes once at startup, or None if missing/unreadable.
+
+    Catching OSError here means a missing or unreadable asset degrades to a
+    controlled 404/500 at request time instead of raising.
+    """
+    try:
+        with open(path, "rb") as f:
+            return f.read()
+    except OSError:
+        return None
+
+
+# Every served file is read once, at import, from a constant path. Request
+# handling then serves from memory, so no file is ever opened in response to a
+# request and no request-derived value can reach a filesystem call (which also
+# means there is no path-injection surface at all). Route -> (bytes or None if
+# the file was missing/unreadable, content type).
+PAGES: dict[str, tuple[bytes | None, str]] = {
+    "/app.js": (_load_bytes(APP_JS), JS_CONTENT_TYPE),
+    "/roster.js": (_load_bytes(ROSTER_JS), JS_CONTENT_TYPE),
+    "/styles.css": (_load_bytes(STYLES_CSS), CSS_CONTENT_TYPE),
+}
+INDEX_BYTES: bytes | None = _load_bytes(INDEX_HTML)
 
 # --- Name cleaning / filtering --------------------------------------------
 ANNOT = re.compile(
@@ -680,6 +714,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_ok_bytes(self, body: bytes, content_type: str) -> None:
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def _read_json(self) -> dict[str, Any]:
         try:
             n = int(self.headers.get("Content-Length", 0))
@@ -693,18 +734,31 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             return {}
 
+    def _serve_index(self) -> bool:
+        if self.path != "/" and not self.path.startswith("/index"):
+            return False
+        if INDEX_BYTES is None:
+            self._json(500, {"error": "index.html missing"})
+        else:
+            self._send_ok_bytes(INDEX_BYTES, "text/html; charset=utf-8")
+        return True
+
+    def _serve_static(self) -> bool:
+        page = PAGES.get(self.path)
+        if page is None:
+            return False
+        body, content_type = page
+        if body is None:
+            self._json(404, {"error": "not found"})
+        else:
+            self._send_ok_bytes(body, content_type)
+        return True
+
     def do_GET(self) -> None:
-        if self.path == "/" or self.path.startswith("/index"):
-            try:
-                with open(INDEX_HTML, "rb") as f:
-                    body = f.read()
-            except FileNotFoundError:
-                return self._json(500, {"error": "index.html missing"})
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+        # self.path includes any query string (e.g. "/app.js?v=123"); match on
+        # the path component only so cache-busting params don't 404 the UI.
+        self.path = urlsplit(self.path).path
+        if self._serve_index() or self._serve_static():
             return
 
         if self.path == "/events":
@@ -742,6 +796,8 @@ class Handler(BaseHTTPRequestHandler):
     )
 
     def do_POST(self) -> None:
+        # Strip any query string before route matching (see do_GET).
+        self.path = urlsplit(self.path).path
         handler = self._STATIC_POST.get(self.path)
         if handler:
             return handler(self)

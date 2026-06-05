@@ -19,3 +19,4 @@ htmlcov/
 # web tooling
 .fallow/
 node_modules/
+coverage/

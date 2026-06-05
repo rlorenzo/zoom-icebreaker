@@ -89,6 +89,15 @@ repos:
         types_or: [javascript, jsx, ts, tsx]
         stages: [pre-push]
 
+      - id: vitest
+        name: vitest (web unit + jsdom integration)
+        entry: vitest run
+        language: node
+        additional_dependencies: ["vitest@4.1.8", "jsdom@29.1.1"]
+        pass_filenames: false
+        types_or: [javascript, jsx, ts, tsx]
+        stages: [pre-push]
+
   - repo: https://github.com/jackdewinter/pymarkdown
     rev: v0.9.37
     hooks:
