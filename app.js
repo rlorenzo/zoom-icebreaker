@@ -143,6 +143,25 @@ function focusedReorderRow(e) {
   return { pid: row.dataset.pid };
 }
 
+// Compute the id order after nudging `pid` by `delta`, or null if the move is
+// out of bounds or would land on a non-reorderable (host/introduced/absent)
+// row. Pure, so the guard logic stays unit-testable and the handler stays flat.
+function keyboardReorder(pid, delta) {
+  const order = state.participants.map((x) => x.id);
+  const fromIdx = order.indexOf(pid);
+  const toIdx = fromIdx + delta;
+  const minIdx = hostFirst() ? 1 : 0;
+  if (toIdx < minIdx || toIdx >= order.length) return null;
+  // Mirror the drag handler: don't reorder past an introduced (or absent) row.
+  // Swapping with one shifts backend slot numbering with no visible move, since
+  // sortForDisplay keeps introduced rows below waiting ones.
+  const dest = state.participants[toIdx];
+  if (!dest?.present || dest.introduced) return null;
+  order.splice(fromIdx, 1);
+  order.splice(toIdx, 0, pid);
+  return order;
+}
+
 // ---- event wiring ------------------------------------------------
 function wirePrompt() {
   promptEl.addEventListener("input", () => autosize(promptEl));
@@ -262,18 +281,8 @@ function wireRosterActions() {
     const target = focusedReorderRow(e);
     if (!target) return;
     e.preventDefault();
-    const order = state.participants.map((x) => x.id);
-    const fromIdx = order.indexOf(target.pid);
-    const toIdx = fromIdx + delta;
-    const minIdx = hostFirst() ? 1 : 0;
-    if (toIdx < minIdx || toIdx >= order.length) return;
-    // Mirror the drag handler: don't reorder past an introduced (or absent)
-    // row. Swapping with one shifts backend slot numbering with no visible
-    // move, since sortForDisplay keeps introduced rows below waiting ones.
-    const dest = state.participants[toIdx];
-    if (!dest?.present || dest.introduced) return;
-    order.splice(fromIdx, 1);
-    order.splice(toIdx, 0, target.pid);
+    const order = keyboardReorder(target.pid, delta);
+    if (!order) return;
     lastFocusPid = target.pid;
     postOrder(order);
   });
