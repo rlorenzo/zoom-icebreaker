@@ -84,15 +84,38 @@ DEFAULT_WIN_PROCESS = "Zoom.exe"
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX_HTML = os.path.join(HERE, "index.html")
 
-# Static assets referenced by index.html (extracted from the formerly-inline
-# page). Each is a fixed module-constant absolute path; the handler dispatches
-# on an exact request-path match, so nothing user-derived ever reaches open()
-# (no path-traversal surface and no tainted path for CodeQL to flag).
+# Static assets referenced by index.html, by fixed module-constant absolute path.
 APP_JS = os.path.join(HERE, "app.js")
 ROSTER_JS = os.path.join(HERE, "roster.js")
 STYLES_CSS = os.path.join(HERE, "styles.css")
 JS_CONTENT_TYPE = "text/javascript; charset=utf-8"
 CSS_CONTENT_TYPE = "text/css; charset=utf-8"
+
+
+def _load_bytes(path: str) -> bytes | None:
+    """Read a file's bytes once at startup, or None if missing/unreadable.
+
+    Catching OSError here means a missing or unreadable asset degrades to a
+    controlled 404/500 at request time instead of raising.
+    """
+    try:
+        with open(path, "rb") as f:
+            return f.read()
+    except OSError:
+        return None
+
+
+# Every served file is read once, at import, from a constant path. Request
+# handling then serves from memory, so no file is ever opened in response to a
+# request and no request-derived value can reach a filesystem call (which also
+# means there is no path-injection surface at all). Route -> (bytes or None if
+# the file was missing/unreadable, content type).
+PAGES: dict[str, tuple[bytes | None, str]] = {
+    "/app.js": (_load_bytes(APP_JS), JS_CONTENT_TYPE),
+    "/roster.js": (_load_bytes(ROSTER_JS), JS_CONTENT_TYPE),
+    "/styles.css": (_load_bytes(STYLES_CSS), CSS_CONTENT_TYPE),
+}
+INDEX_BYTES: bytes | None = _load_bytes(INDEX_HTML)
 
 # --- Name cleaning / filtering --------------------------------------------
 ANNOT = re.compile(
@@ -691,14 +714,6 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    @staticmethod
-    def _read_bytes(abspath: str) -> bytes | None:
-        try:
-            with open(abspath, "rb") as f:
-                return f.read()
-        except FileNotFoundError:
-            return None
-
     def _send_ok_bytes(self, body: bytes, content_type: str) -> None:
         self.send_response(200)
         self.send_header("Content-Type", content_type)
@@ -719,42 +734,24 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             return {}
 
-    def _serve_file(
-        self, abspath: str, content_type: str, missing_code: int, missing_msg: str
-    ) -> None:
-        try:
-            body = self._read_bytes(abspath)
-        except OSError:
-            # PermissionError, IsADirectoryError, etc. — return a controlled
-            # JSON error instead of letting the exception drop the connection.
-            self._json(500, {"error": "could not read file"})
-            return
-        if body is None:
-            self._json(missing_code, {"error": missing_msg})
-        else:
-            self._send_ok_bytes(body, content_type)
-
     def _serve_index(self) -> bool:
         if self.path != "/" and not self.path.startswith("/index"):
             return False
-        self._serve_file(
-            INDEX_HTML, "text/html; charset=utf-8", 500, "index.html missing"
-        )
+        if INDEX_BYTES is None:
+            self._json(500, {"error": "index.html missing"})
+        else:
+            self._send_ok_bytes(INDEX_BYTES, "text/html; charset=utf-8")
         return True
 
     def _serve_static(self) -> bool:
-        # Exact-match dispatch: each branch serves a fixed module-constant path,
-        # so the request path is never used to build the file path. This keeps
-        # the open() argument free of user-derived data (no path traversal, and
-        # nothing for CodeQL's path-injection query to flag).
-        if self.path == "/app.js":
-            self._serve_file(APP_JS, JS_CONTENT_TYPE, 404, "not found")
-        elif self.path == "/roster.js":
-            self._serve_file(ROSTER_JS, JS_CONTENT_TYPE, 404, "not found")
-        elif self.path == "/styles.css":
-            self._serve_file(STYLES_CSS, CSS_CONTENT_TYPE, 404, "not found")
-        else:
+        page = PAGES.get(self.path)
+        if page is None:
             return False
+        body, content_type = page
+        if body is None:
+            self._json(404, {"error": "not found"})
+        else:
+            self._send_ok_bytes(body, content_type)
         return True
 
     def do_GET(self) -> None:

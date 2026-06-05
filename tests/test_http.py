@@ -75,9 +75,9 @@ class TestGetRoot:
         code, _ = _get(server + "/api/bogus")
         assert code == 404
 
-    def test_missing_index_html(self, server, monkeypatch, tmp_path):
-        # Point INDEX_HTML to a nonexistent file and verify the 500 response.
-        monkeypatch.setattr(tracker, "INDEX_HTML", str(tmp_path / "nope.html"))
+    def test_missing_index_html(self, server, monkeypatch):
+        # A missing index.html (no preloaded bytes) yields a controlled 500.
+        monkeypatch.setattr(tracker, "INDEX_BYTES", None)
         code, raw = _get(server + "/")
         assert code == 500
         assert b"index.html missing" in raw
@@ -102,9 +102,9 @@ class TestStaticAssets:
         assert "css" in ctype
         assert raw
 
-    def test_missing_static_asset_returns_404(self, server, monkeypatch, tmp_path):
-        # A safelisted route whose backing file is absent should 404, not 500.
-        monkeypatch.setattr(tracker, "APP_JS", str(tmp_path / "gone.js"))
+    def test_missing_static_asset_returns_404(self, server, monkeypatch):
+        # A safelisted route whose asset failed to load (no bytes) 404s.
+        monkeypatch.setitem(tracker.PAGES, "/app.js", (None, tracker.JS_CONTENT_TYPE))
         code, _ = _get(server + "/app.js")
         assert code == 404
 
@@ -133,13 +133,12 @@ class TestStaticAssets:
         assert code == 200
         assert b"<html" in raw.lower() or b"<!doctype" in raw.lower()
 
-    def test_unreadable_static_asset_returns_500(self, server, monkeypatch):
-        # A path that exists but can't be read as a file (here, a directory)
-        # should yield a controlled JSON 500, not drop the connection.
-        monkeypatch.setattr(tracker, "APP_JS", tracker.HERE)
-        code, raw = _get(server + "/app.js")
-        assert code == 500
-        assert b"could not read file" in raw
+    def test_loader_returns_none_on_io_error(self):
+        # _load_bytes degrades missing/unreadable files to None (served as a
+        # controlled 404/500) instead of raising. A directory triggers an
+        # OSError (IsADirectoryError); a nonexistent path a FileNotFoundError.
+        assert tracker._load_bytes(tracker.HERE) is None
+        assert tracker._load_bytes(tracker.HERE + "/does-not-exist.xyz") is None
 
 
 class TestPostQueryString:
