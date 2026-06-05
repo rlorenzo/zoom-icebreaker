@@ -83,6 +83,15 @@ DEFAULT_WIN_PROCESS = "Zoom.exe"
 HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX_HTML = os.path.join(HERE, "index.html")
 
+# Static assets referenced by index.html (extracted from the formerly-inline
+# page). Safelisted by exact request path -> (filename, content type) so there
+# is no path-traversal surface.
+STATIC_FILES: dict[str, tuple[str, str]] = {
+    "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+    "/roster.js": ("roster.js", "text/javascript; charset=utf-8"),
+    "/styles.css": ("styles.css", "text/css; charset=utf-8"),
+}
+
 # --- Name cleaning / filtering --------------------------------------------
 ANNOT = re.compile(
     r"\s*\((?:host|co-?host|me|guest|you|host,\s*me|cohost,\s*me)\)\s*$",
@@ -680,6 +689,21 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    @staticmethod
+    def _read_bytes(abspath: str) -> bytes | None:
+        try:
+            with open(abspath, "rb") as f:
+                return f.read()
+        except FileNotFoundError:
+            return None
+
+    def _send_ok_bytes(self, body: bytes, content_type: str) -> None:
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def _read_json(self) -> dict[str, Any]:
         try:
             n = int(self.headers.get("Content-Length", 0))
@@ -693,18 +717,33 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             return {}
 
+    def _serve_file(
+        self, abspath: str, content_type: str, missing_code: int, missing_msg: str
+    ) -> None:
+        body = self._read_bytes(abspath)
+        if body is None:
+            self._json(missing_code, {"error": missing_msg})
+        else:
+            self._send_ok_bytes(body, content_type)
+
+    def _serve_index(self) -> bool:
+        if self.path != "/" and not self.path.startswith("/index"):
+            return False
+        self._serve_file(
+            INDEX_HTML, "text/html; charset=utf-8", 500, "index.html missing"
+        )
+        return True
+
+    def _serve_static(self) -> bool:
+        static = STATIC_FILES.get(self.path)
+        if static is None:
+            return False
+        filename, content_type = static
+        self._serve_file(os.path.join(HERE, filename), content_type, 404, "not found")
+        return True
+
     def do_GET(self) -> None:
-        if self.path == "/" or self.path.startswith("/index"):
-            try:
-                with open(INDEX_HTML, "rb") as f:
-                    body = f.read()
-            except FileNotFoundError:
-                return self._json(500, {"error": "index.html missing"})
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+        if self._serve_index() or self._serve_static():
             return
 
         if self.path == "/events":

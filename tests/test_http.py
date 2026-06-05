@@ -54,6 +54,13 @@ def _get(url):
     return code, raw
 
 
+def _get_full(url):
+    """GET returning (status, content-type, body) for asset/header checks."""
+    req = urllib.request.Request(url, method="GET")
+    with urllib.request.urlopen(req, timeout=5) as resp:  # nosec B310
+        return resp.status, resp.headers.get("Content-Type"), resp.read()
+
+
 class TestGetRoot:
     def test_serves_index_html(self, server):
         code, raw = _get(server + "/")
@@ -74,6 +81,36 @@ class TestGetRoot:
         code, raw = _get(server + "/")
         assert code == 500
         assert b"index.html missing" in raw
+
+
+class TestStaticAssets:
+    def test_serves_app_js(self, server):
+        code, ctype, raw = _get_full(server + "/app.js")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw  # non-empty body
+
+    def test_serves_roster_js(self, server):
+        code, ctype, raw = _get_full(server + "/roster.js")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw
+
+    def test_serves_styles_css(self, server):
+        code, ctype, raw = _get_full(server + "/styles.css")
+        assert code == 200
+        assert "css" in ctype
+        assert raw
+
+    def test_missing_static_asset_returns_404(self, server, monkeypatch, tmp_path):
+        # Safelisted path whose file is absent should 404, not 500.
+        monkeypatch.setitem(
+            tracker.STATIC_FILES,
+            "/app.js",
+            (str(tmp_path / "gone.js"), "text/javascript"),
+        )
+        code, _ = _get(server + "/app.js")
+        assert code == 404
 
 
 class TestPostAddParticipant:

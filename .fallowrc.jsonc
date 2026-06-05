@@ -1,15 +1,22 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  "entry": ["app.js"],
-  // fallow analyses JS/TS reachability; styles.css is loaded from index.html,
-  // not imported from JS, so exclude it to avoid a false "unused file" finding.
-  "ignorePatterns": ["**/*.css"],
+  // app.js is the browser entry; the *.test.js files are test entry points so
+  // their imports (and the exports they exercise) count as reachable/used.
+  "entry": ["app.js", "tests/**/*.test.js"],
+  // fallow analyses JS/TS reachability; styles.css is loaded from index.html
+  // (not imported from JS), and these are config/coverage artifacts — exclude
+  // them so they aren't reported as unused files.
+  "ignorePatterns": ["**/*.css", "vitest.config.js", "coverage/**"],
+  // vitest/jsdom are dev-only test tooling, used via config + the runner rather
+  // than imported by source, so don't flag them as unused dependencies.
+  "ignoreDependencies": ["vitest", "jsdom", "@vitest/coverage-istanbul"],
   "duplicates": { "minOccurrences": 2 },
-  // Complexity gate aligned with the repo's existing standard (lizard --CCN 10
-  // for the Python sources). CRAP is coverage-weighted; there is no JS unit-test
-  // coverage here, so it degenerates to cyclomatic^2 + cyclomatic. maxCrap 110
-  // mirrors a cyclomatic-10 function at 0% coverage, keeping cyclomatic/cognitive
-  // (the coverage-independent structural metrics) as the effective gate.
-  "health": { "maxCyclomatic": 10, "maxCognitive": 15, "maxCrap": 110 },
+  // Complexity gate aligned with the repo's existing standard (lizard --CCN 10).
+  // CRAP is coverage-weighted: CI runs `fallow audit ... --coverage` against the
+  // vitest istanbul report for accurate scores; without coverage (e.g. the
+  // pre-push hook) CRAP falls back to cyclomatic^2 + cyclomatic, so maxCrap 100
+  // keeps cyclomatic/cognitive (the coverage-independent structural metrics) as
+  // the effective gate either way.
+  "health": { "maxCyclomatic": 10, "maxCognitive": 15, "maxCrap": 100 },
   "rules": {}
 }

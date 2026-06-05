@@ -1,0 +1,17 @@
+{
+  "name": "zoom-icebreaker-web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Front-end test harness for the Icebreaker web UI (app.js / roster.js).",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-istanbul": "^3.2.4",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.4"
+  }
+}
