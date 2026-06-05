@@ -15,3 +15,7 @@ __pycache__/
 # coverage
 .coverage
 htmlcov/
+
+# web tooling
+.fallow/
+node_modules/
