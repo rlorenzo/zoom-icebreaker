@@ -85,13 +85,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 INDEX_HTML = os.path.join(HERE, "index.html")
 
 # Static assets referenced by index.html (extracted from the formerly-inline
-# page). Safelisted by exact request path -> (filename, content type) so there
-# is no path-traversal surface.
-STATIC_FILES: dict[str, tuple[str, str]] = {
-    "/app.js": ("app.js", "text/javascript; charset=utf-8"),
-    "/roster.js": ("roster.js", "text/javascript; charset=utf-8"),
-    "/styles.css": ("styles.css", "text/css; charset=utf-8"),
-}
+# page). Each is a fixed module-constant absolute path; the handler dispatches
+# on an exact request-path match, so nothing user-derived ever reaches open()
+# (no path-traversal surface and no tainted path for CodeQL to flag).
+APP_JS = os.path.join(HERE, "app.js")
+ROSTER_JS = os.path.join(HERE, "roster.js")
+STYLES_CSS = os.path.join(HERE, "styles.css")
+JS_CONTENT_TYPE = "text/javascript; charset=utf-8"
+CSS_CONTENT_TYPE = "text/css; charset=utf-8"
 
 # --- Name cleaning / filtering --------------------------------------------
 ANNOT = re.compile(
@@ -742,20 +743,18 @@ class Handler(BaseHTTPRequestHandler):
         return True
 
     def _serve_static(self) -> bool:
-        static = STATIC_FILES.get(self.path)
-        if static is None:
+        # Exact-match dispatch: each branch serves a fixed module-constant path,
+        # so the request path is never used to build the file path. This keeps
+        # the open() argument free of user-derived data (no path traversal, and
+        # nothing for CodeQL's path-injection query to flag).
+        if self.path == "/app.js":
+            self._serve_file(APP_JS, JS_CONTENT_TYPE, 404, "not found")
+        elif self.path == "/roster.js":
+            self._serve_file(ROSTER_JS, JS_CONTENT_TYPE, 404, "not found")
+        elif self.path == "/styles.css":
+            self._serve_file(STYLES_CSS, CSS_CONTENT_TYPE, 404, "not found")
+        else:
             return False
-        filename, content_type = static
-        # filenames come from the STATIC_FILES safelist, but normalize the
-        # resolved path and confirm it stays within HERE so no request-derived
-        # value can ever escape the app directory. realpath + startswith is the
-        # sanitizer CodeQL's path-injection query recognizes.
-        root = os.path.realpath(HERE)
-        abspath = os.path.realpath(os.path.join(root, filename))
-        if not abspath.startswith(root):
-            self._json(404, {"error": "not found"})
-            return True
-        self._serve_file(abspath, content_type, 404, "not found")
         return True
 
     def do_GET(self) -> None:

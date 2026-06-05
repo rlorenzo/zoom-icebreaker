@@ -102,15 +102,9 @@ class TestStaticAssets:
         assert "css" in ctype
         assert raw
 
-    def test_missing_static_asset_returns_404(self, server, monkeypatch):
-        # Safelisted path whose file is absent should 404, not 500. The handler
-        # applies os.path.basename() and joins with HERE, so a bare filename
-        # reflects actual server behavior (arbitrary directories are ignored).
-        monkeypatch.setitem(
-            tracker.STATIC_FILES,
-            "/app.js",
-            ("gone.js", "text/javascript"),
-        )
+    def test_missing_static_asset_returns_404(self, server, monkeypatch, tmp_path):
+        # A safelisted route whose backing file is absent should 404, not 500.
+        monkeypatch.setattr(tracker, "APP_JS", str(tmp_path / "gone.js"))
         code, _ = _get(server + "/app.js")
         assert code == 404
 
@@ -129,11 +123,7 @@ class TestStaticAssets:
     def test_unreadable_static_asset_returns_500(self, server, monkeypatch):
         # A path that exists but can't be read as a file (here, a directory)
         # should yield a controlled JSON 500, not drop the connection.
-        monkeypatch.setitem(
-            tracker.STATIC_FILES,
-            "/app.js",
-            ("tests", "text/javascript"),
-        )
+        monkeypatch.setattr(tracker, "APP_JS", tracker.HERE)
         code, raw = _get(server + "/app.js")
         assert code == 500
         assert b"could not read file" in raw
