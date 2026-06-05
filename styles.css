@@ -1,0 +1,590 @@
+:root {
+  --paper: #faf7f2;
+  --surface: #f3eee5;
+  --hairline: #ddd3c2;
+  --soft-line: #c8bca6;
+  --muted-ink: #807666;
+  --dim-ink: #4a4036;
+  --ink: #28201a;
+  --clay: #c9573a;
+  --clay-deep: #a44128;
+
+  --rounded-xs: 6px;
+  --rounded-sm: 10px;
+
+  --t-fast: 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  --t-medium: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: "Geist", "Inter", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: var(--paper);
+}
+body {
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 5vh 5vw;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+/* Header --------------------------------------------------------- */
+header {
+  margin-bottom: 40px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.8125rem;
+  color: var(--muted-ink);
+  margin-bottom: 22px;
+}
+.meta b {
+  color: var(--dim-ink);
+  font-weight: 500;
+}
+.meta .sep {
+  color: var(--hairline);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--clay);
+  flex: none;
+  box-shadow: 0 0 0 0 rgba(201, 87, 58, 0.45);
+  animation: pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 9px rgba(201, 87, 58, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 87, 58, 0);
+  }
+}
+
+.prompt-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--paper);
+  padding: 14px 0 12px;
+  margin: -14px 0 10px;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--t-fast);
+}
+.prompt-sticky.is-pinned {
+  border-bottom-color: var(--hairline);
+}
+
+.prompt {
+  display: block;
+  width: 100%;
+  font-family: inherit;
+  font-size: clamp(2rem, 3.4vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  resize: none;
+  overflow: hidden;
+  outline: none;
+}
+.prompt::placeholder {
+  color: var(--soft-line);
+  font-weight: 500;
+}
+.prompt:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+/* Stats ---------------------------------------------------------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat {
+  background: var(--surface);
+  border-radius: var(--rounded-sm);
+  padding: 16px 20px;
+}
+.stat .n {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 2.25rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-feature-settings: "tnum" 1;
+  color: var(--ink);
+}
+.stat .l {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted-ink);
+}
+
+/* Coming-up callout ---------------------------------------------- */
+.callout {
+  background: var(--surface);
+  border-radius: var(--rounded-sm);
+  padding: 14px 20px;
+  margin-bottom: 22px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--dim-ink);
+}
+.callout b {
+  color: var(--ink);
+  font-weight: 500;
+}
+.callout .lead {
+  color: var(--muted-ink);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+/* Roster --------------------------------------------------------- */
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr auto auto auto;
+  align-items: center;
+  gap: 14px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--rounded-sm);
+  padding: 14px 18px;
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast),
+    color var(--t-fast),
+    transform var(--t-medium);
+  outline: none;
+}
+.row[draggable="true"] {
+  cursor: grab;
+}
+.row.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+.row:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+}
+
+.row.host {
+  border-color: var(--soft-line);
+  cursor: default;
+}
+
+.row.introduced {
+  background: var(--surface);
+  color: var(--muted-ink);
+}
+
+.row.left {
+  color: var(--dim-ink);
+}
+
+/* Up-next: a quiet hand to the next speaker. ---------------------- */
+.row.up-next {
+  border-color: oklch(58% 0.14 38 / 0.45);
+}
+.row.up-next .pos {
+  color: var(--clay);
+  font-weight: 600;
+}
+.up-next-tag {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--clay);
+  flex: none;
+}
+
+/* Completion gesture: clay-tinted settle, then surface. ----------- */
+@keyframes mark-flash {
+  0% {
+    background-color: oklch(93% 0.045 38);
+  }
+  60% {
+    background-color: oklch(95% 0.02 38);
+  }
+  100% {
+    background-color: var(--surface);
+  }
+}
+@keyframes draw-check {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes pos-cue {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  45% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.row.just-introduced {
+  animation: mark-flash 3000ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.row.just-introduced .toggle .check path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: draw-check 1000ms cubic-bezier(0.22, 1, 0.36, 1) 800ms forwards;
+}
+.row.up-next.just-cued .pos {
+  transform-origin: center right;
+  animation: pos-cue 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Drop indicators (insertion line) */
+.row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--clay);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+.row.drop-before::before {
+  top: -5px;
+  opacity: 1;
+}
+.row.drop-after::before {
+  bottom: -5px;
+  opacity: 1;
+}
+
+/* biome-ignore lint/style/noDescendingSpecificity: base .pos rule intentionally follows the scoped .row.up-next .pos / .row.up-next.just-cued .pos overrides; they set different properties so source order does not affect the cascade */
+.pos {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--muted-ink);
+  font-feature-settings: "tnum" 1;
+  text-align: right;
+  user-select: none;
+}
+.row.introduced .pos {
+  color: var(--soft-line);
+}
+.pos.left-mark {
+  color: var(--soft-line);
+}
+
+.name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: inherit;
+}
+.row:not(.introduced) .name {
+  color: var(--ink);
+}
+.name .who {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.host-pill {
+  flex: none;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--clay);
+  padding: 4px 6px;
+}
+
+.check {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--muted-ink);
+}
+
+.when {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 0.8125rem;
+  color: var(--muted-ink);
+  font-feature-settings: "tnum" 1;
+  flex: none;
+}
+.row.introduced .when {
+  color: var(--soft-line);
+}
+
+.tag {
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--muted-ink);
+  border: 1px solid var(--hairline);
+  padding: 2px 8px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.toggle {
+  flex: none;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 8px 14px;
+  border-radius: var(--rounded-xs);
+  border: 1px solid var(--hairline);
+  background: var(--paper);
+  color: var(--muted-ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition:
+    background var(--t-fast),
+    color var(--t-fast),
+    border-color var(--t-fast);
+}
+.toggle:hover {
+  border-color: var(--soft-line);
+  color: var(--ink);
+}
+.toggle.on {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.toggle.on:hover {
+  background: var(--dim-ink);
+  border-color: var(--dim-ink);
+}
+.toggle.on .check {
+  color: var(--paper);
+}
+.toggle:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+}
+
+.x {
+  flex: none;
+  background: none;
+  border: 0;
+  padding: 6px;
+  color: var(--soft-line);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--rounded-xs);
+  transition:
+    color var(--t-fast),
+    background var(--t-fast);
+}
+.x:hover {
+  color: var(--clay-deep);
+  background: var(--surface);
+}
+.x:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+}
+
+.empty {
+  color: var(--muted-ink);
+  padding: 56px 0;
+  text-align: center;
+  font-size: 0.9375rem;
+  border: 1px dashed var(--hairline);
+  border-radius: var(--rounded-sm);
+}
+
+/* Footer --------------------------------------------------------- */
+footer {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 20px;
+}
+.add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+input {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  padding: 10px 14px;
+  border-radius: var(--rounded-xs);
+  flex: 1;
+  min-width: 0;
+  transition: border-color var(--t-fast);
+}
+input::placeholder {
+  color: var(--muted-ink);
+}
+input:focus {
+  outline: none;
+  border-color: var(--clay);
+}
+
+.btn {
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 10px 16px;
+  border-radius: var(--rounded-xs);
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast),
+    color var(--t-fast);
+}
+.btn:hover {
+  background: var(--dim-ink);
+  border-color: var(--dim-ink);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+}
+
+.btn.ghost {
+  background: var(--paper);
+  color: var(--dim-ink);
+  border-color: var(--hairline);
+}
+.btn.ghost:hover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--soft-line);
+}
+
+/* Reduced motion ------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: !important is required so this universal reset overrides component-level animation rules (e.g. .dot) for prefers-reduced-motion */
+    animation-duration: 0.001ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: see above — forces author transitions off for prefers-reduced-motion */
+    transition-duration: 0.001ms !important;
+  }
+  .dot {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
+/* Narrow screens ------------------------------------------------- */
+@media (max-width: 640px) {
+  body {
+    padding: 4vh 4vw;
+  }
+  .stats {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .stat {
+    padding: 12px 14px;
+  }
+  .stat .n {
+    font-size: 1.75rem;
+  }
+  .row {
+    grid-template-columns: 28px 1fr auto auto;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .row .when {
+    display: none;
+  }
+  .row .x {
+    padding: 4px;
+  }
+  .toggle {
+    padding: 7px 10px;
+  }
+  /* biome-ignore lint/style/noDescendingSpecificity: narrow-screen override; only adjusts font-size and does not conflict with the .row .when / .row .x rules above */
+  .pos {
+    font-size: 1rem;
+  }
+  footer {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .footer-actions {
+    justify-content: flex-start;
+  }
+}

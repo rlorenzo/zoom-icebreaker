@@ -1,6 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": ["app.js"],
+  // fallow analyses JS/TS reachability; styles.css is loaded from index.html,
+  // not imported from JS, so exclude it to avoid a false "unused file" finding.
+  "ignorePatterns": ["**/*.css"],
   "duplicates": { "minOccurrences": 2 },
+  // Complexity gate aligned with the repo's existing standard (lizard --CCN 10
+  // for the Python sources). CRAP is coverage-weighted; there is no JS unit-test
+  // coverage here, so it degenerates to cyclomatic^2 + cyclomatic. maxCrap 110
+  // mirrors a cyclomatic-10 function at 0% coverage, keeping cyclomatic/cognitive
+  // (the coverage-independent structural metrics) as the effective gate.
+  "health": { "maxCyclomatic": 10, "maxCognitive": 15, "maxCrap": 110 },
   "rules": {}
 }
