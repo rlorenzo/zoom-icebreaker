@@ -746,14 +746,13 @@ class Handler(BaseHTTPRequestHandler):
         if static is None:
             return False
         filename, content_type = static
-        # filenames come from the STATIC_FILES safelist, but resolve the real
-        # path and confirm it stays within HERE so no request-derived value can
-        # ever escape the app directory. This realpath + containment check is
-        # the sanitizer CodeQL recognizes (basename() alone does not clear the
-        # path-injection alert).
+        # filenames come from the STATIC_FILES safelist, but normalize the
+        # resolved path and confirm it stays within HERE so no request-derived
+        # value can ever escape the app directory. realpath + startswith is the
+        # sanitizer CodeQL's path-injection query recognizes.
         root = os.path.realpath(HERE)
-        abspath = os.path.realpath(os.path.join(root, os.path.basename(filename)))
-        if os.path.commonpath((abspath, root)) != root:
+        abspath = os.path.realpath(os.path.join(root, filename))
+        if not abspath.startswith(root + os.sep):
             self._json(404, {"error": "not found"})
             return True
         self._serve_file(abspath, content_type, 404, "not found")
