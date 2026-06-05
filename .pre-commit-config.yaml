@@ -66,6 +66,29 @@ repos:
         pass_filenames: false
         stages: [pre-push]
 
+      - id: biome
+        name: biome (js/css lint + format)
+        entry: biome check --write --no-errors-on-unmatched
+        language: node
+        additional_dependencies: ["@biomejs/biome@2.4.16"]
+        types_or: [javascript, jsx, ts, tsx, css]
+
+      - id: html-validate
+        name: html-validate (html structure / a11y)
+        entry: html-validate
+        language: node
+        additional_dependencies: ["html-validate@11.5.2"]
+        types: [html]
+
+      - id: fallow
+        name: fallow (dead code, duplication, complexity)
+        entry: fallow audit --base main
+        language: node
+        additional_dependencies: ["fallow@2.88.3"]
+        pass_filenames: false
+        types_or: [javascript, jsx, ts, tsx]
+        stages: [pre-push]
+
   - repo: https://github.com/jackdewinter/pymarkdown
     rev: v0.9.37
     hooks:
