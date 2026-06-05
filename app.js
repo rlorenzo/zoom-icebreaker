@@ -267,6 +267,11 @@ function wireRosterActions() {
     const toIdx = fromIdx + delta;
     const minIdx = hostFirst() ? 1 : 0;
     if (toIdx < minIdx || toIdx >= order.length) return;
+    // Mirror the drag handler: don't reorder past an introduced (or absent)
+    // row. Swapping with one shifts backend slot numbering with no visible
+    // move, since sortForDisplay keeps introduced rows below waiting ones.
+    const dest = state.participants[toIdx];
+    if (!dest?.present || dest.introduced) return;
     order.splice(fromIdx, 1);
     order.splice(toIdx, 0, target.pid);
     lastFocusPid = target.pid;

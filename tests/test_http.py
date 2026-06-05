@@ -102,15 +102,48 @@ class TestStaticAssets:
         assert "css" in ctype
         assert raw
 
-    def test_missing_static_asset_returns_404(self, server, monkeypatch, tmp_path):
-        # Safelisted path whose file is absent should 404, not 500.
+    def test_missing_static_asset_returns_404(self, server, monkeypatch):
+        # Safelisted path whose file is absent should 404, not 500. The handler
+        # applies os.path.basename() and joins with HERE, so a bare filename
+        # reflects actual server behavior (arbitrary directories are ignored).
         monkeypatch.setitem(
             tracker.STATIC_FILES,
             "/app.js",
-            (str(tmp_path / "gone.js"), "text/javascript"),
+            ("gone.js", "text/javascript"),
         )
         code, _ = _get(server + "/app.js")
         assert code == 404
+
+    def test_serves_static_asset_with_query_string(self, server):
+        # Cache-busting query params must not bypass the static handler.
+        code, ctype, raw = _get_full(server + "/app.js?v=123")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw
+
+    def test_serves_index_with_query_string(self, server):
+        code, raw = _get(server + "/?v=1")
+        assert code == 200
+        assert b"<html" in raw.lower() or b"<!doctype" in raw.lower()
+
+    def test_unreadable_static_asset_returns_500(self, server, monkeypatch):
+        # A path that exists but can't be read as a file (here, a directory)
+        # should yield a controlled JSON 500, not drop the connection.
+        monkeypatch.setitem(
+            tracker.STATIC_FILES,
+            "/app.js",
+            ("tests", "text/javascript"),
+        )
+        code, raw = _get(server + "/app.js")
+        assert code == 500
+        assert b"could not read file" in raw
+
+
+class TestPostQueryString:
+    def test_post_route_ignores_query_string(self, server):
+        code, body = _post(server + "/api/randomize?x=1")
+        assert code == 200
+        assert body == {"ok": True}
 
 
 class TestPostAddParticipant:

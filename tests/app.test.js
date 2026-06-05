@@ -161,6 +161,25 @@ describe("roster interactions", () => {
     expect(postedUrls()).not.toContain("/api/order");
   });
 
+  it("ignores keyboard reorder into an introduced participant's slot", () => {
+    // Bob is waiting; Cy has introduced and sorts below him. ArrowDown on Bob
+    // is in-bounds but its only destination is the introduced row, which would
+    // shuffle backend slots with no visible move — the guard blocks it.
+    app.render({
+      startedAt: Date.now(),
+      prompt: "",
+      participants: [
+        P({ id: "h", name: "Ann", is_host: true }),
+        P({ id: "b", name: "Bob" }),
+        P({ id: "c", name: "Cy", introduced: true }),
+      ],
+    });
+    const row = document.querySelector('.row[data-pid="b"]');
+    row.focus();
+    row.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    expect(postedUrls()).not.toContain("/api/order");
+  });
+
   it("reorders via dragstart/dragover/drop and clears indicators on dragend", () => {
     seed();
     const rowB = document.querySelector('.row[data-pid="b"]');

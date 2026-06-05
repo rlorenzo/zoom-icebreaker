@@ -35,6 +35,7 @@ import time
 from collections.abc import Callable, Iterable
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, ClassVar, TypedDict
+from urllib.parse import urlsplit
 
 # --- Optional accessibility support (degrades gracefully) ------------------
 # macOS: pyobjc + ApplicationServices (AX*)
@@ -720,7 +721,13 @@ class Handler(BaseHTTPRequestHandler):
     def _serve_file(
         self, abspath: str, content_type: str, missing_code: int, missing_msg: str
     ) -> None:
-        body = self._read_bytes(abspath)
+        try:
+            body = self._read_bytes(abspath)
+        except OSError:
+            # PermissionError, IsADirectoryError, etc. — return a controlled
+            # JSON error instead of letting the exception drop the connection.
+            self._json(500, {"error": "could not read file"})
+            return
         if body is None:
             self._json(missing_code, {"error": missing_msg})
         else:
@@ -747,6 +754,9 @@ class Handler(BaseHTTPRequestHandler):
         return True
 
     def do_GET(self) -> None:
+        # self.path includes any query string (e.g. "/app.js?v=123"); match on
+        # the path component only so cache-busting params don't 404 the UI.
+        self.path = urlsplit(self.path).path
         if self._serve_index() or self._serve_static():
             return
 
@@ -785,6 +795,8 @@ class Handler(BaseHTTPRequestHandler):
     )
 
     def do_POST(self) -> None:
+        # Strip any query string before route matching (see do_GET).
+        self.path = urlsplit(self.path).path
         handler = self._STATIC_POST.get(self.path)
         if handler:
             return handler(self)
