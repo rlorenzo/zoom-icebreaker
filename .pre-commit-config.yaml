@@ -93,7 +93,7 @@ repos:
         name: vitest (web unit + jsdom integration)
         entry: vitest run
         language: node
-        additional_dependencies: ["vitest@3.2.4", "jsdom@26.1.0"]
+        additional_dependencies: ["vitest@4.1.8", "jsdom@29.1.1"]
         pass_filenames: false
         types_or: [javascript, jsx, ts, tsx]
         stages: [pre-push]

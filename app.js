@@ -137,7 +137,9 @@ function focusedReorderRow(e) {
   const row = e.target.closest(".row");
   if (!row || row !== e.target) return null;
   const p = stateById(row.dataset.pid);
-  if (!p || p.is_host || p.introduced) return null;
+  // Mirror the drag handler: only present, non-host, not-yet-introduced rows
+  // are reorderable (a participant may have left while their row held focus).
+  if (!p || p.is_host || !p.present || p.introduced) return null;
   return { pid: row.dataset.pid };
 }
 

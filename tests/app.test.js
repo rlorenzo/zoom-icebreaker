@@ -148,6 +148,19 @@ describe("roster interactions", () => {
     expect(postedUrls()).not.toContain("/api/order");
   });
 
+  it("ignores keyboard reorder for a participant who has left", () => {
+    // b and c are both non-host; without the presence guard, reordering the
+    // (absent) c up past b would be in-bounds and POST — the guard blocks it.
+    app.render({
+      startedAt: Date.now(),
+      prompt: "",
+      participants: [P({ id: "b", name: "Bob" }), P({ id: "c", name: "Cy", present: false })],
+    });
+    const row = document.querySelector('.row[data-pid="c"]');
+    row.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+    expect(postedUrls()).not.toContain("/api/order");
+  });
+
   it("reorders via dragstart/dragover/drop and clears indicators on dragend", () => {
     seed();
     const rowB = document.querySelector('.row[data-pid="b"]');

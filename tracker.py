@@ -739,7 +739,11 @@ class Handler(BaseHTTPRequestHandler):
         if static is None:
             return False
         filename, content_type = static
-        self._serve_file(os.path.join(HERE, filename), content_type, 404, "not found")
+        # filename comes from the STATIC_FILES safelist; basename strips any
+        # directory components as defense-in-depth against path traversal so no
+        # request-derived value can escape HERE.
+        abspath = os.path.join(HERE, os.path.basename(filename))
+        self._serve_file(abspath, content_type, 404, "not found")
         return True
 
     def do_GET(self) -> None:
