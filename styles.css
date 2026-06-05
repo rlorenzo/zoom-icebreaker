@@ -474,6 +474,15 @@ footer {
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+.sponsor-bar {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+.sponsor {
+  border: 0;
+  border-radius: 6px;
+}
 
 input {
   font-family: inherit;
