@@ -108,6 +108,19 @@ class TestStaticAssets:
         code, _ = _get(server + "/app.js")
         assert code == 404
 
+    def test_only_exact_safelisted_paths_are_served(self, server):
+        # Dispatch is exact-match: source files and near-miss paths are never
+        # served, so there is no arbitrary-file-read surface.
+        for path in (
+            "/tracker.py",
+            "/ax_dump.py",
+            "/app.jsx",
+            "/styles.cssx",
+            "/roster",
+        ):
+            code, _ = _get(server + path)
+            assert code == 404, path
+
     def test_serves_static_asset_with_query_string(self, server):
         # Cache-busting query params must not bypass the static handler.
         code, ctype, raw = _get_full(server + "/app.js?v=123")
