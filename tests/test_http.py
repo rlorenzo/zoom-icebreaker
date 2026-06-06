@@ -105,6 +105,12 @@ class TestStaticAssets:
         assert "javascript" in ctype
         assert raw
 
+    def test_serves_demo_js(self, server):
+        code, ctype, raw = _get_full(server + "/demo.js")
+        assert code == 200
+        assert "javascript" in ctype
+        assert raw
+
     def test_serves_styles_css(self, server):
         code, ctype, raw = _get_full(server + "/styles.css")
         assert code == 200
