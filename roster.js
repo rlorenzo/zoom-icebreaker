@@ -51,19 +51,14 @@ export function assignPositions(participants) {
   return positionByPid;
 }
 
+// The roster's up-next row already shows who's next, so the only callout we
+// surface is the completion state — when everyone present has introduced
+// themselves. Listing "Coming up: …" here just duplicated the list.
 export function calloutHtml(present, waiting) {
-  if (waiting.length === 0) {
-    return present.length > 0
-      ? `<div class="callout">Everyone has introduced themselves.</div>`
-      : "";
+  if (waiting.length === 0 && present.length > 0) {
+    return `<div class="callout">Everyone has introduced themselves.</div>`;
   }
-  const lead = escapeHtml(waiting[0].name);
-  const rest = waiting.slice(1).map((p) => escapeHtml(p.name));
-  let body;
-  if (rest.length === 0) body = `<b>${lead}</b>.`;
-  else if (rest.length === 1) body = `<b>${lead}</b>, then ${rest[0]}.`;
-  else body = `<b>${lead}</b>, then ${rest.join(", ")}.`;
-  return `<div class="callout"><span class="lead">Coming up:</span>${body}</div>`;
+  return "";
 }
 
 function rowClass(p, { isUpNext, upNextChanged, justIntroduced }) {

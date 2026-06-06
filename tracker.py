@@ -87,6 +87,7 @@ INDEX_HTML = os.path.join(HERE, "index.html")
 # Static assets referenced by index.html, by fixed module-constant absolute path.
 APP_JS = os.path.join(HERE, "app.js")
 ROSTER_JS = os.path.join(HERE, "roster.js")
+DEMO_JS = os.path.join(HERE, "demo.js")
 STYLES_CSS = os.path.join(HERE, "styles.css")
 JS_CONTENT_TYPE = "text/javascript; charset=utf-8"
 CSS_CONTENT_TYPE = "text/css; charset=utf-8"
@@ -113,6 +114,7 @@ def _load_bytes(path: str) -> bytes | None:
 PAGES: dict[str, tuple[bytes | None, str]] = {
     "/app.js": (_load_bytes(APP_JS), JS_CONTENT_TYPE),
     "/roster.js": (_load_bytes(ROSTER_JS), JS_CONTENT_TYPE),
+    "/demo.js": (_load_bytes(DEMO_JS), JS_CONTENT_TYPE),
     "/styles.css": (_load_bytes(STYLES_CSS), CSS_CONTENT_TYPE),
 }
 INDEX_BYTES: bytes | None = _load_bytes(INDEX_HTML)

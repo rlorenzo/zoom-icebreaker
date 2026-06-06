@@ -34,6 +34,9 @@ let esInstances;
 beforeEach(async () => {
   vi.resetModules();
   document.body.innerHTML = BODY;
+  // jsdom shares localStorage across tests; clear it so the first-run empty
+  // state is deterministic (the demo "seen" flag lives there).
+  localStorage.clear();
 
   fetchMock = vi.fn(() => Promise.resolve({ ok: true }));
   vi.stubGlobal("fetch", fetchMock);
@@ -86,7 +89,7 @@ const dragEvent = (type, extra = {}) => {
 const postedUrls = () => fetchMock.mock.calls.map((c) => c[0]);
 
 describe("render", () => {
-  it("renders rows, stats and the coming-up callout", () => {
+  it("renders rows and stats, with the up-next cue in the roster", () => {
     app.render({
       startedAt: Date.now(),
       prompt: "Q?",
@@ -96,7 +99,18 @@ describe("render", () => {
     expect(document.getElementById("s-present").textContent).toBe("2");
     expect(document.getElementById("s-wait").textContent).toBe("2");
     expect(document.getElementById("s-done").textContent).toBe("0");
-    expect(document.getElementById("calloutBox").textContent).toContain("Coming up");
+    // The "who's next" signal lives on the roster row now, not a separate callout.
+    expect(document.querySelector("#roster .row.up-next")).not.toBeNull();
+    expect(document.getElementById("calloutBox").textContent).toBe("");
+  });
+
+  it("shows the completion callout once everyone present has introduced", () => {
+    app.render({
+      startedAt: Date.now(),
+      prompt: "Q?",
+      participants: [P({ id: "h", name: "Ann", is_host: true, introduced: true })],
+    });
+    expect(document.getElementById("calloutBox").textContent).toContain("Everyone has introduced");
   });
 
   it("shows the empty state when there are no participants", () => {
@@ -234,6 +248,51 @@ describe("prompt + footer", () => {
     const urls = postedUrls();
     expect(urls).toContain("/api/randomize");
     expect(urls).toContain("/api/reset");
+  });
+});
+
+describe("demo mode", () => {
+  const empty = () => app.render({ startedAt: Date.now(), prompt: "", participants: [] });
+
+  it("offers the demo on the first-run empty state", () => {
+    empty();
+    const cta = document.querySelector('#roster .empty.first-run [data-act="demo"]');
+    expect(cta).not.toBeNull();
+    expect(cta.textContent).toMatch(/demo/i);
+  });
+
+  it("shows the lighter empty state once first run has been seen", () => {
+    localStorage.setItem("icebreaker.firstrun.seen", "1");
+    empty();
+    expect(document.querySelector("#roster .empty.first-run")).toBeNull();
+    expect(document.querySelector('#roster .text-link[data-act="demo"]')).not.toBeNull();
+  });
+
+  it("enters demo: reveals the bar and seeds the sample roster", () => {
+    empty();
+    document.querySelector('[data-act="demo"]').click();
+    expect(document.getElementById("demoBar").hidden).toBe(false);
+    expect(document.querySelectorAll("#roster .row")).toHaveLength(6);
+    expect(document.getElementById("s-done").textContent).toBe("2");
+  });
+
+  it("applies actions locally while in demo (DOM updates without an SSE echo)", () => {
+    // Live, a toggle only POSTs and waits for the server echo — the count would
+    // not move synchronously. In demo it changes immediately, which is the proof
+    // the action was applied locally.
+    empty();
+    document.querySelector('[data-act="demo"]').click();
+    document.querySelector(".row:not(.introduced) .toggle").click();
+    expect(document.getElementById("s-done").textContent).toBe("3");
+  });
+
+  it("exits demo back to a clean slate and hides the bar", () => {
+    empty();
+    document.querySelector('[data-act="demo"]').click();
+    document.querySelector('[data-act="exit-demo"]').click();
+    expect(document.getElementById("demoBar").hidden).toBe(true);
+    expect(document.querySelectorAll("#roster .row")).toHaveLength(0);
+    expect(document.querySelector("#roster .empty")).not.toBeNull();
   });
 });
 

@@ -1,3 +1,4 @@
+import { createDemoSession } from "./demo.js";
 import {
   assignPositions,
   calloutHtml,
@@ -14,17 +15,49 @@ let dragPid = null;
 let dropTargetPid = null;
 let dropBefore = true;
 
+// Demo mode: when set, the page renders this in-memory sample session instead of
+// the live server state, and every action mutates it locally (no fetch). The
+// real SSE keeps arriving and is cached in `lastServerState` so exiting demo can
+// snap straight back to the clean live session. See demo.js.
+let demo = null;
+let lastServerState = { participants: [], prompt: "", startedAt: Date.now() };
+const inDemo = () => demo !== null;
+
+// One small UI-preference flag (not meeting data): whether this browser has seen
+// the first-run welcome. It only decides which empty state to show, so a
+// blocked/unavailable localStorage degrades to "always first-run", which is fine.
+const SEEN_KEY = "icebreaker.firstrun.seen";
+const hasSeen = () => {
+  try {
+    return localStorage.getItem(SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+const markSeen = () => {
+  try {
+    localStorage.setItem(SEEN_KEY, "1");
+  } catch {
+    /* storage unavailable — first-run prompt simply stays available */
+  }
+};
+
 // DOM handles resolved in init() so importing this module has no side effects
 // (keeps it unit/integration testable; the browser entry calls init() below).
 let promptEl;
 let promptSticky;
 let roster;
+let demoBar;
 
 const $ = (id) => document.getElementById(id);
 const stateById = (pid) => state.participants.find((p) => p.id === pid);
 const hostFirst = () => state.participants[0]?.is_host;
 
 // ---- API ---------------------------------------------------------
+// Every mutating action funnels through here. In demo mode it edits the local
+// sample session and re-renders; otherwise it POSTs and the SSE echo re-renders.
+// Keeping the branch in one place per action means the event wiring below never
+// has to know which mode it's in.
 async function post(url, body) {
   return fetch(url, {
     method: "POST",
@@ -32,13 +65,38 @@ async function post(url, body) {
     body: body ? JSON.stringify(body) : undefined,
   });
 }
-const postOrder = (order) => post("/api/order", { order });
-const setIntroduced = (id, v) => post(`/api/participant/${id}/introduced`, { introduced: v });
-const removeP = (id) => post(`/api/participant/${id}/remove`);
-const sendPrompt = (prompt) => post("/api/prompt", { prompt });
-const randomize = () => post("/api/randomize");
-const resetSession = () => post("/api/reset");
-const addPerson = (name) => post("/api/participant", { name });
+const postOrder = (order) =>
+  inDemo() ? render(demo.setOrder(order)) : post("/api/order", { order });
+const setIntroduced = (id, v) =>
+  inDemo()
+    ? render(demo.toggleIntroduced(id, v))
+    : post(`/api/participant/${id}/introduced`, { introduced: v });
+const removeP = (id) =>
+  inDemo() ? render(demo.remove(id)) : post(`/api/participant/${id}/remove`);
+const sendPrompt = (prompt) =>
+  inDemo() ? render(demo.setPrompt(prompt)) : post("/api/prompt", { prompt });
+const randomize = () => (inDemo() ? render(demo.randomize()) : post("/api/randomize"));
+const addPerson = (name) =>
+  inDemo() ? render(demo.add(name)) : post("/api/participant", { name });
+// Reset means "clean slate". In demo that's just leaving demo; live it clears
+// the server session.
+const resetSession = () => (inDemo() ? exitDemo() : post("/api/reset"));
+
+// ---- demo mode ---------------------------------------------------
+function enterDemo() {
+  markSeen();
+  demo = createDemoSession();
+  if (demoBar) demoBar.hidden = false;
+  document.body.classList.add("is-demo");
+  render(demo.snapshot());
+}
+
+function exitDemo() {
+  demo = null;
+  if (demoBar) demoBar.hidden = true;
+  document.body.classList.remove("is-demo");
+  render(lastServerState); // snap back to the clean live session
+}
 
 // ---- DOM helpers -------------------------------------------------
 function autosize(el) {
@@ -73,56 +131,92 @@ function playReorder(rosterEl, oldTops) {
   }
 }
 
+// First launch on this browser gets a welcome that explains the surface and
+// offers the demo; after that, a clearing (e.g. reset between rounds) shows a
+// light line with the demo still one quiet click away. onboard.md: "First use"
+// vs "User cleared".
+function emptyStateHtml() {
+  if (hasSeen()) {
+    return `
+      <div class="empty">
+        <p class="empty-lede">No one yet. Joins appear automatically, or add someone below.</p>
+        <button class="text-link" type="button" data-act="demo">Try the demo</button>
+      </div>`;
+  }
+  return `
+    <div class="empty first-run">
+      <p class="empty-title">Your roster shows up here</p>
+      <p class="empty-body">As people join, names fill in from Zoom automatically, or you add them by hand. You mark each person introduced as they speak, so the whole room can see who has gone and who is up next.</p>
+      <button class="btn" type="button" data-act="demo">Try a demo</button>
+      <p class="empty-foot">Opens a sample meeting you can click around. Nothing is saved, and leaving it clears the slate.</p>
+    </div>`;
+}
+
 // ---- render ------------------------------------------------------
+// Snapshot what we need from the PREVIOUS render before `state` is overwritten:
+// which rows were introduced, who was up next, and where each row sat — so the
+// new render can detect transitions and FLIP-animate moves.
+function capturePrev() {
+  const prev = state.participants || [];
+  return {
+    prevIntroduced: new Set(prev.filter((p) => p.introduced && p.present).map((p) => p.id)),
+    prevUpNextPid: findUpNextPid(prev),
+    oldTops: captureRowTops(roster),
+  };
+}
+
+function updateStats(participants) {
+  const present = participants.filter((p) => p.present);
+  const waiting = present.filter((p) => !p.introduced);
+  $("s-present").textContent = present.length;
+  $("s-done").textContent = present.length - waiting.length;
+  $("s-wait").textContent = waiting.length;
+  $("calloutBox").innerHTML = calloutHtml(present, waiting);
+}
+
+function renderRoster(participants, ctx, oldTops) {
+  if (!participants.length) {
+    roster.innerHTML = emptyStateHtml();
+    return;
+  }
+  roster.innerHTML = participants.map((p) => rowHtml(p, ctx)).join("");
+  playReorder(roster, oldTops);
+}
+
+// Re-focus a row moved by keyboard, once it has re-rendered.
+function restoreFocus() {
+  if (!lastFocusPid) return;
+  document.querySelector(`.row[data-pid="${lastFocusPid}"]`)?.focus();
+  lastFocusPid = null;
+}
+
 export function render(s) {
+  // Seeing real participants (not the demo) means this host is past first run.
+  if (!inDemo() && s.participants.length > 0) markSeen();
+
   const positionByPid = assignPositions(s.participants);
-
   s = { ...s, participants: sortForDisplay(s.participants) };
-
-  // Diff against the previous state BEFORE we overwrite it — that's how we know
-  // which rows just transitioned and where they came from.
-  const prevIntroduced = new Set(
-    (state.participants || []).filter((p) => p.introduced && p.present).map((p) => p.id),
-  );
-  const prevUpNextPid = findUpNextPid(state.participants || []);
-  const oldTops = captureRowTops(roster);
+  const { prevIntroduced, prevUpNextPid, oldTops } = capturePrev();
 
   state = s;
 
   $("since").textContent = fmtTime(s.startedAt);
-
   if (document.activeElement !== promptEl) {
     promptEl.value = s.prompt || "";
     autosize(promptEl);
   }
 
-  const present = s.participants.filter((p) => p.present);
-  const done = s.participants.filter((p) => p.introduced && p.present);
-  const waiting = present.filter((p) => !p.introduced);
+  updateStats(s.participants);
 
-  $("s-present").textContent = present.length;
-  $("s-done").textContent = done.length;
-  $("s-wait").textContent = waiting.length;
-
-  $("calloutBox").innerHTML = calloutHtml(present, waiting);
-
-  // Roster
   const upNextPid = findUpNextPid(s.participants);
-  const upNextChanged = upNextPid && upNextPid !== prevUpNextPid;
-  if (!s.participants.length) {
-    roster.innerHTML = `<div class="empty">No one yet. Joins will appear automatically, or add someone below.</div>`;
-  } else {
-    const ctx = { positionByPid, upNextPid, upNextChanged, prevIntroduced };
-    roster.innerHTML = s.participants.map((p) => rowHtml(p, ctx)).join("");
-    playReorder(roster, oldTops);
-  }
-
-  // Restore focus to row moved by keyboard
-  if (lastFocusPid) {
-    const el = document.querySelector(`.row[data-pid="${lastFocusPid}"]`);
-    if (el) el.focus();
-    lastFocusPid = null;
-  }
+  const ctx = {
+    positionByPid,
+    upNextPid,
+    upNextChanged: upNextPid && upNextPid !== prevUpNextPid,
+    prevIntroduced,
+  };
+  renderRoster(s.participants, ctx, oldTops);
+  restoreFocus();
 }
 
 // ---- drag and drop helpers --------------------------------------
@@ -208,6 +302,12 @@ function wireRosterActions() {
         break;
       case "remove":
         removeP(pid);
+        break;
+      case "demo":
+        enterDemo();
+        break;
+      case "exit-demo":
+        exitDemo();
         break;
     }
   });
@@ -299,13 +399,21 @@ function wireFooter() {
   });
   $("randomBtn").addEventListener("click", () => randomize());
   $("resetBtn").addEventListener("click", () => {
+    // No real data to lose while in demo — just leave it (the demo bar's
+    // "Exit demo" does the same). Live, confirm before clearing the session.
+    if (inDemo()) return exitDemo();
     if (confirm("Clear all participants and start over? The prompt is kept.")) resetSession();
   });
 }
 
 function wireLiveStream() {
   const es = new EventSource("/events");
-  es.onmessage = (e) => render(JSON.parse(e.data));
+  es.onmessage = (e) => {
+    // Always cache the live session so exiting demo can snap straight to it;
+    // only paint it when we aren't overriding the view with the demo.
+    lastServerState = JSON.parse(e.data);
+    if (!inDemo()) render(lastServerState);
+  };
   es.onerror = () => {
     $("live").textContent = "reconnecting";
   };
@@ -319,6 +427,7 @@ export function init() {
   promptEl = $("prompt");
   promptSticky = $("promptSticky");
   roster = $("roster");
+  demoBar = $("demoBar");
   wirePrompt();
   wireRosterActions();
   wireFooter();

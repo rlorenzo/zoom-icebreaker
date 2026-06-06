@@ -72,26 +72,9 @@ describe("calloutHtml", () => {
     expect(calloutHtml([P()], [])).toContain("Everyone has introduced");
   });
 
-  it("lists a single up-next name", () => {
-    expect(calloutHtml([P()], [P({ name: "Ann" })])).toContain("<b>Ann</b>.");
-  });
-
-  it("renders 'then X' for exactly two waiting", () => {
-    expect(calloutHtml([], [P({ name: "Ann" }), P({ name: "Bo" })])).toContain(
-      "<b>Ann</b>, then Bo.",
-    );
-  });
-
-  it("joins remaining names for three or more waiting", () => {
-    expect(calloutHtml([], [P({ name: "Ann" }), P({ name: "Bo" }), P({ name: "Cy" })])).toContain(
-      "then Bo, Cy.",
-    );
-  });
-
-  it("escapes waiting names", () => {
-    const html = calloutHtml([], [P({ name: "<script>" })]);
-    expect(html).toContain("&lt;script&gt;");
-    expect(html).not.toContain("<script>");
+  it("is empty while anyone is still waiting (the roster shows who's next)", () => {
+    expect(calloutHtml([P(), P({ name: "Ann" })], [P({ name: "Ann" })])).toBe("");
+    expect(calloutHtml([], [P({ name: "Ann" }), P({ name: "Bo" })])).toBe("");
   });
 });
 
