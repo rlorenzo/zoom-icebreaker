@@ -16,9 +16,17 @@ One local process, one command. No Node, no Zoom account, no credentials,
 and nothing leaves your machine.
 
 <p align="center">
-  <img src="docs/screenshot-desktop.png"
-       alt="Icebreaker Tracker: a prompt headline, counts for in-the-room, introduced, and still-to-go, a 'coming up next' banner, and a roster where introduced people are dimmed with a checkmark."
-       width="760" />
+  <video src="docs/demo.webm" width="820" autoplay loop muted playsinline
+         poster="docs/screenshot-desktop.png">
+    <img src="docs/screenshot-desktop.png"
+         alt="The Icebreaker Tracker: a host marks people introduced one at a time, the introduced count climbs, the highlighted 'up next' row advances to the next speaker, and each person's row dims with a checkmark as they go."
+         width="820" />
+  </video>
+</p>
+
+<p align="center">
+  <em>No meeting handy? The first screen has a <strong>Try a demo</strong> button that
+  loads this sample roster so you can click around. Leaving demo mode clears the slate.</em>
 </p>
 
 ## Quick start
@@ -38,8 +46,8 @@ you tap one button per person as they speak.
 ## What you get
 
 - **A live roster** that updates for everyone watching the share, no refresh.
-- **One-tap "introduced"** per person. The counts and the "coming up next"
-  banner update instantly.
+- **One-tap "introduced"** per person. The counts and the highlighted "up
+  next" row update instantly.
 - **Automatic Zoom reading** on macOS and Windows — it fills the roster from
   the Participants panel so you rarely type a name.
 - **Manual mode anywhere** — no permission or wrong OS? Type names in. The
@@ -49,10 +57,6 @@ you tap one button per person as they speak.
   data sent anywhere.
 
 ## Two views, one screen
-
-<img src="docs/screenshot-mobile.png"
-     alt="The same roster on a narrow phone-width screen, stacking to a single column."
-     width="260" align="right" />
 
 The host and the room see the same page, and both matter:
 
@@ -103,7 +107,7 @@ work the same as on macOS; `--bundle` is macOS-only and ignored here.
 2. People appear automatically (or add them manually). "Started" shows when
    you began the session.
 3. Tap **Mark introduced** after each person speaks. The counts and the
-   "coming up next" banner update live for everyone watching.
+   highlighted "up next" row update live for everyone watching.
 4. **Reset session** clears it for the next meeting.
 
 ## Command-line options
@@ -150,10 +154,16 @@ pymarkdown (markdown), plus biome and html-validate for the web assets. The
 same checks run on every PR via
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-The web assets (`index.html`, `app.js`, `roster.js`, `styles.css`) are read
-into memory once at startup, so the server never opens a file in response to
-a request. The trade-off: editing any of them requires restarting the server
-(Ctrl-C and re-run) to see the change.
+The web assets (`index.html`, `app.js`, `roster.js`, `demo.js`, `styles.css`)
+are read into memory once at startup, so the server never opens a file in
+response to a request. The trade-off: editing any of them requires restarting
+the server (Ctrl-C and re-run) to see the change.
+
+The README clip (`docs/demo.webm`, VP9) is generated from demo mode, so it
+never needs a real meeting. With the server running, Playwright installed
+(`npx playwright install chromium`), and an ffmpeg available for the VP9
+transcode (`npm i ffmpeg-static`, or `brew install ffmpeg`), regenerate it
+with `npm run record:demo`.
 
 ## Support
 

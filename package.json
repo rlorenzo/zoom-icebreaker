@@ -7,11 +7,13 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "record:demo": "node scripts/record-demo.mjs"
   },
   "devDependencies": {
     "@vitest/coverage-istanbul": "^4.1.8",
     "jsdom": "^29.1.1",
+    "playwright": "^1.60.0",
     "vitest": "^4.1.8"
   }
 }
