@@ -161,9 +161,9 @@ the server (Ctrl-C and re-run) to see the change.
 
 The README clip (`docs/demo.webm`, VP9) is generated from demo mode, so it
 never needs a real meeting. With the server running, Playwright installed
-(`npx playwright install chromium`), and an ffmpeg available for the VP9
-transcode (`npm i ffmpeg-static`, or `brew install ffmpeg`), regenerate it
-with `npm run record:demo`.
+(`npx playwright install chromium`), and an ffmpeg with libvpx-vp9 on `PATH`
+(`brew install ffmpeg`, or point `$FFMPEG` at one), regenerate it with
+`npm run record:demo`.
 
 ## Support
 

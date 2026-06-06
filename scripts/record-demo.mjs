@@ -8,10 +8,10 @@
 //   uv run tracker.py --no-ax --port 3939    # in one terminal
 //   npm run record:demo                      # in another
 //
-// The transcode needs an ffmpeg with libvpx-vp9. It is resolved in order:
-//   FFMPEG=/path/to/ffmpeg env var  ->  the `ffmpeg-static` package  ->  ffmpeg on PATH
-// so `npm i ffmpeg-static` (or `brew install ffmpeg`) is enough. Override the
-// target page with URL=... npm run record:demo
+// The transcode needs an ffmpeg with libvpx-vp9, taken from $FFMPEG or `ffmpeg`
+// on PATH. So `brew install ffmpeg`, or `npm i ffmpeg-static` then
+//   FFMPEG=$(node -p "require('ffmpeg-static')") npm run record:demo
+// Override the target page with URL=... npm run record:demo
 import { execFileSync } from "node:child_process";
 import { rmSync } from "node:fs";
 import { chromium } from "playwright";
@@ -24,13 +24,9 @@ const OUT = "docs/demo.webm";
 // demo bar is hidden. Kept modest so the committed clip stays small.
 const SIZE = { width: 1000, height: 820 };
 
-async function resolveFfmpeg() {
-  if (process.env.FFMPEG) return process.env.FFMPEG;
-  try {
-    return (await import("ffmpeg-static")).default;
-  } catch {
-    return "ffmpeg"; // assume it is on PATH
-  }
+function resolveFfmpeg() {
+  // $FFMPEG (e.g. the ffmpeg-static binary path) or `ffmpeg` on PATH.
+  return process.env.FFMPEG || "ffmpeg";
 }
 
 const browser = await chromium.launch();
@@ -76,7 +72,7 @@ await video.delete();
 await browser.close();
 
 // Transcode VP8 -> VP9 (constant-quality, no audio track).
-const ffmpeg = await resolveFfmpeg();
+const ffmpeg = resolveFfmpeg();
 // biome-ignore format: keep the ffmpeg flags grouped as flag/value pairs
 const args = [
   "-y", "-i", RAW,

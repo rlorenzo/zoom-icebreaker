@@ -153,58 +153,70 @@ function emptyStateHtml() {
 }
 
 // ---- render ------------------------------------------------------
+// Snapshot what we need from the PREVIOUS render before `state` is overwritten:
+// which rows were introduced, who was up next, and where each row sat — so the
+// new render can detect transitions and FLIP-animate moves.
+function capturePrev() {
+  const prev = state.participants || [];
+  return {
+    prevIntroduced: new Set(prev.filter((p) => p.introduced && p.present).map((p) => p.id)),
+    prevUpNextPid: findUpNextPid(prev),
+    oldTops: captureRowTops(roster),
+  };
+}
+
+function updateStats(participants) {
+  const present = participants.filter((p) => p.present);
+  const waiting = present.filter((p) => !p.introduced);
+  $("s-present").textContent = present.length;
+  $("s-done").textContent = present.length - waiting.length;
+  $("s-wait").textContent = waiting.length;
+  $("calloutBox").innerHTML = calloutHtml(present, waiting);
+}
+
+function renderRoster(participants, ctx, oldTops) {
+  if (!participants.length) {
+    roster.innerHTML = emptyStateHtml();
+    return;
+  }
+  roster.innerHTML = participants.map((p) => rowHtml(p, ctx)).join("");
+  playReorder(roster, oldTops);
+}
+
+// Re-focus a row moved by keyboard, once it has re-rendered.
+function restoreFocus() {
+  if (!lastFocusPid) return;
+  document.querySelector(`.row[data-pid="${lastFocusPid}"]`)?.focus();
+  lastFocusPid = null;
+}
+
 export function render(s) {
   // Seeing real participants (not the demo) means this host is past first run.
   if (!inDemo() && s.participants.length > 0) markSeen();
 
   const positionByPid = assignPositions(s.participants);
-
   s = { ...s, participants: sortForDisplay(s.participants) };
-
-  // Diff against the previous state BEFORE we overwrite it — that's how we know
-  // which rows just transitioned and where they came from.
-  const prevIntroduced = new Set(
-    (state.participants || []).filter((p) => p.introduced && p.present).map((p) => p.id),
-  );
-  const prevUpNextPid = findUpNextPid(state.participants || []);
-  const oldTops = captureRowTops(roster);
+  const { prevIntroduced, prevUpNextPid, oldTops } = capturePrev();
 
   state = s;
 
   $("since").textContent = fmtTime(s.startedAt);
-
   if (document.activeElement !== promptEl) {
     promptEl.value = s.prompt || "";
     autosize(promptEl);
   }
 
-  const present = s.participants.filter((p) => p.present);
-  const done = s.participants.filter((p) => p.introduced && p.present);
-  const waiting = present.filter((p) => !p.introduced);
+  updateStats(s.participants);
 
-  $("s-present").textContent = present.length;
-  $("s-done").textContent = done.length;
-  $("s-wait").textContent = waiting.length;
-
-  $("calloutBox").innerHTML = calloutHtml(present, waiting);
-
-  // Roster
   const upNextPid = findUpNextPid(s.participants);
-  const upNextChanged = upNextPid && upNextPid !== prevUpNextPid;
-  if (!s.participants.length) {
-    roster.innerHTML = emptyStateHtml();
-  } else {
-    const ctx = { positionByPid, upNextPid, upNextChanged, prevIntroduced };
-    roster.innerHTML = s.participants.map((p) => rowHtml(p, ctx)).join("");
-    playReorder(roster, oldTops);
-  }
-
-  // Restore focus to row moved by keyboard
-  if (lastFocusPid) {
-    const el = document.querySelector(`.row[data-pid="${lastFocusPid}"]`);
-    if (el) el.focus();
-    lastFocusPid = null;
-  }
+  const ctx = {
+    positionByPid,
+    upNextPid,
+    upNextChanged: upNextPid && upNextPid !== prevUpNextPid,
+    prevIntroduced,
+  };
+  renderRoster(s.participants, ctx, oldTops);
+  restoreFocus();
 }
 
 // ---- drag and drop helpers --------------------------------------
