@@ -3,6 +3,11 @@
 > A live roster of who has introduced themselves — for meetings where
 > everyone goes around the room.
 
+<p align="center">
+  <a href="https://rlorenzo.github.io/zoom-icebreaker/"><strong>▶&nbsp; Open the live app</strong></a>
+  &nbsp;·&nbsp; runs in your browser, no install
+</p>
+
 In meetings where everyone introduces themselves, somebody always asks
 *"wait, has Alex gone yet?"* and the room loses thirty seconds. Icebreaker
 Tracker puts the answer on screen for everyone: a live roster, who has been
