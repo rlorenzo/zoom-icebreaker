@@ -8,11 +8,17 @@ import { vi } from "vitest";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const indexHtml = fs.readFileSync(path.resolve(here, "../index.html"), "utf8");
 
-// The page's <body> with the module <script> stripped, so tests render against
-// the same DOM the browser sees while driving the module directly.
-export const BODY = indexHtml
-  .match(/<body>([\s\S]*?)<\/body>/)[1]
-  .replace(/<script[\s\S]*?<\/script>/g, "");
+// The page's <body> with the module <script> removed, so tests render against
+// the same DOM the browser sees while driving the module directly. Parsed via
+// the DOM (the suites run in jsdom) rather than regex, so script removal is the
+// real thing — no incomplete-sanitization or catastrophic-backtracking traps.
+function bodyWithoutScripts(html) {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  for (const s of doc.body.querySelectorAll("script")) s.remove();
+  return doc.body.innerHTML;
+}
+
+export const BODY = bodyWithoutScripts(indexHtml);
 
 // Stubs for the browser APIs jsdom doesn't implement that both suites rely on.
 export function installDomStubs() {
