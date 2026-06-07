@@ -29,7 +29,20 @@ and nothing leaves your machine.
   loads this sample roster so you can click around. Leaving demo mode clears the slate.</em>
 </p>
 
-## Quick start
+## Two ways to run it
+
+- **In the browser, no install** —
+  **<https://rlorenzo.github.io/zoom-icebreaker/>**. The same page, running
+  entirely client-side: add names by hand, mark people introduced, reorder, set
+  a prompt, screen-share the tab. Your session is kept in the browser
+  (localStorage) so a refresh mid-meeting doesn't lose the slate, and nothing is
+  sent anywhere. The only thing it can't do is read Zoom's panel for you (that
+  needs OS accessibility access) — so it's manual entry, and everything else is
+  identical.
+- **Locally, with automatic Zoom reading** — one Python command, below. Adds
+  auto-filling the roster from Zoom's Participants panel on macOS and Windows.
+
+## Quick start (local app)
 
 ```bash
 uv sync          # one-time: install dependencies
@@ -42,6 +55,8 @@ you tap one button per person as they speak.
 
 > Don't have `uv`? It's a single-binary Python installer — see the
 > [uv install guide](https://docs.astral.sh/uv/getting-started/installation/).
+> Or skip it entirely and use the [hosted
+> version](https://rlorenzo.github.io/zoom-icebreaker/).
 
 ## What you get
 
@@ -52,9 +67,10 @@ you tap one button per person as they speak.
   the Participants panel so you rarely type a name.
 - **Manual mode anywhere** — no permission or wrong OS? Type names in. The
   page is identical.
-- **Private and ephemeral by design** — state lives in memory for the one
-  meeting and is gone when you stop the process. No account, no history, no
-  data sent anywhere.
+- **Private by design** — no account, no history, and nothing sent anywhere.
+  In the local app, state lives only in memory and is gone when you stop the
+  process; the hosted version keeps it in your browser (localStorage) so a
+  refresh doesn't lose the meeting, and clearing it is a click away.
 
 ## Two views, one screen
 
@@ -154,10 +170,15 @@ pymarkdown (markdown), plus biome and html-validate for the web assets. The
 same checks run on every PR via
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-The web assets (`index.html`, `app.js`, `roster.js`, `demo.js`, `styles.css`)
-are read into memory once at startup, so the server never opens a file in
-response to a request. The trade-off: editing any of them requires restarting
-the server (Ctrl-C and re-run) to see the change.
+The web assets (`index.html`, `app.js`, `roster.js`, `demo.js`, `engine.js`,
+`session.js`, `styles.css`) are read into memory once at startup, so the server
+never opens a file in response to a request. The trade-off: editing any of them
+requires restarting the server (Ctrl-C and re-run) to see the change.
+
+The same assets are deployed to GitHub Pages by
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to
+`main`. There, `app.js` finds no `/events` backend and falls back to the local
+in-browser engine (`engine.js`); `tracker.py` is not involved at all.
 
 The README clip (`docs/demo.webm`, VP9) is generated from demo mode, so it
 never needs a real meeting. With the server running, Playwright installed

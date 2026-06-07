@@ -8,7 +8,7 @@ export default defineConfig({
       // Istanbul provider so coverage/coverage-final.json is emitted in the
       // format fallow's --coverage flag consumes for accurate CRAP scoring.
       provider: "istanbul",
-      include: ["app.js", "roster.js"],
+      include: ["app.js", "roster.js", "engine.js", "session.js"],
       reporter: ["text", "json"],
       reportsDirectory: "coverage",
     },

@@ -1,15 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-// Reuse the real markup so the integration tests render against the same DOM
-// the browser sees (minus the module <script>, which we drive directly).
-const here = path.dirname(fileURLToPath(import.meta.url));
-const indexHtml = fs.readFileSync(path.resolve(here, "../index.html"), "utf8");
-const BODY = indexHtml
-  .match(/<body>([\s\S]*?)<\/body>/)[1]
-  .replace(/<script[\s\S]*?<\/script>/g, "");
+import { BODY, installDomStubs } from "./helpers.js";
 
 const P = (over = {}) => ({
   id: "p1",
@@ -38,7 +28,18 @@ beforeEach(async () => {
   // state is deterministic (the demo "seen" flag lives there).
   localStorage.clear();
 
-  fetchMock = vi.fn(() => Promise.resolve({ ok: true }));
+  // The /events probe decides the transport: an event-stream response selects
+  // the server transport these tests exercise (POST to /api/*). Everything else
+  // resolves as a plain ok for the action POSTs.
+  fetchMock = vi.fn((url) =>
+    String(url).includes("events")
+      ? Promise.resolve({
+          ok: true,
+          headers: { get: () => "text/event-stream" },
+          body: { cancel() {} },
+        })
+      : Promise.resolve({ ok: true }),
+  );
   vi.stubGlobal("fetch", fetchMock);
 
   esInstances = [];
@@ -55,21 +56,7 @@ beforeEach(async () => {
       close() {}
     },
   );
-  vi.stubGlobal(
-    "IntersectionObserver",
-    class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-    },
-  );
-  vi.stubGlobal(
-    "confirm",
-    vi.fn(() => true),
-  );
-  window.matchMedia = vi.fn().mockReturnValue({ matches: false });
-  // jsdom doesn't implement the Web Animations API used by playReorder().
-  if (!Element.prototype.animate) Element.prototype.animate = () => ({});
+  installDomStubs();
 
   // Importing runs init() against the prepared DOM (auto-bootstrap at module end).
   app = await import("../app.js");

@@ -1,4 +1,5 @@
 import { createDemoSession } from "./demo.js";
+import { createEngine } from "./engine.js";
 import {
   assignPositions,
   calloutHtml,
@@ -16,11 +17,11 @@ let dropTargetPid = null;
 let dropBefore = true;
 
 // Demo mode: when set, the page renders this in-memory sample session instead of
-// the live server state, and every action mutates it locally (no fetch). The
-// real SSE keeps arriving and is cached in `lastServerState` so exiting demo can
-// snap straight back to the clean live session. See demo.js.
+// the live session, and every action mutates it locally. The live session (from
+// whichever transport is active) keeps arriving and is cached in `lastLiveState`
+// so exiting demo can snap straight back to the clean live session. See demo.js.
 let demo = null;
-let lastServerState = { participants: [], prompt: "", startedAt: Date.now() };
+let lastLiveState = { participants: [], prompt: "", startedAt: Date.now() };
 const inDemo = () => demo !== null;
 
 // One small UI-preference flag (not meeting data): whether this browser has seen
@@ -53,17 +54,95 @@ const $ = (id) => document.getElementById(id);
 const stateById = (pid) => state.participants.find((p) => p.id === pid);
 const hostFirst = () => state.participants[0]?.is_host;
 
-// ---- API ---------------------------------------------------------
-// Every mutating action funnels through here. In demo mode it edits the local
-// sample session and re-renders; otherwise it POSTs and the SSE echo re-renders.
-// Keeping the branch in one place per action means the event wiring below never
-// has to know which mode it's in.
-async function post(url, body) {
-  return fetch(url, {
-    method: "POST",
-    headers: body ? { "Content-Type": "application/json" } : {},
-    body: body ? JSON.stringify(body) : undefined,
-  });
+// ---- transport ---------------------------------------------------
+// The UI speaks one verb: post(url, body). Two transports answer it. On
+// localhost, tracker.py serves an SSE stream at /events and mutates its session
+// via the /api/* POSTs (serverTransport). Served statically with no backend
+// (e.g. GitHub Pages), there is no server, so the same calls route into a local
+// engine that holds the session in the browser (localTransport). init() probes
+// once at startup and picks one; nothing below has to know which is live.
+let activeTransport = null;
+let markTransportReady;
+const transportReady = new Promise((resolve) => {
+  markTransportReady = resolve;
+});
+function post(url, body) {
+  return activeTransport
+    ? activeTransport.post(url, body)
+    : transportReady.then((t) => t.post(url, body));
+}
+
+function serverTransport() {
+  return {
+    post: (url, body) =>
+      fetch(url, {
+        method: "POST",
+        headers: body ? { "Content-Type": "application/json" } : {},
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+    subscribe(onSnapshot) {
+      const es = new EventSource("/events");
+      es.onmessage = (e) => onSnapshot(JSON.parse(e.data));
+      es.onerror = () => {
+        $("live").textContent = "reconnecting";
+      };
+      es.onopen = () => {
+        $("live").textContent = "live";
+      };
+    },
+  };
+}
+
+// The same /api/* paths the server handles, mapped to engine methods. Pure data,
+// so the routing stays a flat table rather than a switch.
+const LOCAL_ROUTES = [
+  [/^\/api\/participant$/, (e, _m, b) => e.add(b.name)],
+  [/^\/api\/participant\/([^/]+)\/introduced$/, (e, m, b) => e.setIntroduced(m[1], b.introduced)],
+  [/^\/api\/participant\/([^/]+)\/remove$/, (e, m) => e.remove(m[1])],
+  [/^\/api\/prompt$/, (e, _m, b) => e.setPrompt(b.prompt)],
+  [/^\/api\/order$/, (e, _m, b) => e.setOrder(b.order)],
+  [/^\/api\/randomize$/, (e) => e.randomize()],
+  [/^\/api\/reset$/, (e) => e.reset()],
+];
+
+function localTransport(engine) {
+  return {
+    post(url, body) {
+      const path = new URL(url, "http://local").pathname;
+      const b = body || {};
+      for (const [re, run] of LOCAL_ROUTES) {
+        const m = re.exec(path);
+        if (m) {
+          run(engine, m, b);
+          break;
+        }
+      }
+      return Promise.resolve();
+    },
+    subscribe(onSnapshot) {
+      engine.subscribe(onSnapshot);
+      $("live").textContent = "live";
+    },
+  };
+}
+
+// Probe for a real backend: only tracker.py answers /events with an event-stream.
+// A 404 page (GitHub Pages), an HTML index, or a network error all mean "no
+// server, use the local engine". The body is cancelled so the probe never holds
+// the stream open.
+async function hasServer() {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 1500);
+  try {
+    const res = await fetch("events", { signal: ctrl.signal });
+    const ct = res.headers.get("content-type") || "";
+    res.body?.cancel?.();
+    return res.ok && ct.includes("text/event-stream");
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 const postOrder = (order) =>
   inDemo() ? render(demo.setOrder(order)) : post("/api/order", { order });
@@ -95,7 +174,7 @@ function exitDemo() {
   demo = null;
   if (demoBar) demoBar.hidden = true;
   document.body.classList.remove("is-demo");
-  render(lastServerState); // snap back to the clean live session
+  render(lastLiveState); // snap back to the clean live session
 }
 
 // ---- DOM helpers -------------------------------------------------
@@ -406,24 +485,15 @@ function wireFooter() {
   });
 }
 
-function wireLiveStream() {
-  const es = new EventSource("/events");
-  es.onmessage = (e) => {
-    // Always cache the live session so exiting demo can snap straight to it;
-    // only paint it when we aren't overriding the view with the demo.
-    lastServerState = JSON.parse(e.data);
-    if (!inDemo()) render(lastServerState);
-  };
-  es.onerror = () => {
-    $("live").textContent = "reconnecting";
-  };
-  es.onopen = () => {
-    $("live").textContent = "live";
-  };
+// Cache every live snapshot so exiting demo can snap straight to it; only paint
+// it when the demo isn't overriding the view.
+function onLiveSnapshot(snap) {
+  lastLiveState = snap;
+  if (!inDemo()) render(snap);
 }
 
 // ---- bootstrap ---------------------------------------------------
-export function init() {
+export async function init() {
   promptEl = $("prompt");
   promptSticky = $("promptSticky");
   roster = $("roster");
@@ -431,7 +501,9 @@ export function init() {
   wirePrompt();
   wireRosterActions();
   wireFooter();
-  wireLiveStream();
+  activeTransport = (await hasServer()) ? serverTransport() : localTransport(createEngine());
+  markTransportReady(activeTransport);
+  activeTransport.subscribe(onLiveSnapshot);
 }
 
-init();
+await init();

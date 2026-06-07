@@ -6,9 +6,13 @@
 //
 // The transitions here mirror tracker.py's State so the demo behaves exactly
 // like the real thing: host pinned to the top, randomize shuffles only the
-// still-to-go people, introduced rows keep their slot. No DOM or globals are
-// touched, so every method is deterministic and unit-testable (see
-// tests/demo.test.js). app.js feeds each snapshot() straight into render().
+// still-to-go people, introduced rows keep their slot. The ordering logic is
+// shared with the live local engine (session.js), so demo and a real hosted
+// session reorder identically. No DOM or globals are touched, so every method
+// is deterministic and unit-testable (see tests/demo.test.js). app.js feeds
+// each snapshot() straight into render().
+
+import { applyOrder, cloneRoster, findHostId, randomizeOrder } from "./session.js";
 
 // The sample prompt + roster. Picked to teach the interface in one glance:
 // the host has already gone (so a non-host carries the visible "up next" cue),
@@ -29,17 +33,6 @@ const SAMPLE_PEOPLE = [
 // The demo presents as a meeting that began 9 minutes ago, so the seeded join
 // times read as a plausible spread across the session so far.
 const SESSION_AGE_MS = 9 * 60 * 1000;
-
-// Fisher-Yates with an injectable RNG so randomize() is testable. Returns a new
-// array; never mutates the input.
-function shuffled(items, rng) {
-  const a = [...items];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // Build the seeded participant list, offsetting each join from the shared
 // `startedAt` so the demo's timeline stays consistent with the snapshot.
@@ -66,20 +59,8 @@ export function createDemoSession(now = Date.now(), rng = Math.random) {
   let manualSeq = 0;
 
   const find = (pid) => participants.find((p) => p.id === pid);
-  const hostId = () => participants.find((p) => p.is_host)?.id ?? null;
-
-  // Pin the current host to index 0, preserving the order of everyone else.
-  const pinHost = (ids) => {
-    const h = hostId();
-    if (h == null) return [...ids];
-    return [h, ...ids.filter((id) => id !== h)];
-  };
-
-  const snapshot = () => ({
-    startedAt,
-    prompt,
-    participants: participants.map((p) => ({ ...p })),
-  });
+  const hostId = () => findHostId(participants);
+  const snapshot = () => ({ startedAt, prompt, participants: cloneRoster(participants) });
 
   return {
     snapshot,
@@ -119,36 +100,14 @@ export function createDemoSession(now = Date.now(), rng = Math.random) {
     // Apply a host-pinned order. Unknown ids drop; any omitted ids tack on at
     // the end — mirrors State.set_order so drag/keyboard reorder feels identical.
     setOrder(orderList) {
-      const known = new Set(participants.map((p) => p.id));
-      const seen = new Set();
-      const next = [];
-      for (const id of orderList) {
-        if (known.has(id) && !seen.has(id)) {
-          seen.add(id);
-          next.push(id);
-        }
-      }
-      for (const p of participants) if (!seen.has(p.id)) next.push(p.id);
-      const order = pinHost(next);
-      const byId = new Map(participants.map((p) => [p.id, p]));
-      participants = order.map((id) => byId.get(id));
+      participants = applyOrder(participants, orderList, hostId());
       return snapshot();
     },
 
     // Shuffle only the still-to-go non-hosts; introduced people keep their slot,
     // the host stays pinned. Mirrors State.randomize.
     randomize() {
-      const h = hostId();
-      const nonHost = participants.filter((p) => p.id !== h);
-      const pool = shuffled(
-        nonHost.filter((p) => !p.introduced).map((p) => p.id),
-        rng,
-      );
-      let k = 0;
-      const reordered = nonHost.map((p) => (p.introduced ? p.id : pool[k++]));
-      const order = pinHost(reordered);
-      const byId = new Map(participants.map((p) => [p.id, p]));
-      participants = order.map((id) => byId.get(id));
+      participants = randomizeOrder(participants, hostId(), rng);
       return snapshot();
     },
   };
