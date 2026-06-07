@@ -34,7 +34,12 @@ export function installDomStubs() {
     "confirm",
     vi.fn(() => true),
   );
-  window.matchMedia = vi.fn().mockReturnValue({ matches: false });
+  // Stub via vi.stubGlobal (not a direct window assignment) so vi.unstubAllGlobals()
+  // restores it between suites. app.js only reads .matches.
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn(() => ({ matches: false })),
+  );
   // jsdom doesn't implement the Web Animations API used by playReorder().
   if (!Element.prototype.animate) Element.prototype.animate = () => ({});
 }

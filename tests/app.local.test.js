@@ -49,7 +49,10 @@ describe("local (backend-less) mode", () => {
     await import("../app.js");
     expect(document.querySelector("#roster .empty")).not.toBeNull();
     expect(seen).toHaveLength(0); // no server transport
-    expect(postedUrls()).toEqual(["events"]); // only the probe
+    // Only the probe ran — assert its shape, not an exact string, so an
+    // equivalent probe URL (e.g. "/events") wouldn't make this brittle.
+    expect(postedUrls()).toHaveLength(1);
+    expect(postedUrls()[0]).toMatch(/(^|\/)events(\?|$)/);
   });
 
   it("adds a participant locally with no /api POST", async () => {

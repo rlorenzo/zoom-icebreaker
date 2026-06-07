@@ -67,9 +67,10 @@ you tap one button per person as they speak.
   the Participants panel so you rarely type a name.
 - **Manual mode anywhere** — no permission or wrong OS? Type names in. The
   page is identical.
-- **Private and ephemeral by design** — state lives in memory for the one
-  meeting and is gone when you stop the process. No account, no history, no
-  data sent anywhere.
+- **Private by design** — no account, no history, and nothing sent anywhere.
+  In the local app, state lives only in memory and is gone when you stop the
+  process; the hosted version keeps it in your browser (localStorage) so a
+  refresh doesn't lose the meeting, and clearing it is a click away.
 
 ## Two views, one screen
 
