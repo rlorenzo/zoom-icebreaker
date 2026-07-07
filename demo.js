@@ -52,8 +52,10 @@ function seedParticipants(startedAt) {
 // { startedAt, prompt, participants }. Participants stay in BACKEND order
 // (host first, then arrival/drag order); render() re-sorts for display and
 // numbers positions from this order, so the host keeps "1" even after going.
-export function createDemoSession(now = Date.now(), rng = Math.random) {
-  const startedAt = now - SESSION_AGE_MS;
+// `now` is a clock function (like engine.js takes) so manual adds get the time
+// they happen, not the time the demo opened.
+export function createDemoSession(now = Date.now, rng = Math.random) {
+  const startedAt = now() - SESSION_AGE_MS;
   let prompt = SAMPLE_PROMPT;
   let participants = seedParticipants(startedAt);
   let manualSeq = 0;
@@ -82,7 +84,7 @@ export function createDemoSession(now = Date.now(), rng = Math.random) {
         participants.push({
           id: `demo-m${manualSeq++}`,
           name: nm,
-          joinTime: now,
+          joinTime: now(),
           leftTime: null,
           present: true,
           introduced: false,

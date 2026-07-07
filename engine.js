@@ -19,13 +19,26 @@ import { applyOrder, cloneRoster, findHostId, randomizeOrder } from "./session.j
 
 const STORE_KEY = "icebreaker.session.v1";
 
+// A stored participant is usable if it looks like what commit() writes.
+// Anything else — nulls or foreign shapes from a corrupted write, or another
+// page sharing this origin's localStorage (e.g. project sites on
+// username.github.io) — is dropped rather than adopted and re-persisted, since
+// a null entry would make every later mutation throw on `p.id`.
+const isParticipant = (p) =>
+  p !== null && typeof p === "object" && typeof p.id === "string" && typeof p.name === "string";
+
 // localStorage may be blocked (private mode, embedded contexts). Both helpers
 // degrade silently: a blocked read starts a fresh session, a blocked write just
 // means this session won't survive a reload — the meeting still works.
 function loadSaved(key) {
   try {
     const data = JSON.parse(localStorage.getItem(key) || "null");
-    return data && Array.isArray(data.participants) ? data : null;
+    if (!data || !Array.isArray(data.participants)) return null;
+    return {
+      startedAt: typeof data.startedAt === "number" ? data.startedAt : null,
+      prompt: typeof data.prompt === "string" ? data.prompt : "",
+      participants: data.participants.filter(isParticipant),
+    };
   } catch {
     return null;
   }
@@ -51,14 +64,35 @@ export function createEngine({ key = STORE_KEY, now = Date.now } = {}) {
   const hostId = () => findHostId(participants);
   const snapshot = () => ({ startedAt, prompt, participants: cloneRoster(participants) });
 
-  // Save, then echo the new snapshot to every subscriber — the local stand-in
-  // for tracker.py's broadcast(). Returns the snapshot for direct callers/tests.
-  const commit = () => {
-    persist(key, { startedAt, prompt, participants });
+  const emit = () => {
     const snap = snapshot();
     for (const fn of listeners) fn(snap);
     return snap;
   };
+
+  // Save, then echo the new snapshot to every subscriber — the local stand-in
+  // for tracker.py's broadcast(). Returns the snapshot for direct callers/tests.
+  const commit = () => {
+    persist(key, { startedAt, prompt, participants });
+    return emit();
+  };
+
+  // Another tab of this origin may commit to the same key (the host often
+  // opens one tab to screen-share and one to drive). Adopt those writes so a
+  // stale tab reflects them instead of clobbering them with its own old state
+  // on its next action. The storage event only fires in the tabs that did NOT
+  // write, so this never loops.
+  if (typeof window !== "undefined") {
+    window.addEventListener("storage", (e) => {
+      if (e.key !== key) return;
+      const next = loadSaved(key);
+      if (!next) return;
+      startedAt = next.startedAt ?? startedAt;
+      prompt = next.prompt;
+      participants = next.participants;
+      emit();
+    });
+  }
 
   return {
     snapshot,

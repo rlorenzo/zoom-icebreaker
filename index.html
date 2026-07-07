@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Icebreaker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500&display=swap" rel="stylesheet" />
+<!-- No third-party requests: the page is private by design (see README), so
+     the type falls back through locally installed fonts instead of a webfont
+     fetched from a CDN. -->
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -72,16 +72,9 @@
   </footer>
 
   <div class="sponsor-bar">
-    <iframe
-      class="sponsor"
-      src="https://github.com/sponsors/rlorenzo/button"
-      title="Sponsor rlorenzo"
-      height="32"
-      width="114"
-      loading="lazy"
-      referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-    ></iframe>
+    <!-- A plain link, not the sponsors iframe: an embedded iframe phones
+         github.com on every page load, which the privacy promise rules out. -->
+    <a class="sponsor" href="https://github.com/sponsors/rlorenzo" target="_blank" rel="noopener noreferrer">&#9825; Sponsor this project</a>
   </div>
 </div>
 

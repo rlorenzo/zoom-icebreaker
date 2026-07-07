@@ -115,6 +115,17 @@ describe("render", () => {
 describe("roster interactions", () => {
   const seed = () => app.render({ startedAt: Date.now(), prompt: "", participants: trio() });
 
+  // Pick up `fromPid`'s row and hover it over `toPid`'s (whose rect is stubbed
+  // to top 100 / height 40, so clientY < 120 means the upper half).
+  const dragOver = (fromPid, toPid, clientY) => {
+    const from = document.querySelector(`.row[data-pid="${fromPid}"]`);
+    const to = document.querySelector(`.row[data-pid="${toPid}"]`);
+    to.getBoundingClientRect = () => ({ top: 100, height: 40, bottom: 140 });
+    from.dispatchEvent(dragEvent("dragstart"));
+    to.dispatchEvent(dragEvent("dragover", { clientY }));
+    return { from, to };
+  };
+
   it("POSTs introduced when a toggle is clicked", () => {
     seed();
     document.querySelector('.toggle[data-pid="b"]').click();
@@ -181,19 +192,48 @@ describe("roster interactions", () => {
     expect(postedUrls()).not.toContain("/api/order");
   });
 
+  it("keeps introduced participants' backend slots when reordering (sticky positions)", () => {
+    // Backend order: Ann(host), Bob(introduced), Cy, Dan — display sinks Bob
+    // to the bottom. Dragging Dan above Cy must not renumber Bob: the posted
+    // order keeps him in slot 2 and only permutes the waiting rows.
+    app.render({
+      startedAt: Date.now(),
+      prompt: "",
+      participants: [
+        P({ id: "h", name: "Ann", is_host: true }),
+        P({ id: "b", name: "Bob", introduced: true }),
+        P({ id: "c", name: "Cy" }),
+        P({ id: "d", name: "Dan" }),
+      ],
+    });
+    const { to } = dragOver("d", "c", 105); // upper half -> drop-before
+    to.dispatchEvent(dragEvent("drop"));
+
+    const call = fetchMock.mock.calls.find((c) => c[0] === "/api/order");
+    expect(call).toBeTruthy();
+    expect(JSON.parse(call[1].body).order).toEqual(["h", "b", "d", "c"]);
+  });
+
+  it("ignores a drag onto a participant who has left", () => {
+    app.render({
+      startedAt: Date.now(),
+      prompt: "",
+      participants: [P({ id: "b", name: "Bob" }), P({ id: "c", name: "Cy", present: false })],
+    });
+    const { to } = dragOver("b", "c", 130);
+    expect(to.classList.contains("drop-after")).toBe(false);
+    to.dispatchEvent(dragEvent("drop"));
+    expect(postedUrls()).not.toContain("/api/order");
+  });
+
   it("reorders via dragstart/dragover/drop and clears indicators on dragend", () => {
     seed();
-    const rowB = document.querySelector('.row[data-pid="b"]');
-    const rowC = document.querySelector('.row[data-pid="c"]');
-    rowC.getBoundingClientRect = () => ({ top: 100, height: 40, bottom: 140 });
-
-    rowB.dispatchEvent(dragEvent("dragstart"));
-    rowC.dispatchEvent(dragEvent("dragover", { clientY: 130 })); // lower half -> drop-after
-    expect(rowC.classList.contains("drop-after")).toBe(true);
-    rowC.dispatchEvent(dragEvent("drop"));
+    const { from, to } = dragOver("b", "c", 130); // lower half -> drop-after
+    expect(to.classList.contains("drop-after")).toBe(true);
+    to.dispatchEvent(dragEvent("drop"));
     expect(postedUrls()).toContain("/api/order");
 
-    rowB.dispatchEvent(dragEvent("dragend"));
+    from.dispatchEvent(dragEvent("dragend"));
     expect(document.querySelector(".drop-after")).toBeNull();
   });
 });

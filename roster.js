@@ -2,6 +2,8 @@
 // touched here, so every function is deterministic and unit-testable on its
 // own (see tests/roster.test.js). app.js imports these for rendering.
 
+import { isReorderable } from "./session.js";
+
 // ---- icons (inline so a single file ships) -----------------------
 const ICON_CHECK = `<svg class="check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3 3 7-7" pathLength="100"/></svg>`;
 const ICON_X = `<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>`;
@@ -75,10 +77,8 @@ function rowClass(p, { isUpNext, upNextChanged, justIntroduced }) {
     .join(" ");
 }
 
-// Only present, not-yet-introduced non-hosts can be reordered.
 function rowDragAttrs(p) {
-  const reorderable = !p.is_host && p.present && !p.introduced;
-  return reorderable ? 'draggable="true" tabindex="0"' : "";
+  return isReorderable(p) ? 'draggable="true" tabindex="0"' : "";
 }
 
 function toggleLabelHtml(p) {

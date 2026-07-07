@@ -8,6 +8,7 @@ import {
   rowHtml,
   sortForDisplay,
 } from "./roster.js";
+import { isReorderable, permuteReorderable } from "./session.js";
 
 // ---- state cache & helpers --------------------------------------
 let state = { participants: [], prompt: "", startedAt: Date.now() };
@@ -52,7 +53,6 @@ let demoBar;
 
 const $ = (id) => document.getElementById(id);
 const stateById = (pid) => state.participants.find((p) => p.id === pid);
-const hostFirst = () => state.participants[0]?.is_host;
 
 // ---- transport ---------------------------------------------------
 // The UI speaks one verb: post(url, body). Two transports answer it. On
@@ -204,7 +204,7 @@ function playReorder(rosterEl, oldTops) {
     const dy = oldTop - r.getBoundingClientRect().top;
     if (Math.abs(dy) < 2) continue;
     r.animate([{ transform: `translateY(${dy}px)` }, { transform: "translateY(0)" }], {
-      duration: 2400,
+      duration: 200,
       easing: "cubic-bezier(0.22, 1, 0.36, 1)",
     });
   }
@@ -274,9 +274,12 @@ export function render(s) {
   if (!inDemo() && s.participants.length > 0) markSeen();
 
   const positionByPid = assignPositions(s.participants);
-  s = { ...s, participants: sortForDisplay(s.participants) };
+  const displayList = sortForDisplay(s.participants);
   const { prevIntroduced, prevUpNextPid, oldTops } = capturePrev();
 
+  // Keep `state` in BACKEND order. The reorder handlers derive the posted
+  // order from it, and posting the display-sorted list would renumber
+  // introduced rows — their sticky positions come from their backend slots.
   state = s;
 
   $("since").textContent = fmtTime(s.startedAt);
@@ -294,7 +297,7 @@ export function render(s) {
     upNextChanged: upNextPid && upNextPid !== prevUpNextPid,
     prevIntroduced,
   };
-  renderRoster(s.participants, ctx, oldTops);
+  renderRoster(displayList, ctx, oldTops);
   restoreFocus();
 }
 
@@ -305,34 +308,29 @@ function clearDropIndicators() {
   }
 }
 
-// Resolve the focused, reorderable row from a keyboard event, or null.
+// Resolve the focused, reorderable row from a keyboard event, or null
+// (a participant may have left while their row held focus).
 function focusedReorderRow(e) {
   const row = e.target.closest(".row");
   if (!row || row !== e.target) return null;
   const p = stateById(row.dataset.pid);
-  // Mirror the drag handler: only present, non-host, not-yet-introduced rows
-  // are reorderable (a participant may have left while their row held focus).
-  if (!p || p.is_host || !p.present || p.introduced) return null;
+  if (!p || !isReorderable(p)) return null;
   return { pid: row.dataset.pid };
 }
 
-// Compute the id order after nudging `pid` by `delta`, or null if the move is
-// out of bounds or would land on a non-reorderable (host/introduced/absent)
-// row. Pure, so the guard logic stays unit-testable and the handler stays flat.
+// Compute the id order after nudging `pid` one visible slot up or down among
+// the reorderable rows, or null when the move falls off either end. Host,
+// introduced, and departed rows are skipped entirely, so their backend slots
+// (and sticky position numbers) never shift. Pure, so the guard logic stays
+// unit-testable and the handler stays flat.
 function keyboardReorder(pid, delta) {
-  const order = state.participants.map((x) => x.id);
-  const fromIdx = order.indexOf(pid);
+  const sub = state.participants.filter(isReorderable).map((p) => p.id);
+  const fromIdx = sub.indexOf(pid);
   const toIdx = fromIdx + delta;
-  const minIdx = hostFirst() ? 1 : 0;
-  if (toIdx < minIdx || toIdx >= order.length) return null;
-  // Mirror the drag handler: don't reorder past an introduced (or absent) row.
-  // Swapping with one shifts backend slot numbering with no visible move, since
-  // sortForDisplay keeps introduced rows below waiting ones.
-  const dest = state.participants[toIdx];
-  if (!dest?.present || dest.introduced) return null;
-  order.splice(fromIdx, 1);
-  order.splice(toIdx, 0, pid);
-  return order;
+  if (fromIdx < 0 || toIdx < 0 || toIdx >= sub.length) return null;
+  sub.splice(fromIdx, 1);
+  sub.splice(toIdx, 0, pid);
+  return permuteReorderable(state.participants, sub);
 }
 
 // ---- event wiring ------------------------------------------------
@@ -397,7 +395,7 @@ function wireRosterActions() {
     if (!row) return;
     const pid = row.dataset.pid;
     const p = stateById(pid);
-    if (!p || p.is_host || !p.present || p.introduced) {
+    if (!p || !isReorderable(p)) {
       e.preventDefault();
       return;
     }
@@ -423,7 +421,10 @@ function wireRosterActions() {
     const pid = row.dataset.pid;
     if (pid === dragPid) return;
     const target = stateById(pid);
-    if (!target || (target.introduced && !target.is_host)) return;
+    // Valid drop targets are reorderable rows, plus the host row (interpreted
+    // as "after host"). Introduced and departed rows are skipped: dropping
+    // next to one would shift backend slots with no meaningful visible move.
+    if (!target || !(isReorderable(target) || target.is_host)) return;
     clearDropIndicators();
     // Dropping on the host row is always interpreted as "after host".
     const rect = row.getBoundingClientRect();
@@ -443,14 +444,22 @@ function wireRosterActions() {
     dropTargetPid = null;
     if (!targetPid) return;
 
-    const order = state.participants.map((p) => p.id);
-    const fromIdx = order.indexOf(moving);
+    // Move within the reorderable rows only, then map back onto the full
+    // backend order so host/introduced/departed slots stay untouched.
+    const sub = state.participants.filter(isReorderable).map((p) => p.id);
+    const fromIdx = sub.indexOf(moving);
     if (fromIdx < 0) return;
-    order.splice(fromIdx, 1);
-    const toIdx = order.indexOf(targetPid);
-    if (toIdx < 0) return;
-    order.splice(dropBefore ? toIdx : toIdx + 1, 0, moving);
-    postOrder(order);
+    sub.splice(fromIdx, 1);
+    let toIdx;
+    if (stateById(targetPid)?.is_host) {
+      toIdx = 0; // dropping on the host row means "first after the host"
+    } else {
+      const t = sub.indexOf(targetPid);
+      if (t < 0) return;
+      toIdx = dropBefore ? t : t + 1;
+    }
+    sub.splice(toIdx, 0, moving);
+    postOrder(permuteReorderable(state.participants, sub));
   });
 
   // ---- keyboard reorder -----------------------------------------

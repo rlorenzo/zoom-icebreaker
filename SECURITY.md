@@ -12,6 +12,6 @@ Only the latest version of Icebreaker Tracker is supported.
 
 If you discover a potential security vulnerability in this project, please report it privately. **Do not create a public GitHub issue for security vulnerabilities.**
 
-Please send an email to the project maintainers (see README for contact info, or use GitHub's private vulnerability reporting if enabled) with a description of the issue and steps to reproduce it.
+Please use [GitHub's private vulnerability reporting](https://github.com/rlorenzo/zoom-icebreaker/security/advisories/new) — open the repository's **Security** tab and choose **Report a vulnerability** — with a description of the issue and steps to reproduce it.
 
 We will acknowledge your report and provide an estimated timeframe for a fix.
