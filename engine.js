@@ -23,9 +23,26 @@ const STORE_KEY = "icebreaker.session.v1";
 // Anything else — nulls or foreign shapes from a corrupted write, or another
 // page sharing this origin's localStorage (e.g. project sites on
 // username.github.io) — is dropped rather than adopted and re-persisted, since
-// a null entry would make every later mutation throw on `p.id`.
+// a null entry would make every later mutation throw on `p.id` and a missing
+// joinTime would render as "Invalid Date".
 const isParticipant = (p) =>
-  p !== null && typeof p === "object" && typeof p.id === "string" && typeof p.name === "string";
+  p !== null &&
+  typeof p === "object" &&
+  typeof p.id === "string" &&
+  typeof p.name === "string" &&
+  typeof p.joinTime === "number";
+
+// Coerce the remaining fields to the exact shape commit() writes, so nothing
+// downstream meets a foreign type.
+const sanitizeParticipant = (p) => ({
+  id: p.id,
+  name: p.name,
+  joinTime: p.joinTime,
+  leftTime: typeof p.leftTime === "number" ? p.leftTime : null,
+  present: Boolean(p.present),
+  introduced: Boolean(p.introduced),
+  is_host: Boolean(p.is_host),
+});
 
 // localStorage may be blocked (private mode, embedded contexts). Both helpers
 // degrade silently: a blocked read starts a fresh session, a blocked write just
@@ -37,7 +54,7 @@ function loadSaved(key) {
     return {
       startedAt: typeof data.startedAt === "number" ? data.startedAt : null,
       prompt: typeof data.prompt === "string" ? data.prompt : "",
-      participants: data.participants.filter(isParticipant),
+      participants: data.participants.filter(isParticipant).map(sanitizeParticipant),
     };
   } catch {
     return null;

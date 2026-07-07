@@ -878,6 +878,9 @@ def poller(args: argparse.Namespace, exclude_re: re.Pattern[str]) -> None:
         try:
             people = read_zoom_participants(args, exclude_re)
             if people is None:
+                # Zoom not running is not an empty panel: only truly
+                # consecutive empty successful reads may clear the roster.
+                empty_reads = 0
                 if not pat_warned:
                     sys.stderr.write(
                         "[reader] Zoom not running yet; will keep checking.\n"
@@ -889,6 +892,7 @@ def poller(args: argparse.Namespace, exclude_re: re.Pattern[str]) -> None:
                 if people or empty_reads >= EMPTY_READS_TO_CLEAR:
                     STATE.sync_participants(people)
         except Exception as e:
+            empty_reads = 0  # a failed read says nothing about the panel
             sys.stderr.write(f"[reader] read error: {e}\n")
         time.sleep(args.interval)
 

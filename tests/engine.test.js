@@ -149,7 +149,8 @@ describe("persistence", () => {
           null,
           "Pat",
           { noId: true },
-          { id: "ok1", name: "Pat", present: true, introduced: false, is_host: false },
+          { id: "no-time", name: "Ghost" }, // missing joinTime — dropped
+          { id: "ok1", name: "Pat", joinTime: NOW, present: 1, is_host: false },
         ],
       }),
     );
@@ -158,6 +159,12 @@ describe("persistence", () => {
     expect(names(snap)).toEqual(["Pat"]);
     expect(snap.startedAt).toBe(NOW);
     expect(snap.prompt).toBe("");
+    // Loose fields are coerced to the exact shape commit() writes.
+    expect(snap.participants[0]).toMatchObject({
+      present: true,
+      introduced: false,
+      leftTime: null,
+    });
     expect(e.remove("ok1").participants).toHaveLength(0); // no throw on mutation
   });
 
@@ -172,7 +179,14 @@ describe("persistence", () => {
         startedAt: NOW,
         prompt: "From tab A",
         participants: [
-          { id: "a1", name: "Alice", present: true, introduced: false, is_host: false },
+          {
+            id: "a1",
+            name: "Alice",
+            joinTime: NOW,
+            present: true,
+            introduced: false,
+            is_host: false,
+          },
         ],
       }),
     );
