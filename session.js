@@ -9,6 +9,21 @@
 // one). Shared so demo and engine resolve it identically.
 export const findHostId = (participants) => participants.find((p) => p.is_host)?.id ?? null;
 
+// Only present, not-yet-introduced non-hosts can be dragged or nudged into a
+// new slot. Shared by rendering (roster.js) and the reorder handlers (app.js)
+// so the draggable affordance and the accepted moves can never disagree.
+export const isReorderable = (p) => !p.is_host && p.present && !p.introduced;
+
+// Rebuild the full id order with the reorderable participants permuted into
+// `reorderedIds`, while everyone else (host, introduced, departed) keeps their
+// backend slot. This is what keeps position numbers sticky (see
+// roster.js assignPositions): reordering the waiting people never shifts the
+// slots of those who already went.
+export function permuteReorderable(participants, reorderedIds) {
+  let k = 0;
+  return participants.map((p) => (isReorderable(p) ? reorderedIds[k++] : p.id));
+}
+
 // A deep-enough copy of the roster for snapshots, so callers can't mutate state.
 export const cloneRoster = (participants) => participants.map((p) => ({ ...p }));
 

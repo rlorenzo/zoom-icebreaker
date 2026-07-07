@@ -8,17 +8,18 @@ extractor against them. Zoom's tree is undocumented and changes between
 versions, so always run this first.
 
 Usage:
-    python3 ax_dump.py                 # dump Zoom, default depth 14
+    python3 ax_dump.py                  # dump Zoom, default depth 14
     python3 ax_dump.py --depth 20
     python3 ax_dump.py --bundle us.zoom.xos
-    python3 ax_dump.py --grep -i part  # only print branches matching a regex
+    python3 ax_dump.py --grep part -i   # only print nodes matching a regex,
+                                        # case-insensitively
     python3 ax_dump.py --max-nodes 8000
 
 Tips:
     1. Start/join a meeting and OPEN the Participants panel first.
     2. Run this, then search the output for a name you can see on screen.
     3. Note the chain of AXRole / AXIdentifier / AXDescription values that
-       leads to the names. That chain is what ax_participants.py targets.
+       leads to the names. That chain is what tracker.py's AX reader targets.
 """
 
 from __future__ import annotations
@@ -36,11 +37,7 @@ try:
         AXUIElementCreateApplication,
     )
 except ImportError:
-    sys.exit(
-        "pyobjc is not installed. From this folder run:\n"
-        "  python3 -m venv .venv && source .venv/bin/activate\n"
-        "  pip install -r requirements.txt\n"
-    )
+    sys.exit("pyobjc is not installed. From this folder run:\n  uv sync\n")
 
 DEFAULT_BUNDLE = "us.zoom.xos"
 
@@ -126,7 +123,13 @@ def main() -> None:
         nargs="+",
         default=None,
         help="only print nodes whose line matches this regex "
-        "(prefix -i for case-insensitive, e.g. --grep -i participant)",
+        "(multiple words are joined with spaces)",
+    )
+    ap.add_argument(
+        "-i",
+        "--ignore-case",
+        action="store_true",
+        help="make --grep case-insensitive",
     )
     args = ap.parse_args()
 
@@ -151,12 +154,8 @@ def main() -> None:
 
     pattern: re.Pattern[str] | None = None
     if args.grep:
-        toks = list(args.grep)
-        flags = 0
-        if toks and toks[0] == "-i":
-            flags = re.IGNORECASE
-            toks = toks[1:]
-        pattern = re.compile(" ".join(toks), flags)
+        flags = re.IGNORECASE if args.ignore_case else 0
+        pattern = re.compile(" ".join(args.grep), flags)
 
     printed = 0
     for _depth, line in lines:

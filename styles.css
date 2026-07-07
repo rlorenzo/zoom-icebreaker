@@ -286,7 +286,7 @@ header {
   font-weight: 600;
 }
 .up-next-tag {
-  font-size: 0.6875rem;
+  font-size: 0.75rem; /* DESIGN.md floor: labels never go below 12px */
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -379,7 +379,7 @@ header {
 .row.introduced .pos {
   color: var(--soft-line);
 }
-.pos.left-mark {
+.row.left .pos {
   color: var(--soft-line);
 }
 
@@ -404,7 +404,7 @@ header {
 
 .host-pill {
   flex: none;
-  font-size: 0.6875rem;
+  font-size: 0.75rem; /* DESIGN.md floor: labels never go below 12px */
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: lowercase;
@@ -431,7 +431,7 @@ header {
 }
 
 .tag {
-  font-size: 0.6875rem;
+  font-size: 0.75rem; /* DESIGN.md floor: labels never go below 12px */
   letter-spacing: 0.06em;
   color: var(--muted-ink);
   border: 1px solid var(--hairline);
@@ -598,8 +598,20 @@ footer {
   margin-top: 32px;
 }
 .sponsor {
-  border: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-ink);
+  text-decoration: none;
+  border: 1px solid var(--hairline);
   border-radius: 6px;
+  padding: 6px 12px;
+  transition:
+    color var(--t-fast),
+    border-color var(--t-fast);
+}
+.sponsor:hover {
+  color: var(--ink);
+  border-color: var(--clay);
 }
 
 input {

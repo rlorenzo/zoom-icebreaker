@@ -553,8 +553,11 @@ class State:
             by_id = {pid: dict(p) for pid, p in self.participants.items()}
             ordered = [by_id[pid] for pid in self.order if pid in by_id]
             # Defensive: include any participant not in order at the end.
+            # (Set membership: `pid in self.order` per participant would make
+            # every snapshot O(n^2) under the lock.)
+            in_order = set(self.order)
             for pid, p in by_id.items():
-                if pid not in self.order:
+                if pid not in in_order:
                     ordered.append(p)
             return {
                 "startedAt": self.started_at,
@@ -860,18 +863,36 @@ Handler._STATIC_POST = {
 
 
 # --- Reader poller thread --------------------------------------------------
+# One empty read is ambiguous: the meeting may have ended (everyone should be
+# marked as left), but the host may also have just closed the participants
+# panel or Zoom repainted mid-read. Require a few consecutive empty reads
+# before treating "no names" as authoritative; a reopened panel revives
+# everyone on the next non-empty read either way.
+EMPTY_READS_TO_CLEAR = 3
+
+
 def poller(args: argparse.Namespace, exclude_re: re.Pattern[str]) -> None:
     pat_warned = False
+    empty_reads = 0
     while True:
         try:
             people = read_zoom_participants(args, exclude_re)
-            if people is None and not pat_warned:
-                sys.stderr.write("[reader] Zoom not running yet; will keep checking.\n")
-                pat_warned = True
-            elif people:
+            if people is None:
+                # Zoom not running is not an empty panel: only truly
+                # consecutive empty successful reads may clear the roster.
+                empty_reads = 0
+                if not pat_warned:
+                    sys.stderr.write(
+                        "[reader] Zoom not running yet; will keep checking.\n"
+                    )
+                    pat_warned = True
+            else:
                 pat_warned = False
-                STATE.sync_participants(people)
+                empty_reads = 0 if people else empty_reads + 1
+                if people or empty_reads >= EMPTY_READS_TO_CLEAR:
+                    STATE.sync_participants(people)
         except Exception as e:
+            empty_reads = 0  # a failed read says nothing about the panel
             sys.stderr.write(f"[reader] read error: {e}\n")
         time.sleep(args.interval)
 

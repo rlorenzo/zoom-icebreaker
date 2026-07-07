@@ -134,4 +134,66 @@ describe("persistence", () => {
     localStorage.setItem(key, "{ not json");
     expect(createEngine({ key, now: clock }).snapshot().participants).toHaveLength(0);
   });
+
+  it("drops corrupted participant entries instead of adopting them", () => {
+    // A foreign or corrupted write (hosted deployments can share the origin's
+    // localStorage with sibling pages) must not produce ghost rows or make
+    // later mutations throw on a null entry.
+    const key = freshKey();
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        startedAt: "yesterday", // wrong type — ignored
+        prompt: 42, // wrong type — ignored
+        participants: [
+          null,
+          "Pat",
+          { noId: true },
+          { id: "no-time", name: "Ghost" }, // missing joinTime — dropped
+          { id: "ok1", name: "Pat", joinTime: NOW, present: 1, is_host: false },
+        ],
+      }),
+    );
+    const e = createEngine({ key, now: clock });
+    const snap = e.snapshot();
+    expect(names(snap)).toEqual(["Pat"]);
+    expect(snap.startedAt).toBe(NOW);
+    expect(snap.prompt).toBe("");
+    // Loose fields are coerced to the exact shape commit() writes.
+    expect(snap.participants[0]).toMatchObject({
+      present: true,
+      introduced: false,
+      leftTime: null,
+    });
+    expect(e.remove("ok1").participants).toHaveLength(0); // no throw on mutation
+  });
+
+  it("adopts another tab's write on a storage event instead of clobbering it", () => {
+    const key = freshKey();
+    const stale = createEngine({ key, now: clock }); // loaded while storage was empty
+    // Simulate another tab committing to the same key. jsdom does not fire
+    // cross-tab storage events, so dispatch what the browser would deliver.
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        startedAt: NOW,
+        prompt: "From tab A",
+        participants: [
+          {
+            id: "a1",
+            name: "Alice",
+            joinTime: NOW,
+            present: true,
+            introduced: false,
+            is_host: false,
+          },
+        ],
+      }),
+    );
+    window.dispatchEvent(new StorageEvent("storage", { key }));
+    expect(names(stale.snapshot())).toEqual(["Alice"]);
+    // The stale tab's next action now builds on tab A's roster, not on [].
+    expect(names(stale.add("Bob"))).toEqual(["Alice", "Bob"]);
+    expect(stale.snapshot().prompt).toBe("From tab A");
+  });
 });
