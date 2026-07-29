@@ -90,7 +90,6 @@ def walk(
     max_depth: int,
     counter: list[int],
     max_nodes: int,
-    pattern: re.Pattern[str] | None,
     lines: list[tuple[int, str]],
     prefix: str = "",
 ) -> None:
@@ -107,7 +106,6 @@ def walk(
             max_depth,
             counter,
             max_nodes,
-            pattern,
             lines,
             prefix + "  ",
         )
@@ -150,7 +148,7 @@ def main() -> None:
 
     app_el = AXUIElementCreateApplication(pid)
     lines: list[tuple[int, str]] = []
-    walk(app_el, 0, args.depth, [0], args.max_nodes, None, lines)
+    walk(app_el, 0, args.depth, [0], args.max_nodes, lines)
 
     pattern: re.Pattern[str] | None = None
     if args.grep:

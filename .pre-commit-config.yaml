@@ -3,6 +3,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        # fonts/OFL.txt is vendored upstream verbatim; re-vendoring it (see
+        # fonts/README.md) must stay a clean no-op diff, not a whitespace fight.
+        exclude: ^fonts/OFL\.txt$
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-toml
@@ -10,7 +13,7 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.13
+    rev: v0.15.22
     hooks:
       - id: ruff-check
         args: [--fix]
@@ -70,21 +73,21 @@ repos:
         name: biome (js/css lint + format)
         entry: biome check --write --no-errors-on-unmatched
         language: node
-        additional_dependencies: ["@biomejs/biome@2.4.16"]
+        additional_dependencies: ["@biomejs/biome@2.5.5"]
         types_or: [javascript, jsx, ts, tsx, css]
 
       - id: html-validate
         name: html-validate (html structure / a11y)
         entry: html-validate
         language: node
-        additional_dependencies: ["html-validate@11.5.2"]
+        additional_dependencies: ["html-validate@11.5.6"]
         types: [html]
 
       - id: fallow
         name: fallow (dead code, duplication, complexity)
         entry: fallow audit --base main
         language: node
-        additional_dependencies: ["fallow@2.88.3"]
+        additional_dependencies: ["fallow@3.7.1"]
         pass_filenames: false
         types_or: [javascript, jsx, ts, tsx]
         stages: [pre-push]
@@ -93,13 +96,13 @@ repos:
         name: vitest (web unit + jsdom integration)
         entry: vitest run
         language: node
-        additional_dependencies: ["vitest@4.1.8", "jsdom@29.1.1"]
+        additional_dependencies: ["vitest@4.1.10", "jsdom@29.1.1"]
         pass_filenames: false
         types_or: [javascript, jsx, ts, tsx]
         stages: [pre-push]
 
   - repo: https://github.com/jackdewinter/pymarkdown
-    rev: v0.9.37
+    rev: v0.9.39
     hooks:
       - id: pymarkdown
         args: ["-d", "md013", "scan"]

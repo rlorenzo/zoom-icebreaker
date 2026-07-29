@@ -1,10 +1,15 @@
 """Tests for the State class in tracker.py."""
 
+import json
+import queue
 import random
+import threading
+import time
 
 import pytest
 
-from tracker import State
+import tracker
+from tracker import SSE_QUEUE_MAX, State
 
 
 def _names(snapshot):
@@ -272,7 +277,7 @@ class TestRemoveAndReset:
         # Should not raise.
         state.remove("nope")
 
-    def test_reset_clears_participants_but_keeps_prompt(self, state):
+    def test_reset_clears_participants_but_keeps_prompt(self, state, monkeypatch):
         state.set_prompt("Favorite color?")
         state.sync_participants(
             [
@@ -281,13 +286,15 @@ class TestRemoveAndReset:
             ]
         )
         started_at_before = state.snapshot()["startedAt"]
+        # Pin the clock a minute ahead so "refreshed" is a strict change. The
+        # old assertion used >= to tolerate sub-ms resolution, which meant it
+        # also passed when reset() never touched the clock at all.
+        monkeypatch.setattr(tracker.time, "time", lambda: started_at_before / 1000 + 60)
         state.reset()
         snap = state.snapshot()
         assert snap["participants"] == []
         assert snap["prompt"] == "Favorite color?"
-        # startedAt should be refreshed (>=, since clock may not have advanced
-        # at sub-ms resolution).
-        assert snap["startedAt"] >= started_at_before
+        assert snap["startedAt"] > started_at_before
 
 
 class TestPromptAndSnapshot:
@@ -323,3 +330,185 @@ class TestAddManual:
         state.add_manual("Alice")
         names = [p["name"] for p in state.snapshot()["participants"]]
         assert names.count("Alice") == 2
+
+
+class TestAutoReadIdentity:
+    """Zoom's panel is only a list of display names, so identity has to be
+    reconstructed across reads. These pin the behaviour that name-derived ids
+    used to get wrong."""
+
+    def test_same_display_name_twice_stays_two_people(self, state):
+        # Two guests genuinely called the same thing must not collapse onto one
+        # row — whoever collapsed away would silently never be tracked.
+        state.sync_participants(
+            [
+                {"name": "John Smith", "is_host": False},
+                {"name": "John Smith", "is_host": False},
+                {"name": "Ana", "is_host": False},
+            ]
+        )
+        assert _names(state.snapshot()) == ["John Smith", "John Smith", "Ana"]
+        ids = [p["id"] for p in state.snapshot()["participants"]]
+        assert len(set(ids)) == 3
+
+    def test_repeated_names_do_not_multiply_across_reads(self, state):
+        people = [
+            {"name": "John Smith", "is_host": False},
+            {"name": "John Smith", "is_host": False},
+        ]
+        state.sync_participants(people)
+        before = [p["id"] for p in state.snapshot()["participants"]]
+        state.sync_participants(people)
+        assert [p["id"] for p in state.snapshot()["participants"]] == before
+
+    def test_rename_keeps_the_row_and_its_introduced_flag(self, state):
+        state.sync_participants(
+            [
+                {"name": "Alex", "is_host": False},
+                {"name": "Bo", "is_host": False},
+            ]
+        )
+        alex = _pid_of(state, "Alex")
+        state.set_introduced(alex, True)
+        state.sync_participants(
+            [
+                {"name": "Alex Rivera", "is_host": False},
+                {"name": "Bo", "is_host": False},
+            ]
+        )
+        snap = state.snapshot()
+        assert _names(snap) == ["Alex Rivera", "Bo"]
+        renamed = _by_name(state, "Alex Rivera")
+        assert renamed["id"] == alex  # same row, not a ghost + a stranger
+        assert renamed["introduced"] is True
+        assert renamed["present"] is True
+
+    def test_ambiguous_swap_is_not_guessed_at(self, state):
+        # Two out and two in at once has no single possible pairing, so
+        # carrying anyone's checkmark across would be a coin flip. Treat it as
+        # an ordinary leave plus join instead.
+        state.sync_participants(
+            [{"name": "P", "is_host": False}, {"name": "Q", "is_host": False}]
+        )
+        state.sync_participants(
+            [{"name": "X", "is_host": False}, {"name": "Y", "is_host": False}]
+        )
+        by_name = {p["name"]: p for p in state.snapshot()["participants"]}
+        assert by_name["P"]["present"] is False
+        assert by_name["Q"]["present"] is False
+        assert by_name["X"]["present"] is True
+        assert by_name["Y"]["present"] is True
+
+    def test_a_plain_arrival_is_not_mistaken_for_a_rename(self, state):
+        # Nobody left, so the newcomer can't be anyone's new name. The rename
+        # rebind must stay off unless a present row actually vanished.
+        state.sync_participants([{"name": "Alex", "is_host": False}])
+        alex = _pid_of(state, "Alex")
+        state.set_introduced(alex, True)
+        state.sync_participants(
+            [{"name": "Alex", "is_host": False}, {"name": "Sam", "is_host": False}]
+        )
+        assert _names(state.snapshot()) == ["Alex", "Sam"]
+        assert _by_name(state, "Sam")["id"] != alex
+        assert _by_name(state, "Sam")["introduced"] is False
+        assert _by_name(state, "Alex")["introduced"] is True
+
+    def test_manual_rows_are_never_claimed_by_a_panel_name(self, state):
+        # A hand-typed row is not part of the panel's identity space: an
+        # auto-read "Carol" must get her own row rather than adopting (and
+        # later marking absent) the manual one.
+        state.add_manual("Carol")
+        manual = _pid_of(state, "Carol")
+        state.sync_participants([{"name": "Carol", "is_host": False}])
+        ids = [p["id"] for p in state.snapshot()["participants"]]
+        assert len(ids) == 2
+        assert manual in ids
+        assert all(p["present"] for p in state.snapshot()["participants"])
+
+    def test_ids_are_never_reused_after_reset(self, state):
+        # reset() clears the roster but not the counter: a stale SSE frame or
+        # an in-flight click must not land on a new round's participant.
+        state.sync_participants([{"name": "Alice", "is_host": False}])
+        state.add_manual("Manual")
+        before = {p["id"] for p in state.snapshot()["participants"]}
+        state.reset()
+        state.sync_participants([{"name": "Alice", "is_host": False}])
+        state.add_manual("Manual")
+        after = {p["id"] for p in state.snapshot()["participants"]}
+        assert before.isdisjoint(after)
+
+    def test_rejoining_under_the_same_name_reuses_the_row(self, state):
+        state.sync_participants([{"name": "Alice", "is_host": False}])
+        alice = _pid_of(state, "Alice")
+        state.set_introduced(alice, True)
+        state.sync_participants([])  # panel empties (Alice drops off)
+        state.sync_participants([{"name": "Alice", "is_host": False}])
+        again = _by_name(state, "Alice")
+        assert again["id"] == alice
+        assert again["introduced"] is True
+
+
+class TestBroadcastQueueBound:
+    def test_slow_client_keeps_the_newest_frame(self, state):
+        q = queue.Queue(maxsize=SSE_QUEUE_MAX)
+        state.clients.add(q)
+        for i in range(SSE_QUEUE_MAX * 4):
+            state.add_manual(f"p{i}")
+        # The queue is capped, and the frame a stalled reader would see next
+        # time it drains is the CURRENT one — old frames are dropped, not new.
+        assert q.qsize() == SSE_QUEUE_MAX
+        newest = json.loads(list(q.queue)[-1].removeprefix("data: "))
+        assert len(newest["participants"]) == SSE_QUEUE_MAX * 4
+
+
+class TestBroadcastSerialisation:
+    def test_snapshot_and_fanout_do_not_interleave(self, state, monkeypatch):
+        """Two broadcasts must not overlap between snapshot and fan-out.
+
+        snapshot() and the client fan-out take the state lock separately, so
+        without an outer lock a poller sync and a host's click can interleave:
+        the newer snapshot reaches a queue first and the older one lands behind
+        it. The client is then pinned to stale state, and it does not recover,
+        because sync_participants only broadcasts when something changed.
+        """
+        peak = [0]
+        live = [0]
+        tally = threading.Lock()
+        real_snapshot = state.snapshot
+
+        def slow_snapshot():
+            with tally:
+                live[0] += 1
+                peak[0] = max(peak[0], live[0])
+            time.sleep(0.05)  # hold the window open so an overlap is visible
+            try:
+                return real_snapshot()
+            finally:
+                with tally:
+                    live[0] -= 1
+
+        monkeypatch.setattr(state, "snapshot", slow_snapshot)
+        threads = [threading.Thread(target=state.broadcast) for _ in range(4)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5)
+
+        assert peak[0] == 1, f"{peak[0]} broadcasts overlapped"
+
+    def test_client_ends_on_the_current_roster(self, state):
+        # Whatever the interleaving, the frame a client is left holding must
+        # describe the roster as it actually is.
+        q: queue.Queue[str] = queue.Queue(maxsize=tracker.SSE_QUEUE_MAX)
+        state.clients.add(q)
+        threads = [
+            threading.Thread(target=state.add_manual, args=(f"p{i}",))
+            for i in range(12)
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5)
+        state.broadcast()  # settle
+        last = json.loads(list(q.queue)[-1].removeprefix("data: "))
+        assert len(last["participants"]) == len(state.snapshot()["participants"]) == 12

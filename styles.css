@@ -1,3 +1,31 @@
+/* Typeface -------------------------------------------------------------
+   Atkinson Hyperlegible was drawn by the Braille Institute to stay readable
+   when vision is degraded: letterforms that collapse into each other in most
+   sans faces (I/l/1, O/0, b/d) are drawn apart on purpose. That is the same
+   problem a 720p screen-share creates for a room full of people, which is why
+   it is here rather than a face chosen for looks.
+
+   Served from this repo, never from a CDN — the README promises nothing
+   leaves your machine, and a webfont request would quietly break that. Both
+   are variable and declare the file's full wght axis (200–800) so a weight
+   the face can render is never clamped away; we ship the latin subset only,
+   ~50KB total. `swap` means the roster is readable before the face arrives.
+   ---------------------------------------------------------------------- */
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("fonts/atkinson-next-var-latin.woff2") format("woff2-variations");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  src: url("fonts/atkinson-mono-var-latin.woff2") format("woff2-variations");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --paper: #faf7f2;
   --surface: #f3eee5;
@@ -15,7 +43,7 @@
   --t-fast: 140ms cubic-bezier(0.22, 1, 0.36, 1);
   --t-medium: 200ms cubic-bezier(0.22, 1, 0.36, 1);
 
-  font-family: "Geist", "Inter", system-ui, sans-serif;
+  font-family: "Atkinson Hyperlegible Next", system-ui, sans-serif;
 }
 
 * {
@@ -84,7 +112,7 @@ body {
   color: var(--ink);
 }
 .demo-bar-note {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--muted-ink);
 }
 
@@ -165,7 +193,7 @@ header {
 .prompt:focus-visible {
   outline: 2px solid var(--clay);
   outline-offset: 6px;
-  border-radius: 2px;
+  border-radius: var(--rounded-xs);
 }
 
 /* Stats ---------------------------------------------------------- */
@@ -181,7 +209,7 @@ header {
   padding: 16px 20px;
 }
 .stat .n {
-  font-family: "Geist Mono", ui-monospace, monospace;
+  font-family: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
   font-size: 2.25rem;
   font-weight: 500;
   line-height: 1;
@@ -203,18 +231,9 @@ header {
   border-radius: var(--rounded-sm);
   padding: 14px 20px;
   margin-bottom: 22px;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   color: var(--dim-ink);
-}
-.callout b {
-  color: var(--ink);
-  font-weight: 500;
-}
-.callout .lead {
-  color: var(--muted-ink);
-  font-weight: 500;
-  margin-right: 4px;
 }
 
 /* Roster --------------------------------------------------------- */
@@ -301,10 +320,10 @@ header {
 /* Completion gesture: clay-tinted settle, then surface. ----------- */
 @keyframes mark-flash {
   0% {
-    background-color: oklch(93% 0.045 38);
+    background-color: color-mix(in oklab, var(--clay) 16%, var(--surface));
   }
   60% {
-    background-color: oklch(95% 0.02 38);
+    background-color: color-mix(in oklab, var(--clay) 7%, var(--surface));
   }
   100% {
     background-color: var(--surface);
@@ -368,7 +387,7 @@ header {
 
 /* biome-ignore lint/style/noDescendingSpecificity: base .pos rule intentionally follows the scoped .row.up-next .pos / .row.up-next.just-cued .pos overrides; they set different properties so source order does not affect the cascade */
 .pos {
-  font-family: "Geist Mono", ui-monospace, monospace;
+  font-family: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
   font-size: 1.125rem;
   font-weight: 500;
   color: var(--muted-ink);
@@ -420,7 +439,7 @@ header {
 }
 
 .when {
-  font-family: "Geist Mono", ui-monospace, monospace;
+  font-family: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
   font-size: 0.8125rem;
   color: var(--muted-ink);
   font-feature-settings: "tnum" 1;
@@ -537,7 +556,7 @@ header {
 }
 .empty-body {
   max-width: 50ch;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--dim-ink);
   text-wrap: pretty;
@@ -551,7 +570,7 @@ header {
 /* A quiet text link — used to re-offer the demo after first run. -------- */
 .text-link {
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--clay-deep);
   background: none;
@@ -560,7 +579,7 @@ header {
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
-  border-radius: 4px;
+  border-radius: var(--rounded-xs);
   transition: color var(--t-fast);
 }
 .text-link:hover {
@@ -717,7 +736,7 @@ input:focus {
   }
   /* biome-ignore lint/style/noDescendingSpecificity: narrow-screen override; only adjusts font-size and does not conflict with the .row .when / .row .x rules above */
   .pos {
-    font-size: 1rem;
+    font-size: 1.125rem;
   }
   footer {
     grid-template-columns: 1fr;

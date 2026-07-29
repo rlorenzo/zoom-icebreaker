@@ -23,7 +23,7 @@
   <header>
     <div class="meta">
       <span class="dot" aria-hidden="true"></span>
-      <span id="live">live</span>
+      <span id="live" aria-live="polite">live</span>
       <span class="sep" aria-hidden="true">·</span>
       <span>Started <b id="since">··</b></span>
     </div>
@@ -41,7 +41,7 @@
     ></textarea>
   </div>
 
-  <div class="stats" aria-label="Counts">
+  <div class="stats" role="group" aria-label="Counts" aria-live="polite">
     <div class="stat">
       <div class="n" id="s-present">0</div>
       <div class="l">In the room</div>
@@ -62,7 +62,7 @@
 
   <footer>
     <form class="add-row" id="addForm" autocomplete="off">
-      <input id="addName" placeholder="Add someone manually&hellip;" aria-label="Add participant by name" />
+      <input id="addName" type="text" placeholder="Add someone manually&hellip;" aria-label="Add participant by name" />
       <button class="btn" type="submit">Add</button>
     </form>
     <div class="footer-actions">

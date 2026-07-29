@@ -64,7 +64,9 @@ you tap one button per person as they speak.
 - **One-tap "introduced"** per person. The counts and the highlighted "up
   next" row update instantly.
 - **Automatic Zoom reading** on macOS and Windows — it fills the roster from
-  the Participants panel so you rarely type a name.
+  the Participants panel so you rarely type a name. Keep that panel **open**:
+  it is what the tracker reads, and with it closed the roster simply stays
+  empty rather than guessing at whatever else is on screen.
 - **Manual mode anywhere** — no permission or wrong OS? Type names in. The
   page is identical.
 - **Private by design** — no account, no history, and nothing sent anywhere.

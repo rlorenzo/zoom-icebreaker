@@ -11,37 +11,69 @@ colors:
   ink: "#28201a"
   clay: "#c9573a"
   clay-deep: "#a44128"
+  up-next-tint: "oklch(96.5% 0.04 44)"
 typography:
   display:
-    fontFamily: "Geist, Inter, system-ui, sans-serif"
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "clamp(2rem, 3.4vw, 2.75rem)"
     fontWeight: 600
     lineHeight: 1.05
     letterSpacing: "-0.015em"
   headline:
-    fontFamily: "Geist, Inter, system-ui, sans-serif"
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "1.25rem"
     fontWeight: 500
     lineHeight: 1.2
     letterSpacing: "-0.01em"
+  title:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "1.0625rem"
+    fontWeight: 500
+    lineHeight: 1.3
+    letterSpacing: "-0.005em"
   body:
-    fontFamily: "Geist, Inter, system-ui, sans-serif"
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "0.9375rem"
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "0"
+  caption:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 400
+    lineHeight: 1.4
+    letterSpacing: "0"
   label:
-    fontFamily: "Geist, Inter, system-ui, sans-serif"
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 500
     lineHeight: 1.3
     letterSpacing: "0.04em"
   numeric:
-    fontFamily: "Geist Mono, ui-monospace, monospace"
+    fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
     fontSize: "2.25rem"
     fontWeight: 500
     lineHeight: 1
     letterSpacing: "-0.01em"
+    fontFeature: "'tnum' 1"
+  numeric-compact:
+    fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
+    fontSize: "1.75rem"
+    fontWeight: 500
+    lineHeight: 1
+    letterSpacing: "-0.01em"
+    fontFeature: "'tnum' 1"
+  numeric-row:
+    fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
+    fontSize: "1.125rem"
+    fontWeight: 500
+    lineHeight: 1
+    fontFeature: "'tnum' 1"
+  numeric-emphasis:
+    fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1
     fontFeature: "'tnum' 1"
 rounded:
   xs: "6px"
@@ -120,14 +152,15 @@ components:
 
 A small, considered utility that helps the host of a meeting without performing. Every choice on the page is in service of two simultaneous audiences: the host clicking up close, and the whole room watching the screen-share from across a Zoom feed. Nothing is decorative; nothing competes with the conversation in the room.
 
-The system is light, warm, and restrained. Paper-coded neutrals (faintly warm, never bleached white) carry the canvas. A single sans-serif (Geist) handles every text role; tabular numerics use the matching mono. One accent, clay terracotta, exists for moments of attention (live indicator, focus outlines, identity badges) and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. The design wants to be remembered for *not* getting in the way.
+The system is light, warm, and restrained. Paper-coded neutrals (faintly warm, never bleached white) carry the canvas. A single sans-serif (Atkinson Hyperlegible Next) handles every text role; tabular numerics use its matching mono. One accent, clay terracotta, exists for moments of attention (live indicator, focus outlines, identity badges) and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. The design wants to be remembered for *not* getting in the way.
 
 This system explicitly rejects the gravitational pulls of its category: the dark-navy-and-amber dashboard look the current tracker shipped with, the gamified leaderboard chrome (avatars, points, badges), and the generic SaaS hero-metric template. It also rejects the obvious icebreaker-orange reflex; the warm accent here is clay, not pumpkin.
 
 ### Key Characteristics
 
 - Light theme, warm paper neutrals, never `#fff`
-- Single sans family (Geist), single mono (Geist Mono) for numerics
+- Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics
+- Type is self-hosted, never fetched: the face is part of the build, not a CDN request
 - One accent (clay), used sparingly and never as a state carrier
 - Flat by default: no shadows, tonal layering only
 - Restrained motion: state transitions only, never decorative
@@ -152,35 +185,45 @@ A small, hand-picked palette tuned for daylight rooms and compressed video. Ever
 - **Dim Ink** (`#4a4036` / `oklch(35% 0.018 40)`): tertiary text and ghost-button text. Always paired with a paper or surface background.
 - **Ink** (`#28201a` / `oklch(20% 0.022 40)`): primary text and the primary-button fill. Never `#000`. The brown undertone is what makes the page feel warm even in monochrome moments.
 
+### State Tint
+
+- **Up-Next Tint** (`oklch(96.5% 0.04 44)`): the warm wash behind the up-next roster row, and the only surface in the system that carries chroma above the neutral ceiling. It exists because the room — not the host — has to find the next speaker instantly through compressed video, where a tonal step alone is the first thing the codec eats. Paired with a clay border and a larger position number, never load-bearing on its own.
+
 ### Named Rules: Colors
 
 **The Restrained Accent Rule.** Clay covers ≤10% of any rendered screen. If you find yourself reaching for a second accent, you're solving the wrong problem. Add weight, label, or tone instead.
 
-**The Tinted-Neutral Rule.** Every neutral has chroma between 0.005 and 0.022 in the clay hue family. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent.
+**The Tinted-Neutral Rule.** Every *neutral* has chroma between 0.005 and 0.022 in the clay hue family. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent. The Up-Next Tint (chroma 0.04) is the one sanctioned exception and is not a neutral: it is a state surface, and adding a second one requires retiring this rule rather than quietly widening it.
 
 **The No-Hue-Borne-State Rule.** Introduced vs. waiting is never carried by hue alone. State pairs fill density (paper vs. surface), weight (regular vs. medium), and an explicit icon. A deuteranopic viewer must distinguish the two on first glance.
 
 ## 3. Typography
 
-**Display Font:** Geist (with Inter, system-ui, sans-serif fallback)
-**Body Font:** Geist (same family, regular weight)
-**Numeric Font:** Geist Mono (with ui-monospace fallback) for counts, times, and other tabular data
+**Display Font:** Atkinson Hyperlegible Next (with system-ui, sans-serif fallback)
+**Body Font:** Atkinson Hyperlegible Next (same family, regular weight)
+**Numeric Font:** Atkinson Hyperlegible Mono (with ui-monospace fallback) for counts, times, and other tabular data
 
-**Character:** A single modern humanist sans carries every text role. Geist has wide apertures and a neutral-warm voice; it survives screen-share compression where geometric fonts collapse. The matching mono provides tabular alignment for the meeting counts (3 / 7 / 4) without introducing a second voice.
+**Character:** A single humanist sans carries every text role. Atkinson Hyperlegible was drawn by the Braille Institute for readers with low vision, which makes it unusually well suited to a surface whose primary audience is watching through compressed video: the characters that collapse into each other in most sans faces — `I` / `l` / `1`, `O` / `0`, `b` / `d` — are drawn apart on purpose. It reads as warm and slightly informal rather than clinical, which suits a page that sits in the corner of a meeting. The matching mono provides tabular alignment for the counts (3 / 7 / 4) without introducing a second voice.
 
 ### Hierarchy
 
-- **Display** (Geist, 600, `clamp(2rem, 3.4vw, 2.75rem)`, line-height 1.05, letter-spacing -0.015em): the page title ("Who's gone yet?"). One per page, ever.
-- **Headline** (Geist, 500, 1.25rem, line-height 1.2): used for the "Still to go" callout's lead phrase, when something needs to read between display and body.
-- **Body** (Geist, 400, 0.9375rem / 15px, line-height 1.5): the roster names, the waiting list copy. Default for any non-numeric text.
-- **Label** (Geist, 500, 0.75rem / 12px, letter-spacing 0.04em): the small uppercase or sentence-case roles on stat tiles, tags, and buttons. Never used as long-form text.
-- **Numeric** (Geist Mono, 500, 2.25rem / 36px, line-height 1, font-feature `tnum`): the big counts on stat tiles. Tabular figures so widths don't reflow when numbers update.
+- **Display** (Atkinson Next, 600, `clamp(2rem, 3.4vw, 2.75rem)`, line-height 1.05, letter-spacing -0.015em): the page title ("Who's gone yet?"). One per page, ever.
+- **Headline** (Atkinson Next, 500, 1.25rem, line-height 1.2): the name on the up-next row, sized up so the room reads the next speaker before the host says anything.
+- **Title** (Atkinson Next, 500, 1.0625rem / 17px, line-height 1.3): the roster names. Two points above body because these are the words the room actually reads through a compressed feed; every other text role can afford to be quieter, this one cannot.
+- **Body** (Atkinson Next, 400, 0.9375rem / 15px, line-height 1.5): prose — empty-state copy, the completion callout. Default for any non-numeric text that isn't a name.
+- **Caption** (Atkinson Next, 400, 0.8125rem / 13px, line-height 1.4): the header meta line, joined-at timestamps, and empty-state footnotes. Secondary information the host may want and the room can ignore.
+- **Label** (Atkinson Next, 500, 0.75rem / 12px, letter-spacing 0.04em): the small uppercase or sentence-case roles on stat tiles, tags, and buttons. Never used as long-form text.
+- **Numeric** (Atkinson Mono, 500, 2.25rem / 36px, line-height 1, font-feature `tnum`): the big counts on stat tiles. Tabular figures so widths don't reflow when numbers update. Drops to **Numeric Compact** (1.75rem / 28px) below 640px, where three full-size counts would crowd the row.
+- **Numeric Row** (Atkinson Mono, 500, 1.125rem / 18px, font-feature `tnum`): the standing position number on each roster row.
+- **Numeric Emphasis** (Atkinson Mono, 600, 1.5rem / 24px, font-feature `tnum`): the position number on the up-next row only. The size step is half the up-next signal; the tint is the other half.
 
 ### Named Rules: Typography
 
-**The One-Family Rule.** Geist (plus Geist Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight. The previous Fraunces + IBM Plex Mono pairing is retired; that combination served a different brief.
+**The One-Family Rule.** Atkinson Hyperlegible Next (plus Atkinson Hyperlegible Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight. Two pairings are retired and must not return: Fraunces + IBM Plex Mono, and the Geist pair that replaced it — the latter was declared but never actually delivered, so the design only existed on machines that happened to have it installed.
 
-**The Tabular Numerics Rule.** Every number that updates live (counts on stat tiles, the joined-at timestamp) is rendered in Geist Mono with `font-feature-settings: 'tnum'`. Numbers must not reflow their container when they tick.
+**The Tabular Numerics Rule.** Every number that updates live (counts on stat tiles, the joined-at timestamp) is rendered in Atkinson Mono with `font-feature-settings: 'tnum'`. Numbers must not reflow their container when they tick.
+
+**The Self-Hosted Type Rule.** The face ships from this repo (`fonts/`, latin subset, ~50KB) and is never fetched from a CDN. Two reasons, and both are binding: a webfont request would break the promise that nothing leaves your machine, and a face that is merely *named* renders only for whoever already has it. If you change the typeface, you ship the file — declaring a family you do not deliver is the bug this rule exists to prevent.
 
 **The Screen-Share Floor Rule.** Body type never goes below 15px. Labels never go below 12px. Anything smaller dies in the 1080p video pipeline. Test by downsampling a screenshot to 1280×720 and reading from 2m away.
 
@@ -224,7 +267,7 @@ The host's primary interaction. Always reachable, always cheap.
 Three tiles at the top: present count, introduced count, still-to-go count.
 
 - **Shape:** 10px radius, surface background (not paper, so it reads as data rather than a duplicate row).
-- **Number:** numeric typography (Geist Mono, 36px, tabular). Always ink color; never tinted to match status.
+- **Number:** numeric typography (Atkinson Mono, 36px, tabular). Always ink color; never tinted to match status.
 - **Label:** label typography below the number, muted-ink, sentence case.
 - **No border.** Tonal contrast with paper is the only delimiter. *Bordered stat tiles read as dashboard; these read as a ledger summary.*
 - **Internal padding:** 16px vertical, 20px horizontal.
@@ -265,7 +308,7 @@ The "still to go" frame that lists names not yet introduced.
  (`#faf7f2`) for the canvas and default row; Surface (`#f3eee5`) as the only second tonal layer. That two-step palette is the entire elevation system.
 - **Do** carry the introduced-vs-waiting distinction in *fill density + weight + icon* (paper→surface, regular→muted-ink, no checkmark→checkmark). The state must be legible on a deuteranopic monitor.
 - **Do** keep Clay accent under 10% of any rendered screen. Use it for the live dot, focus outlines, and the host identity label. Nowhere else.
-- **Do** render every live-updating number in Geist Mono with `font-feature-settings: 'tnum'`. Numbers must not reflow their container.
+- **Do** render every live-updating number in Atkinson Mono with `font-feature-settings: 'tnum'`. Numbers must not reflow their container.
 - **Do** test every screen by downsampling a screenshot to 1280×720 and reading it from 2m away. If you can't read a row name or a count, the type is too small.
 - **Do** treat reduced-motion as a hard mode switch: the live dot stops pulsing, transitions drop to opacity-only, and the roster updates without animation.
 
