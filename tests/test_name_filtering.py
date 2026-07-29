@@ -334,3 +334,93 @@ class TestReaderDedupe:
         )
         assert [p["name"] for p in people] == ["Ana Costa"]
         assert people[0]["is_host"] is True
+
+
+class _FakeAX:
+    """A stand-in AX element: attribute dict plus children."""
+
+    def __init__(self, attrs=None, children=()):
+        self.attrs = attrs or {}
+        self.children = list(children)
+
+
+def _fake_attr(el, name):
+    if name == "AXChildren":
+        return el.children
+    return el.attrs.get(name)
+
+
+def _cell(item_type, *texts):
+    kids = [_FakeAX({"AXRole": "AXStaticText", "AXValue": t}) for t in texts]
+    return _FakeAX(
+        {"AXRole": "AXRow", "AXSubrole": "AXTableRow"},
+        [_FakeAX({"AXRole": "AXCell", "AXIdentifier": item_type}, kids)],
+    )
+
+
+class TestInviteesAreNotParticipants:
+    """Regression: only people who actually joined belong on the roster.
+
+    Zoom's panel has a "Joined (N)" section and a "Not joined (N)" section, and
+    every invitee row carries their RSVP as a sibling text node. Flattened, that
+    reads as a name followed by another name — which is how "Accepted" and
+    "No response" ended up on a live roster. Structure mirrors a real capture:
+    each row's cell is tagged with a ZMHCTableItemType_* identifier.
+    """
+
+    @staticmethod
+    def _panel():
+        return _FakeAX(
+            {"AXRole": "AXOutline", "AXDescription": "Participants list"},
+            [
+                _cell("ZMHCTableItemType_PANELIST_Group", "Joined (4)"),
+                _cell("ZMHCTableItemType_PANELIST", "Rex Lorenzo (Host, me)"),
+                _cell("ZMHCTableItemType_PANELIST", "JJMatashi (Co-host, Guest)"),
+                _cell("ZMHCTableItemType_PANELIST", "Chris Loza"),
+                _cell("ZMHCTableItemType_PANELIST", "Rob Knight (he/him) (Guest)"),
+                _cell("ZMHCTableItemType_Invitee_Group", "Not joined (2)"),
+                _cell("ZMHCTableItemType_Invitee", "Jeffrey Williams", "No response"),
+                _cell(
+                    "ZMHCTableItemType_Invitee", "Emmanuel Arinze (Guest)", "Accepted"
+                ),
+            ],
+        )
+
+    def _read(self, monkeypatch):
+        monkeypatch.setattr(tracker, "_attr", _fake_attr)
+        raw = []
+        tracker._collect_texts(self._panel(), raw)
+        exclude_re = build_exclude_re(DEFAULT_EXCLUDE)
+        return tracker._filter_and_dedupe(raw, exclude_re, 2)
+
+    def test_only_joined_people_are_returned(self, monkeypatch):
+        people = self._read(monkeypatch)
+        assert [p["name"] for p in people] == [
+            "Rex Lorenzo",
+            "JJMatashi",
+            "Chris Loza",
+            "Rob Knight (he/him)",
+        ]
+
+    def test_rsvp_statuses_never_become_participants(self, monkeypatch):
+        names = [p["name"] for p in self._read(monkeypatch)]
+        for status in ("Accepted", "No response", "Declined"):
+            assert status not in names
+
+    def test_people_who_have_not_joined_are_excluded(self, monkeypatch):
+        names = [p["name"] for p in self._read(monkeypatch)]
+        assert "Emmanuel Arinze" not in names
+
+    def test_section_headers_are_not_participants(self, monkeypatch):
+        names = [p["name"] for p in self._read(monkeypatch)]
+        assert not any(n.startswith(("Joined", "Not joined")) for n in names)
+
+    def test_combined_role_annotation_keeps_the_person(self, monkeypatch):
+        # "(Co-host, Guest)" used to survive cleaning, then hit `co-host` in
+        # DEFAULT_EXCLUDE and drop the attendee off the roster entirely.
+        names = [p["name"] for p in self._read(monkeypatch)]
+        assert "JJMatashi" in names
+
+    def test_host_is_still_detected(self, monkeypatch):
+        people = self._read(monkeypatch)
+        assert [p["name"] for p in people if p["is_host"]] == ["Rex Lorenzo"]

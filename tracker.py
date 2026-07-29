@@ -135,8 +135,15 @@ PAGES: dict[str, tuple[bytes | None, str]] = {
 INDEX_BYTES: bytes | None = _load_bytes(INDEX_HTML)
 
 # --- Name cleaning / filtering --------------------------------------------
+# Zoom appends the roles a person holds, and it combines them freely:
+# "(Host, me)", "(Co-host, Guest)", "(Guest)". Match any comma-separated run of
+# role words rather than a fixed list of pairs — an unmatched combination is
+# not cosmetic, because the leftover "co-host" then hits DEFAULT_EXCLUDE and
+# the attendee is dropped from the roster entirely. Pronouns like "(he/him)"
+# deliberately do not match and are preserved.
+_ROLE_WORD = r"(?:co-?host|host|guest|panelist|attendee|me|you)"
 ANNOT = re.compile(
-    r"\s*\((?:host|co-?host|me|guest|you|host,\s*me|cohost,\s*me)\)\s*$",
+    rf"\s*\(\s*{_ROLE_WORD}(?:\s*,\s*{_ROLE_WORD})*\s*\)\s*$",
     re.IGNORECASE,
 )
 ROLEWORD = re.compile(r"\b(host|co-?host|guest|me|you)\b\s*$", re.IGNORECASE)
@@ -230,6 +237,25 @@ def looks_like_name(s: str, exclude_re: re.Pattern[str], min_len: int) -> bool:
 # --- Accessibility reading -------------------------------------------------
 TEXT_ROLES = {"AXStaticText", "AXCell", "AXButton", "AXRow", "AXTextField"}
 
+# Zoom tags every row in the participants panel with what that row *is*, which
+# is the only reliable way to tell a person in the meeting from someone merely
+# invited. The panel has two sections — "Joined (7)" and "Not joined (2)" — and
+# each invitee row carries their RSVP as a sibling text node, so a flattened
+# read yields "Emmanuel Arinze" immediately followed by "Accepted", both
+# looking exactly like names. Prune these subtrees instead: the section headers
+# because they are chrome, the invitees because they are not in the meeting.
+#
+# Rows we keep are `ZMHCTableItemType_PANELIST`. If Zoom ever renames these,
+# pruning simply stops matching and the reader degrades to its old behaviour
+# rather than breaking; `--debug` will show the node count jump.
+SKIP_CELL_IDS = frozenset(
+    {
+        "ZMHCTableItemType_Invitee",  # a person who has NOT joined
+        "ZMHCTableItemType_Invitee_Group",  # the "Not joined (N)" header
+        "ZMHCTableItemType_PANELIST_Group",  # the "Joined (N)" header
+    }
+)
+
 # Zoom's chat panel has a recipient picker that mentions "participants",
 # so it can match the participant anchor regex. We reject anchors that
 # look like chat so the harvester doesn't slurp up chat-panel labels
@@ -311,6 +337,8 @@ def _collect_texts(
     if counter[0] >= 6000 or depth > 40:
         return
     counter[0] += 1
+    if str(_attr(el, "AXIdentifier") or "") in SKIP_CELL_IDS:
+        return
     if _attr(el, "AXRole") in TEXT_ROLES:
         t = _node_text(el)
         if t:
