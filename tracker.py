@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import hashlib
 import json
 import os
 import queue
@@ -33,8 +32,8 @@ import sys
 import threading
 import time
 from collections.abc import Callable, Iterable
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any, ClassVar, TypedDict
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
+from typing import Any, ClassVar, TypedDict, cast
 from urllib.parse import urlsplit
 
 # --- Optional accessibility support (degrades gracefully) ------------------
@@ -91,8 +90,12 @@ DEMO_JS = os.path.join(HERE, "demo.js")
 ENGINE_JS = os.path.join(HERE, "engine.js")
 SESSION_JS = os.path.join(HERE, "session.js")
 STYLES_CSS = os.path.join(HERE, "styles.css")
+# Self-hosted so the page makes no third-party request; see styles.css.
+FONT_SANS = os.path.join(HERE, "fonts", "atkinson-next-var-latin.woff2")
+FONT_MONO = os.path.join(HERE, "fonts", "atkinson-mono-var-latin.woff2")
 JS_CONTENT_TYPE = "text/javascript; charset=utf-8"
 CSS_CONTENT_TYPE = "text/css; charset=utf-8"
+WOFF2_CONTENT_TYPE = "font/woff2"
 
 
 def _load_bytes(path: str) -> bytes | None:
@@ -120,6 +123,14 @@ PAGES: dict[str, tuple[bytes | None, str]] = {
     "/engine.js": (_load_bytes(ENGINE_JS), JS_CONTENT_TYPE),
     "/session.js": (_load_bytes(SESSION_JS), JS_CONTENT_TYPE),
     "/styles.css": (_load_bytes(STYLES_CSS), CSS_CONTENT_TYPE),
+    "/fonts/atkinson-next-var-latin.woff2": (
+        _load_bytes(FONT_SANS),
+        WOFF2_CONTENT_TYPE,
+    ),
+    "/fonts/atkinson-mono-var-latin.woff2": (
+        _load_bytes(FONT_MONO),
+        WOFF2_CONTENT_TYPE,
+    ),
 }
 INDEX_BYTES: bytes | None = _load_bytes(INDEX_HTML)
 
@@ -315,15 +326,33 @@ def _filter_and_dedupe(
 
     Host detection runs on the raw text BEFORE cleaning, since the
     "(host)" / "(host, me)" annotations are stripped by clean_name.
+
+    KNOWN LIMITATION: the dedupe is global across the harvested nodes, so two
+    real participants sharing a display name arrive downstream as one person.
+    It cannot simply be dropped: TEXT_ROLES spans row, cell and static-text
+    nodes, so a single participant is normally harvested several times over
+    and a raw list would multiply everybody. Telling "same person, three
+    nodes" apart from "two people, one name" needs a row-aware harvest, which
+    is the fix this layer is missing — State._assign_ax_pids already keeps
+    repeated names on separate rows once they get past here.
     """
     people: list[Person] = []
-    seen: set[str] = set()
+    seen: dict[str, int] = {}  # lowercased name -> index into `people`
     for t in raw:
         is_host = bool(HOST_DETECT.search(t))
         n = clean_name(t)
-        if looks_like_name(n, exclude_re, min_len) and n.lower() not in seen:
-            seen.add(n.lower())
+        if not looks_like_name(n, exclude_re, min_len):
+            continue
+        idx = seen.get(n.lower())
+        if idx is None:
+            seen[n.lower()] = len(people)
             people.append({"name": n, "is_host": is_host})
+        elif is_host:
+            # Only one of the nodes harvested for a row carries "(host)", and
+            # it is not reliably the first one: an AXRow whose own text is the
+            # bare name can precede the AXStaticText that has the annotation.
+            # Keeping the flag here stops node order from deciding who's host.
+            people[idx]["is_host"] = True
     return people
 
 
@@ -338,9 +367,18 @@ def _read_zoom_participants_ax(
     pat = re.compile(args.anchor_regex, re.IGNORECASE)
     anchors: list[Any] = []
     _collect_anchors(app_el, pat, anchors)
-    roots = anchors if anchors else [app_el]
+    if not anchors:
+        # No participants panel anywhere in the tree. Harvesting the whole app
+        # instead would scrape Zoom's own chrome: with no meeting open, every
+        # toolbar button ("History", "Create new", "Open activity center") is
+        # an AXButton with a description, and AXButton is a text role — so the
+        # roster fills with the app's UI. No panel means no participants, and
+        # an exclude list can never keep up with one vendor's button labels.
+        if args.debug:
+            sys.stderr.write("[ax] no participants panel found; reporting none\n")
+        return []
     raw: list[str] = []
-    for r in roots:
+    for r in anchors:
         _collect_texts(r, raw)
     if args.debug:
         sys.stderr.write(f"[ax] {len(anchors)} anchor(s), {len(raw)} raw nodes\n")
@@ -455,9 +493,14 @@ def _read_zoom_participants_uia(
     anchors: list[Any] = []
     for w in windows:
         _uia_collect_anchors(w, pat, anchors)
-    roots = anchors if anchors else windows
+    if not anchors:
+        # Same reasoning as the macOS reader: no panel means no participants,
+        # not "scrape the whole window".
+        if args.debug:
+            sys.stderr.write("[uia] no participants panel found; reporting none\n")
+        return []
     raw: list[str] = []
-    for r in roots:
+    for r in anchors:
         _uia_collect_texts(r, raw)
     if args.debug:
         sys.stderr.write(f"[uia] {len(anchors)} anchor(s), {len(raw)} raw nodes\n")
@@ -477,6 +520,14 @@ def read_zoom_participants(
 
 
 # --- State -----------------------------------------------------------------
+# A participant id carries its origin in the first character: "a" for a name
+# read off Zoom's panel, "m" for one typed in by hand. Only auto-read rows are
+# reconciled against a panel read — a manual row must never be marked left just
+# because Zoom cannot see it.
+AX_PREFIX = "a"
+MANUAL_PREFIX = "m"
+
+
 class State:
     def __init__(self) -> None:
         self.lock = threading.Lock()
@@ -485,11 +536,111 @@ class State:
         self.order: list[str] = []  # list of pids in display order
         self.prompt = ""  # the icebreaker question shown as page title
         self.clients: set[queue.Queue[str]] = set()  # one Queue per SSE client
+        self._seq = 0  # monotonic counter behind every participant id
 
     @staticmethod
-    def _id(prefix: str, name: str) -> str:
-        h = hashlib.sha1(name.lower().encode(), usedforsecurity=False).hexdigest()[:12]
-        return prefix + h
+    def _is_ax(pid: str) -> bool:
+        """Whether `pid` was read off Zoom's panel rather than typed in."""
+        return pid.startswith(AX_PREFIX)
+
+    def _new_id(self, prefix: str) -> str:
+        """Mint a fresh participant id (see AX_PREFIX / MANUAL_PREFIX).
+
+        Deliberately NOT derived from the name. Zoom's panel is only a list of
+        display names, so hashing the name made the name the identity: two
+        people called "John Smith" collapsed onto one row, and renaming
+        yourself mid-meeting replaced your row with a stranger's. The counter
+        is never reset (not even by reset()) so an id is never reused.
+
+        The duplicate-name half of that only holds from sync_participants()
+        inward. The AX/UIA readers still collapse repeated names before they
+        reach here (see _filter_and_dedupe), so a second "John Smith" arrives
+        today only via a manual add or a direct API call.
+        """
+        self._seq += 1
+        return f"{prefix}{self._seq:x}"
+
+    def _ax_name_pool(self) -> dict[str, list[str]]:
+        """Existing auto-read participants, bucketed by lowercased name."""
+        pool: dict[str, list[str]] = {}
+        for pid, p in self.participants.items():
+            if self._is_ax(pid):
+                pool.setdefault(p["name"].lower(), []).append(pid)
+        return pool
+
+    def _vanished_present(self, claimed: set[str]) -> list[str]:
+        """Present auto-read participants who did not show up in this read."""
+        return [
+            pid
+            for pid, p in self.participants.items()
+            if self._is_ax(pid) and pid not in claimed and p["present"]
+        ]
+
+    def _apply_rename(self, paired: list[tuple[str | None, str]]) -> None:
+        """Rebind the one new name that is really a rename, if there is one.
+
+        Only a one-for-one swap counts: exactly one present participant
+        vanished from the panel and exactly one unfamiliar name took their
+        place, leaving a single possible pairing. With two or more on either
+        side the pairing would be a guess, and guessing wrong carries
+        somebody's introduced checkmark over to the wrong person — so those
+        are left alone as an ordinary leave plus join.
+
+        Even the one-for-one case is a judgement call: one person leaving and
+        a different one joining inside the same poll is indistinguishable from
+        a rename here. Renames are much the commoner event at this
+        granularity, so they win, and the cost of being wrong is a single
+        checkmark on the wrong row that the host can clear.
+        """
+        claimed = {pid for pid, _ in paired if pid is not None}
+        vanished = self._vanished_present(claimed)
+        fresh = [i for i, (pid, _) in enumerate(paired) if pid is None]
+        if len(vanished) == 1 and len(fresh) == 1:
+            paired[fresh[0]] = (vanished[0], paired[fresh[0]][1])
+
+    def _assign_ax_pids(self, names: list[str]) -> list[str]:
+        """Resolve each panel name to a stable participant id.
+
+        Names are matched against existing auto-read participants one-for-one
+        and each match is consumed, so repeated display names stay on separate
+        rows instead of collapsing. Whoever is left over is either a rename
+        (see _apply_rename) or genuinely new.
+        """
+        pool = self._ax_name_pool()
+        paired: list[tuple[str | None, str]] = []
+        for nm in names:
+            bucket = pool.get(nm.lower())
+            paired.append((bucket.pop(0) if bucket else None, nm))
+        self._apply_rename(paired)
+        return [pid or self._new_id(AX_PREFIX) for pid, _ in paired]
+
+    @staticmethod
+    def _named_entries(people: list[Person]) -> list[tuple[Person, str]]:
+        """Drop blank names, pairing each surviving entry with its clean name."""
+        named: list[tuple[Person, str]] = []
+        for entry in people:
+            nm = str(entry.get("name") or "").strip()
+            if nm:
+                named.append((entry, nm))
+        return named
+
+    def _upsert_read(
+        self, named: list[tuple[Person, str]], pids: list[str]
+    ) -> tuple[bool, set[str], str | None]:
+        """Insert or refresh everyone in one panel read.
+
+        Returns (anything changed, the ids seen this read, the host's id).
+        """
+        changed = False
+        seen: set[str] = set()
+        host_pid: str | None = None
+        for (entry, nm), pid in zip(named, pids, strict=True):
+            seen.add(pid)
+            if entry.get("is_host"):
+                host_pid = pid
+            if self._upsert(pid, nm):
+                changed = True
+        return changed, seen, host_pid
 
     def _upsert(self, pid: str, name: str) -> bool:
         """Insert or refresh a participant. Order is appended to on first sight."""
@@ -542,7 +693,7 @@ class State:
         """Mark AX-tracked participants no longer in the panel as left."""
         changed = False
         for pid, p in self.participants.items():
-            if pid.startswith("a") and pid not in seen_pids and p["present"]:
+            if self._is_ax(pid) and pid not in seen_pids and p["present"]:
                 p["present"] = False
                 p["leftTime"] = now
                 changed = True
@@ -574,31 +725,28 @@ class State:
         with self.lock:
             clients = list(self.clients)
         for q in clients:
-            with contextlib.suppress(Exception):
+            # Make room by dropping the OLDEST frame: every message is a full
+            # snapshot, so the newest is the only one that matters and
+            # discarding it would leave the client stale forever. Empty/Full
+            # can still fire if another thread broadcasts between these calls;
+            # losing one frame of a redundant stream is not worth locking for.
+            with contextlib.suppress(queue.Empty, queue.Full):
+                if q.full():
+                    q.get_nowait()
                 q.put_nowait(data)
 
     def add_manual(self, name: str) -> None:
         with self.lock:
-            self._upsert(self._id("m", name + str(time.time())), name)
+            self._upsert(self._new_id(MANUAL_PREFIX), name)
         self.broadcast()
 
     def sync_participants(self, people: list[Person]) -> bool:
         """`people` is a list of {"name": str, "is_host": bool}."""
-        changed = False
         now = time.time() * 1000
         with self.lock:
-            seen: set[str] = set()
-            host_pid: str | None = None
-            for entry in people:
-                nm = str(entry.get("name") or "").strip()
-                if not nm:
-                    continue
-                pid = self._id("a", nm)
-                seen.add(pid)
-                if entry.get("is_host"):
-                    host_pid = pid
-                if self._upsert(pid, nm):
-                    changed = True
+            named = self._named_entries(people)
+            pids = self._assign_ax_pids([nm for _, nm in named])
+            changed, seen, host_pid = self._upsert_read(named, pids)
             if host_pid is not None and self._settle_host(host_pid):
                 changed = True
             if self._mark_missing_as_left(seen, now):
@@ -689,6 +837,22 @@ STATE = State()
 
 
 # --- HTTP + SSE ------------------------------------------------------------
+# Binding to 127.0.0.1 keeps other machines out, but not other *pages*: while
+# the tracker is running, any site open in the host's browser can post to
+# localhost, and a text/plain body skips the CORS preflight that would
+# otherwise block it. A forged Host header is the DNS-rebinding version of the
+# same trick, and would expose the roster to a read as well. So every request
+# has to name this server in Host, and any Origin it carries must be our exact
+# origin -- scheme, host and port, since the port is what separates us from
+# whatever else the user has running on localhost.
+ALLOWED_HOSTS = frozenset({"localhost", "127.0.0.1", "::1"})
+
+# Each SSE message is a complete snapshot, so a backed-up client only ever
+# needs the newest one. Bounding the queue stops a stalled reader (a laptop
+# asleep with the tab open) from growing it without limit.
+SSE_QUEUE_MAX = 32
+
+
 class QuietHTTPServer(ThreadingHTTPServer):
     """ThreadingHTTPServer that ignores benign client-disconnect errors.
 
@@ -714,6 +878,56 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, format: str, *args: Any) -> None:
         pass  # quiet
+
+    @staticmethod
+    def _hostname(value: str) -> str | None:
+        """Host out of a `Host:` authority or an `Origin:` URL, or None.
+
+        urlsplit already does the port-stripping, IPv6 de-bracketing and
+        case-folding that hand-rolled splitting keeps getting wrong
+        ("[::1]:8000", "LOCALHOST"). A malformed header raises ValueError;
+        anything we cannot parse is treated as untrusted.
+        """
+        with contextlib.suppress(ValueError):
+            return urlsplit(value if "//" in value else f"//{value}").hostname
+        return None
+
+    def _origin_is_ours(self, origin: str) -> bool:
+        """Whether an `Origin:` URL is this exact server, port included.
+
+        A browser origin is (scheme, host, port), so hostname alone is not
+        enough: http://localhost:9999 is some *other* local app, and matching
+        on "localhost" would hand it our whole POST API. The loopback names
+        are not interchangeable either -- 127.0.0.1 and ::1 are distinct
+        origins that can hold distinct servers on the same port -- so the
+        Origin host must be the very name this request was addressed to
+        rather than merely an allowed one. Host is only trusted for that
+        comparison because _is_local_request() has already pinned it to
+        ALLOWED_HOSTS; the port is still taken from the socket we are bound
+        to, never from the client's claim. Origin carries no port when it is
+        the scheme default, hence the 80 fallback.
+        """
+        with contextlib.suppress(ValueError):
+            parts = urlsplit(origin)
+            host = self._hostname(self.headers.get("Host", ""))
+            if parts.scheme != "http" or host is None or parts.hostname != host:
+                return False
+            # self.server is typed as the generic BaseServer; every server we
+            # construct is an HTTPServer, which is what defines server_port.
+            return (parts.port or 80) == cast(HTTPServer, self.server).server_port
+        return False
+
+    def _is_local_request(self) -> bool:
+        """Whether this request really came from a page this server served.
+
+        See ALLOWED_HOSTS. Requests without an Origin (a plain address-bar
+        navigation, curl, EventSource reconnects on some browsers) are fine;
+        it is a *mismatched* Origin that means another site is driving us.
+        """
+        if self._hostname(self.headers.get("Host", "")) not in ALLOWED_HOSTS:
+            return False
+        origin = self.headers.get("Origin")
+        return origin is None or self._origin_is_ours(origin)
 
     def _json(self, code: int, obj: object) -> None:
         body = json.dumps(obj).encode()
@@ -767,6 +981,8 @@ class Handler(BaseHTTPRequestHandler):
         # self.path includes any query string (e.g. "/app.js?v=123"); match on
         # the path component only so cache-busting params don't 404 the UI.
         self.path = urlsplit(self.path).path
+        if not self._is_local_request():
+            return self._json(403, {"error": "forbidden"})
         if self._serve_index() or self._serve_static():
             return
 
@@ -776,7 +992,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-cache")
             self.send_header("Connection", "keep-alive")
             self.end_headers()
-            q: queue.Queue[str] = queue.Queue()
+            q: queue.Queue[str] = queue.Queue(maxsize=SSE_QUEUE_MAX)
             with STATE.lock:
                 STATE.clients.add(q)
             try:
@@ -807,6 +1023,8 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         # Strip any query string before route matching (see do_GET).
         self.path = urlsplit(self.path).path
+        if not self._is_local_request():
+            return self._json(403, {"error": "forbidden"})
         handler = self._STATIC_POST.get(self.path)
         if handler:
             return handler(self)

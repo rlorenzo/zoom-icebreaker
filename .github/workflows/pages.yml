@@ -33,6 +33,9 @@ jobs:
         run: |
           mkdir _site
           cp index.html styles.css app.js roster.js demo.js engine.js session.js _site/
+          # The typeface is self-hosted (see styles.css); without this the
+          # hosted build 404s the woff2 and silently drops to system-ui.
+          cp -R fonts _site/fonts
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b  # v3.0.1
       - id: deployment

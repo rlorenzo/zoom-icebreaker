@@ -1,7 +1,10 @@
 """Tests for the pure name-cleaning / filtering helpers in tracker.py."""
 
+import argparse
+
 import pytest
 
+import tracker
 from tracker import (
     CHAT_HINT_RE,
     DEFAULT_EXCLUDE,
@@ -208,3 +211,126 @@ class TestChatAnchorDetection:
     def test_uia_anchor_not_flagged_for_participant_panel(self):
         el = _FakeUIAElement(Name="Participants (3)", AutomationId="ParticipantsList")
         assert not _is_chat_anchor_uia(el)
+
+
+class TestNoPanelMeansNoParticipants:
+    """Regression: Zoom running but NOT in a meeting must yield an empty roster.
+
+    The readers used to fall back to the whole application when no participants
+    panel matched the anchor regex. Zoom's home window is full of AXButton /
+    ButtonControl nodes ("History", "Create new", "Open activity center"), and
+    those roles are harvested as text — so the roster filled up with the app's
+    own toolbar. Verified against a real idle Zoom: 322 nodes in the tree, zero
+    matching the anchor.
+    """
+
+    @staticmethod
+    def _args():
+        return argparse.Namespace(
+            bundle="us.zoom.xos", anchor_regex="participant", min_len=2, debug=False
+        )
+
+    def test_ax_reader_returns_empty_when_no_panel(self, monkeypatch):
+        texts_called = []
+        monkeypatch.setattr(tracker, "_find_pid", lambda bundle: 4242)
+        monkeypatch.setattr(
+            tracker, "AXUIElementCreateApplication", lambda pid: "APP", raising=False
+        )
+        # Anchor search finds nothing — exactly the idle-Zoom case.
+        monkeypatch.setattr(
+            tracker, "_collect_anchors", lambda *a, **k: None, raising=False
+        )
+        monkeypatch.setattr(
+            tracker,
+            "_collect_texts",
+            lambda *a, **k: texts_called.append(a),
+            raising=False,
+        )
+        exclude_re = build_exclude_re(DEFAULT_EXCLUDE)
+        assert tracker._read_zoom_participants_ax(self._args(), exclude_re) == []
+        # The whole-app scrape must not happen at all.
+        assert texts_called == []
+
+    def test_uia_reader_returns_empty_when_no_panel(self, monkeypatch):
+        texts_called = []
+        monkeypatch.setattr(tracker, "_uia_zoom_windows", lambda: ["WIN"])
+        monkeypatch.setattr(
+            tracker, "_uia_collect_anchors", lambda *a, **k: None, raising=False
+        )
+        monkeypatch.setattr(
+            tracker,
+            "_uia_collect_texts",
+            lambda *a, **k: texts_called.append(a),
+            raising=False,
+        )
+        exclude_re = build_exclude_re(DEFAULT_EXCLUDE)
+        assert tracker._read_zoom_participants_uia(self._args(), exclude_re) == []
+        assert texts_called == []
+
+    def test_zoom_not_running_is_distinct_from_empty_panel(self, monkeypatch):
+        # None ("can't read") must stay distinct from [] ("read it, nobody
+        # there"): the poller only clears the roster on consecutive empty reads.
+        monkeypatch.setattr(tracker, "_find_pid", lambda bundle: None)
+        exclude_re = build_exclude_re(DEFAULT_EXCLUDE)
+        assert tracker._read_zoom_participants_ax(self._args(), exclude_re) is None
+
+
+class TestReaderDedupe:
+    """Pins where duplicate display names are still lost: the reader, not State.
+
+    State._assign_ax_pids keeps two "John Smith"s on two rows, but the readers
+    hand it a single John — both platforms funnel their harvest through
+    _filter_and_dedupe, which drops every later occurrence of a name. The
+    dedupe is load-bearing (TEXT_ROLES harvests each participant from its row,
+    cell and static-text nodes alike), so fixing this means harvesting per row,
+    not deleting the dedupe. These tests document today's behavior; the
+    duplicate assertion is expected to flip when a row-aware harvest lands.
+    """
+
+    @staticmethod
+    def _exclude():
+        return build_exclude_re(DEFAULT_EXCLUDE)
+
+    def test_repeated_nodes_for_one_participant_collapse(self):
+        # Why the dedupe exists: one participant, harvested three times.
+        people = tracker._filter_and_dedupe(
+            ["Ana Costa", "Ana Costa", "Ana Costa"], self._exclude(), 2
+        )
+        assert [p["name"] for p in people] == ["Ana Costa"]
+
+    def test_two_real_participants_sharing_a_name_also_collapse(self):
+        # KNOWN LIMITATION, not a desired outcome: these are two people.
+        people = tracker._filter_and_dedupe(
+            ["John Smith", "John Smith", "Ana Costa"], self._exclude(), 2
+        )
+        assert [p["name"] for p in people] == ["John Smith", "Ana Costa"]
+
+    def test_host_annotation_survives_whatever_order_nodes_arrive_in(self):
+        # Regression: the flag used to come from whichever node was harvested
+        # first, so a row whose bare-name node preceded its "(host)" node lost
+        # the host marker entirely — and then State._settle_host had nobody to
+        # promote, leaving a stale host pinned to the top of the roster.
+        plain_first = tracker._filter_and_dedupe(
+            ["Alice Chen", "Alice Chen (host)"], self._exclude(), 2
+        )
+        annotated_first = tracker._filter_and_dedupe(
+            ["Alice Chen (host)", "Alice Chen"], self._exclude(), 2
+        )
+        assert (
+            plain_first == annotated_first == [{"name": "Alice Chen", "is_host": True}]
+        )
+
+    def test_non_host_duplicate_does_not_clear_an_established_host(self):
+        people = tracker._filter_and_dedupe(
+            ["Alice Chen (host)", "Alice Chen", "Alice Chen"], self._exclude(), 2
+        )
+        assert people == [{"name": "Alice Chen", "is_host": True}]
+
+    def test_case_and_annotation_variants_count_as_the_same_name(self):
+        # Dedupe keys on the cleaned, lowercased name, so "(host)" / casing
+        # differences do not sneak a second row in.
+        people = tracker._filter_and_dedupe(
+            ["Ana Costa (host)", "ana costa", "ANA COSTA"], self._exclude(), 2
+        )
+        assert [p["name"] for p in people] == ["Ana Costa"]
+        assert people[0]["is_host"] is True

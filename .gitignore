@@ -20,3 +20,4 @@ htmlcov/
 .fallow/
 node_modules/
 coverage/
+.rec-tmp/

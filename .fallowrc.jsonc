@@ -2,7 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   // app.js is the browser entry; the *.test.js files are test entry points so
   // their imports (and the exports they exercise) count as reachable/used.
-  "entry": ["app.js", "tests/**/*.test.js"],
+  // scripts/record-demo.mjs is the `npm run record:demo` entry point.
+  "entry": ["app.js", "tests/**/*.test.js", "scripts/record-demo.mjs"],
   // fallow analyses JS/TS reachability; styles.css is loaded from index.html
   // (not imported from JS), and these are config/coverage artifacts — exclude
   // them so they aren't reported as unused files.

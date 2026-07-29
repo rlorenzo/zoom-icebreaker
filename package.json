@@ -11,9 +11,15 @@
     "record:demo": "node scripts/record-demo.mjs"
   },
   "devDependencies": {
-    "@vitest/coverage-istanbul": "^4.1.9",
+    "@vitest/coverage-istanbul": "^4.1.10",
     "jsdom": "^29.1.1",
-    "playwright": "^1.61.0",
-    "vitest": "^4.1.9"
+    "playwright": "1.61.1",
+    "vitest": "^4.1.10"
+  },
+  "//overrides": "Exact pins (not ^) so a caret can't pull in a release too new to have been vetted. postcss remediates GHSA-r28c-9q8g-f849; the other two are transitives that a lockfile refresh floated to same-day publishes.",
+  "overrides": {
+    "postcss": "8.5.18",
+    "@napi-rs/wasm-runtime": "1.1.6",
+    "tinyrainbow": "3.1.0"
   }
 }
