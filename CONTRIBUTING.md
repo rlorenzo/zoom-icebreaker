@@ -17,8 +17,13 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 
     ```bash
     uv sync --dev
-    uv run pre-commit install
+    npm ci   # only needed if you touch index.html, the JS, or styles.css
+    uv run pre-commit install --hook-type pre-commit --hook-type pre-push
     ```
+
+    Installing the pre-push hook too is what enables the slower gates
+    (`pip-audit`, `fallow`, `vitest`), which are staged on push rather than on
+    every commit.
 
 ## Workflow
 
@@ -27,10 +32,15 @@ This project uses [uv](https://docs.astral.sh/uv/) for dependency management.
 3. **Run checks locally** before committing:
 
     ```bash
-    uv run pre-commit run --all
+    uv run pre-commit run --all   # commit-stage hooks, pytest included
+    npm test                      # web suite (vitest), if you touched the web assets
     ```
 
-    This runs `ruff` (linting/formatting), `bandit` (security), `lizard` (complexity), and `pymarkdown` checks.
+    `pre-commit run --all` covers `ruff` (lint + format), `mypy` (strict),
+    `bandit` and `gitleaks` (security), `lizard` (complexity), `pylint`
+    (duplicate code), `pytest`, `pymarkdown`, `biome`, and `html-validate`.
+    See the [README's Development section](README.md#development) for the full
+    tool list and what runs on push versus on commit.
 4. **Submit a Pull Request**.
 
 ## Guidelines

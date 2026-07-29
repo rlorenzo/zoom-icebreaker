@@ -69,6 +69,9 @@ you tap one button per person as they speak.
   empty rather than guessing at whatever else is on screen.
 - **Manual mode anywhere** — no permission or wrong OS? Type names in. The
   page is identical.
+- **A prompt and the order you want** — set an icebreaker prompt at the top of
+  the page, drag a still-to-go row (or focus it and press ↑/↓) to move someone,
+  or hit **Randomize order**. People who have already gone keep their number.
 - **Private by design** — no account, no history, and nothing sent anywhere.
   In the local app, state lives only in memory and is gone when you stop the
   process; the hosted version keeps it in your browser (localStorage) so a
@@ -137,6 +140,7 @@ work the same as on macOS; `--bundle` is macOS-only and ignored here.
 --anchor-regex    text identifying the participants container
 --exclude "a,b"   extra whole-word non-name terms to filter out
 --min-len N       minimum name length (default 2)
+--bundle ID       macOS Zoom bundle id (default us.zoom.xos); ignored elsewhere
 --debug           print anchor / raw-node diagnostics
 ```
 
@@ -146,9 +150,13 @@ Zoom's accessibility tree is undocumented and changes between versions. If
 names don't appear, see what Zoom is exposing and tune the matcher:
 
 ```bash
-uv run ax_dump.py --grep '(?i)participant'
+uv run ax_dump.py --grep '(?i)participant'   # macOS only
 uv run tracker.py --anchor-regex 'participants|attendees' --debug
 ```
+
+`ax_dump.py` reads the macOS AX tree, so it is macOS-only; on Windows use
+`tracker.py --debug`, which prints the same anchor and raw-node diagnostics
+from the UIA side.
 
 Known limitations:
 
@@ -162,20 +170,33 @@ Known limitations:
 ## Development
 
 ```bash
-uv sync --dev                # install dev tools
-uv run pre-commit install    # enable the git hook
-uv run pre-commit run --all  # run all checks once
+uv sync --dev                # Python dev tools
+npm ci                       # web dev tools (vitest, biome, playwright)
+uv run pre-commit install --hook-type pre-commit --hook-type pre-push
+uv run pre-commit run --all  # every commit-stage hook once
 ```
 
-Tooling: ruff (lint + format), bandit (security), lizard (complexity),
-pymarkdown (markdown), plus biome and html-validate for the web assets. The
-same checks run on every PR via
+Running the suites directly:
+
+```bash
+uv run pytest                # Python: HTTP handler, session state, name filtering
+npm test                     # web: unit + jsdom integration (vitest)
+npm run coverage             # same, plus the coverage report fallow reads
+```
+
+Tooling: ruff (lint + format), mypy (strict), bandit and gitleaks (security),
+lizard (complexity), pylint (duplicate code), pymarkdown (markdown), and
+pip-audit / npm audit for dependency CVEs — plus biome, html-validate, and
+fallow for the web assets. The slower gates (pip-audit, fallow, vitest) are
+staged on pre-push rather than on every commit, so `pre-commit run --all`
+skips them; CI runs the whole set on every PR via
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 The web assets (`index.html`, `app.js`, `roster.js`, `demo.js`, `engine.js`,
-`session.js`, `styles.css`) are read into memory once at startup, so the server
-never opens a file in response to a request. The trade-off: editing any of them
-requires restarting the server (Ctrl-C and re-run) to see the change.
+`session.js`, `styles.css`, and the two self-hosted faces in `fonts/`) are read
+into memory once at startup, so the server never opens a file in response to a
+request. The trade-off: editing any of them requires restarting the server
+(Ctrl-C and re-run) to see the change.
 
 The same assets are deployed to GitHub Pages by
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml) on every push to
