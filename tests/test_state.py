@@ -3,6 +3,8 @@
 import json
 import queue
 import random
+import threading
+import time
 
 import pytest
 
@@ -457,3 +459,56 @@ class TestBroadcastQueueBound:
         assert q.qsize() == SSE_QUEUE_MAX
         newest = json.loads(list(q.queue)[-1].removeprefix("data: "))
         assert len(newest["participants"]) == SSE_QUEUE_MAX * 4
+
+
+class TestBroadcastSerialisation:
+    def test_snapshot_and_fanout_do_not_interleave(self, state, monkeypatch):
+        """Two broadcasts must not overlap between snapshot and fan-out.
+
+        snapshot() and the client fan-out take the state lock separately, so
+        without an outer lock a poller sync and a host's click can interleave:
+        the newer snapshot reaches a queue first and the older one lands behind
+        it. The client is then pinned to stale state, and it does not recover,
+        because sync_participants only broadcasts when something changed.
+        """
+        peak = [0]
+        live = [0]
+        tally = threading.Lock()
+        real_snapshot = state.snapshot
+
+        def slow_snapshot():
+            with tally:
+                live[0] += 1
+                peak[0] = max(peak[0], live[0])
+            time.sleep(0.05)  # hold the window open so an overlap is visible
+            try:
+                return real_snapshot()
+            finally:
+                with tally:
+                    live[0] -= 1
+
+        monkeypatch.setattr(state, "snapshot", slow_snapshot)
+        threads = [threading.Thread(target=state.broadcast) for _ in range(4)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5)
+
+        assert peak[0] == 1, f"{peak[0]} broadcasts overlapped"
+
+    def test_client_ends_on_the_current_roster(self, state):
+        # Whatever the interleaving, the frame a client is left holding must
+        # describe the roster as it actually is.
+        q: queue.Queue[str] = queue.Queue(maxsize=tracker.SSE_QUEUE_MAX)
+        state.clients.add(q)
+        threads = [
+            threading.Thread(target=state.add_manual, args=(f"p{i}",))
+            for i in range(12)
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=5)
+        state.broadcast()  # settle
+        last = json.loads(list(q.queue)[-1].removeprefix("data: "))
+        assert len(last["participants"]) == len(state.snapshot()["participants"]) == 12

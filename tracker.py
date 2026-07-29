@@ -564,6 +564,7 @@ class State:
         self.order: list[str] = []  # list of pids in display order
         self.prompt = ""  # the icebreaker question shown as page title
         self.clients: set[queue.Queue[str]] = set()  # one Queue per SSE client
+        self._broadcast_lock = threading.Lock()  # serialises snapshot -> fan-out
         self._seq = 0  # monotonic counter behind every participant id
 
     @staticmethod
@@ -747,21 +748,33 @@ class State:
             }
 
     def broadcast(self) -> None:
-        data = "data: " + json.dumps(self.snapshot()) + "\n\n"
-        # Copy under the lock: handler threads add/discard clients concurrently,
-        # so iterating the live set could raise "set changed size during iteration".
-        with self.lock:
-            clients = list(self.clients)
-        for q in clients:
-            # Make room by dropping the OLDEST frame: every message is a full
-            # snapshot, so the newest is the only one that matters and
-            # discarding it would leave the client stale forever. Empty/Full
-            # can still fire if another thread broadcasts between these calls;
-            # losing one frame of a redundant stream is not worth locking for.
-            with contextlib.suppress(queue.Empty, queue.Full):
-                if q.full():
-                    q.get_nowait()
-                q.put_nowait(data)
+        # One broadcast at a time, end to end. Taking the snapshot and handing
+        # it to the clients are two separate lock acquisitions, so without this
+        # a poller sync and a host's click can interleave: the newer snapshot
+        # reaches a queue first and the older one lands behind it, leaving that
+        # client displaying stale state. It does not self-heal either, because
+        # sync_participants only broadcasts when something actually changed —
+        # a quiet meeting would keep the wrong roster on screen indefinitely.
+        #
+        # A separate lock rather than making self.lock reentrant: broadcast is
+        # always called with self.lock released, so the order here is only ever
+        # _broadcast_lock -> lock, and self.lock keeps its non-reentrant
+        # discipline (holding it across a broadcast would deadlock, loudly).
+        with self._broadcast_lock:
+            data = "data: " + json.dumps(self.snapshot()) + "\n\n"
+            # Copy under the lock: handler threads add/discard clients
+            # concurrently, so iterating the live set could raise "set changed
+            # size during iteration".
+            with self.lock:
+                clients = list(self.clients)
+            for q in clients:
+                # Make room by dropping the OLDEST frame: every message is a
+                # full snapshot, so the newest is the only one that matters and
+                # discarding it would leave the client stale forever.
+                with contextlib.suppress(queue.Empty, queue.Full):
+                    if q.full():
+                        q.get_nowait()
+                    q.put_nowait(data)
 
     def add_manual(self, name: str) -> None:
         with self.lock:
