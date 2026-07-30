@@ -6,7 +6,12 @@
 <title>Icebreaker</title>
 <!-- No third-party requests: the page is private by design (see README), so
      the typeface is vendored in fonts/ and served from this origin (see the
-     @font-face rules in styles.css) rather than fetched from a CDN. -->
+     @font-face rules in styles.css) rather than fetched from a CDN.
+     Preloaded because @font-face is only discovered after styles.css parses,
+     which puts the roster's own typeface a round-trip behind the text it sets.
+     `crossorigin` is required even same-origin: fonts fetch in CORS mode. -->
+<link rel="preload" as="font" type="font/woff2" href="fonts/atkinson-next-var-latin.woff2" crossorigin />
+<link rel="preload" as="font" type="font/woff2" href="fonts/atkinson-mono-var-latin.woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -41,24 +46,40 @@
     ></textarea>
   </div>
 
-  <div class="stats" role="group" aria-label="Counts" aria-live="polite">
-    <div class="stat">
-      <div class="n" id="s-present">0</div>
-      <div class="l">In the room</div>
-    </div>
-    <div class="stat">
-      <div class="n" id="s-done">0</div>
-      <div class="l">Introduced</div>
-    </div>
-    <div class="stat">
-      <div class="n" id="s-wait">0</div>
-      <div class="l">Still to go</div>
-    </div>
-  </div>
+  <main>
+    <h1 class="sr-only">Icebreaker tracker</h1>
 
-  <div id="calloutBox"></div>
+    <!-- Not a live region. The counts are a summary of the roster below, and
+         announcing all three on every change buried the one fact that actually
+         changed; #srStatus speaks that single sentence instead. -->
+    <div class="stats" role="group" aria-label="Counts">
+      <div class="stat">
+        <div class="n" id="s-present">0</div>
+        <div class="l">In the room</div>
+      </div>
+      <div class="stat">
+        <div class="n" id="s-done">0</div>
+        <div class="l">Introduced</div>
+      </div>
+      <div class="stat">
+        <div class="n" id="s-wait">0</div>
+        <div class="l">Still to go</div>
+      </div>
+    </div>
 
-  <div class="roster" id="roster" aria-live="polite"></div>
+    <div id="calloutBox" role="status"></div>
+
+    <!-- A real list, and not a live region: app.js rewrites this wholesale on
+         every frame, so aria-live here re-read the entire roster on each change
+         (and the Zoom poller can fire that every 5s). -->
+    <ul class="roster" id="roster"></ul>
+
+    <!-- One sentence per change, for assistive tech only. -->
+    <p class="sr-only" id="srStatus" role="status" aria-live="polite"></p>
+    <p class="sr-only" id="reorderHint">
+      Press the up or down arrow key to move this person in the order.
+    </p>
+  </main>
 
   <footer>
     <form class="add-row" id="addForm" autocomplete="off">

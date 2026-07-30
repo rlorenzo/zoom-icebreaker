@@ -129,3 +129,34 @@ describe("rowHtml", () => {
     expect(html).toContain('<div class="pos"></div>');
   });
 });
+
+describe("rowHtml accessibility", () => {
+  const ctx = (over = {}) => ({
+    positionByPid: new Map([["p1", 1]]),
+    upNextPid: "p1",
+    upNextChanged: false,
+    prevIntroduced: new Set(),
+    ...over,
+  });
+
+  it("renders every row as a native list item", () => {
+    const html = rowHtml(P(), ctx()).trim();
+    expect(html.startsWith("<li")).toBe(true);
+    expect(html.endsWith("</li>")).toBe(true);
+  });
+
+  it("exposes the introduced state through aria-pressed", () => {
+    expect(rowHtml(P(), ctx())).toContain('aria-pressed="false"');
+    expect(rowHtml(P({ introduced: true }), ctx({ upNextPid: null }))).toContain(
+      'aria-pressed="true"',
+    );
+  });
+
+  it("describes the reorder affordance only where reordering is possible", () => {
+    expect(rowHtml(P(), ctx())).toContain('aria-describedby="reorderHint"');
+    // The host is pinned, so its row is not reorderable and gets no hint.
+    expect(rowHtml(P({ is_host: true }), ctx({ upNextPid: null }))).not.toContain(
+      "aria-describedby",
+    );
+  });
+});

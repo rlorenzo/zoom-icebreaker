@@ -27,18 +27,33 @@
 }
 
 :root {
+  /* The page is screen-shared into lit rooms and never ships a dark variant;
+     saying so stops Chrome's Auto Dark Theme force-inverting the paper world. */
+  color-scheme: only light;
+
   --paper: #faf7f2;
   --surface: #f3eee5;
   --hairline: #ddd3c2;
   --soft-line: #c8bca6;
-  --muted-ink: #807666;
+  /* Contrast floors, measured against the surface each colour actually sits on:
+     hint-ink 3.01:1 (non-text + large text), muted-ink 4.53:1 on surface and
+     4.90:1 on paper. soft-line is 1.6-1.7:1 and is therefore a BORDER colour
+     only — it was previously used for quieted numerals, which made them
+     effectively invisible. */
+  --hint-ink: #9a8e79;
+  --muted-ink: #756b5c;
   --dim-ink: #4a4036;
   --ink: #28201a;
   --clay: #c9573a;
   --clay-deep: #a44128;
+  /* The up-next wash. Deliberately out of sRGB: it clips to #ffecde on sRGB
+     displays and renders wider on P3, which is acceptable for a tint but is
+     why it is a token rather than a value repeated at each use site. */
+  --up-next-tint: oklch(96.5% 0.04 44);
 
   --rounded-xs: 6px;
   --rounded-sm: 10px;
+  --rounded-pill: 999px;
 
   --t-fast: 140ms cubic-bezier(0.22, 1, 0.36, 1);
   --t-medium: 200ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -71,6 +86,21 @@ body {
   margin: 0 auto;
 }
 
+/* Available to assistive tech, absent from the shared screen. The page's real
+   headline is the editable prompt, which cannot be an h1, so the document's
+   heading and its reorder instructions live here instead. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Demo-mode bar -------------------------------------------------- */
 /* A calm, unmistakable banner so the room never reads sample data as a real
    meeting. Surface tone + soft-line border (the "reads from the back of the
@@ -101,7 +131,7 @@ body {
 .demo-bar-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--rounded-pill);
   background: var(--clay);
   flex: none;
 }
@@ -137,21 +167,37 @@ header {
   color: var(--hairline);
 }
 
+/* The halo rides a composited pseudo-element (transform + opacity) rather than
+   an animated box-shadow. Same silhouette, but it no longer repaints the dot
+   every frame — which matters here more than usual: this page is screen-shared,
+   and a perpetually repainting region denies the video encoder a static area to
+   skip, spending bitrate on decoration instead of on the roster. */
 .dot {
+  position: relative;
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--rounded-pill);
   background: var(--clay);
   flex: none;
-  box-shadow: 0 0 0 0 rgba(201, 87, 58, 0.45);
+}
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--clay);
+  opacity: 0.45;
   animation: pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 @keyframes pulse {
-  70% {
-    box-shadow: 0 0 0 9px rgba(201, 87, 58, 0);
+  0% {
+    transform: scale(1);
+    opacity: 0.45;
   }
+  70%,
   100% {
-    box-shadow: 0 0 0 0 rgba(201, 87, 58, 0);
+    transform: scale(3.6);
+    opacity: 0;
   }
 }
 
@@ -187,7 +233,9 @@ header {
   outline: none;
 }
 .prompt::placeholder {
-  color: var(--soft-line);
+  /* Large text, so 3:1 is the floor; soft-line sat at 1.75:1 and read as an
+     empty field rather than an invitation to type. */
+  color: var(--hint-ink);
   font-weight: 500;
 }
 .prompt:focus-visible {
@@ -241,6 +289,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  list-style: none;
 }
 
 .row {
@@ -290,7 +339,7 @@ header {
    whole "who's next" signal (no separate callout), this row is sized up and
    warm-tinted so the room reads it instantly over compressed screen-share. */
 .row.up-next {
-  background: oklch(96.5% 0.04 44);
+  background: var(--up-next-tint);
   border-color: var(--clay);
   padding-top: 18px;
   padding-bottom: 18px;
@@ -363,6 +412,15 @@ header {
   transform-origin: center right;
   animation: pos-cue 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+/* The Sequenced-Not-Simultaneous Rule: the cue is the third beat, so it waits
+   for the checkmark to land (800ms delay + 1000ms draw). Scoped to renders that
+   actually contain an introduction — up-next also changes on a reorder or when
+   someone leaves, and those carry no flash and no checkmark to follow, so an
+   unconditional delay would strand the cue 1.8s after the gesture that caused
+   it. Reduced motion zeroes this along with every other delay. */
+.roster:has(.just-introduced) .row.up-next.just-cued .pos {
+  animation-delay: 1800ms;
+}
 
 /* Drop indicators (insertion line) */
 .row::before {
@@ -395,11 +453,13 @@ header {
   text-align: right;
   user-select: none;
 }
-.row.introduced .pos {
-  color: var(--soft-line);
-}
+/* Quieted, not erased. These were soft-line (1.62:1 on surface) which made the
+   standing position number unreadable; the row already reads as "done" through
+   its surface fill and muted name, so the numeral only has to step back, not
+   vanish. */
+.row.introduced .pos,
 .row.left .pos {
-  color: var(--soft-line);
+  color: var(--muted-ink);
 }
 
 /* biome-ignore lint/style/noDescendingSpecificity: base .name rule intentionally follows the scoped .row.up-next .name / .row:not(.introduced) .name overrides; they set different properties so source order does not affect the cascade */
@@ -427,7 +487,9 @@ header {
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: lowercase;
-  color: var(--clay);
+  /* clay-deep, not clay: the same 4.5:1 rule that governs paper text ON clay
+     also governs clay AS text. Plain clay is 4.00:1 on paper. */
+  color: var(--clay-deep);
   padding: 4px 6px;
 }
 
@@ -446,7 +508,7 @@ header {
   flex: none;
 }
 .row.introduced .when {
-  color: var(--soft-line);
+  color: var(--muted-ink);
 }
 
 .tag {
@@ -455,7 +517,7 @@ header {
   color: var(--muted-ink);
   border: 1px solid var(--hairline);
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--rounded-pill);
   flex: none;
 }
 
@@ -505,7 +567,9 @@ header {
   background: none;
   border: 0;
   padding: 6px;
-  color: var(--soft-line);
+  /* The glyph is the only thing identifying this control, so it answers to the
+     3:1 non-text floor. soft-line was 1.75:1. */
+  color: var(--hint-ink);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -521,6 +585,26 @@ header {
 .x:focus-visible {
   outline: 2px solid var(--clay);
   outline-offset: 2px;
+}
+/* hint-ink is measured on paper (3.01:1) and only just clears the 3:1 non-text
+   floor there. The introduced row fills with surface, which drops the glyph to
+   2.79:1, and the up-next tint drops it to 2.81:1 — so on those two fills it
+   steps up to muted-ink (4.53:1 and 4.56:1). Per DESIGN.md: measure a colour
+   against the surface it actually sits on, not against paper by default. */
+.row.introduced .x,
+.row.up-next .x {
+  color: var(--muted-ink);
+}
+/* Hover is restated because the two rules above outrank the base `.x:hover`;
+   without this the glyph would go inert on exactly the rows they cover. The
+   fill is paper rather than surface for the same reason the colour moved: on
+   these rows surface is the row's own background (the up-next tint matches its
+   luminance to within 1%), so the default chip is invisible. Paper is the only
+   other step the two-tone palette allows. */
+.row.introduced .x:hover,
+.row.up-next .x:hover {
+  color: var(--clay-deep);
+  background: var(--paper);
 }
 
 .empty {
@@ -575,7 +659,8 @@ header {
   color: var(--clay-deep);
   background: none;
   border: 0;
-  padding: 2px 4px;
+  /* 4px block padding puts the hit area at 28px, clearing the 24px minimum. */
+  padding: 4px;
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -583,7 +668,9 @@ header {
   transition: color var(--t-fast);
 }
 .text-link:hover {
-  color: var(--clay);
+  /* Darkens to ink on hover, the same direction the sponsor link travels.
+     Brightening to clay dropped it to 4.00:1. */
+  color: var(--ink);
 }
 .text-link:focus-visible {
   outline: 2px solid var(--clay);
@@ -622,7 +709,7 @@ footer {
   color: var(--muted-ink);
   text-decoration: none;
   border: 1px solid var(--hairline);
-  border-radius: 6px;
+  border-radius: var(--rounded-xs);
   padding: 6px 12px;
   transition:
     color var(--t-fast),
@@ -638,7 +725,10 @@ input {
   font-size: 0.9375rem;
   color: var(--ink);
   background: var(--paper);
-  border: 1px solid var(--hairline);
+  /* A field's boundary is the only thing that says "type here", so unlike the
+     buttons (which have their own text) it answers to the 3:1 non-text floor.
+     hairline is 1.39:1. */
+  border: 1px solid var(--hint-ink);
   padding: 10px 14px;
   border-radius: var(--rounded-xs);
   flex: 1;
@@ -690,18 +780,33 @@ input:focus {
 }
 
 /* Reduced motion ------------------------------------------------- */
+/* Reduced motion removes the movement, never the message. Every state this
+   system animates is also carried by fill, weight, an icon, or a label, so the
+   change still lands — it just lands instantly. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     /* biome-ignore lint/complexity/noImportantStyles: !important is required so this universal reset overrides component-level animation rules (e.g. .dot) for prefers-reduced-motion */
     animation-duration: 0.001ms !important;
+    /* Delays must go too. draw-check waits 800ms before it runs, so zeroing
+       only the duration left the checkmark invisible for those 800ms — the
+       feedback disappeared precisely for the users who need it stated plainly. */
+    /* biome-ignore lint/complexity/noImportantStyles: see above — a delayed animation is still motion-adjacent latency */
+    animation-delay: 0ms !important;
     /* biome-ignore lint/complexity/noImportantStyles: see above — forces author transitions off for prefers-reduced-motion */
     transition-duration: 0.001ms !important;
   }
-  .dot {
+  .dot::after {
+    /* The halo is ambient decoration; connection state is also in the adjacent
+       "live" / "reconnecting" text, so nothing is lost by removing it. */
     animation: none;
-    box-shadow: none;
+    opacity: 0;
+  }
+  .row.just-introduced .toggle .check path {
+    /* Land the checkmark drawn rather than relying on the animation's fill. */
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
   }
 }
 
@@ -728,8 +833,13 @@ input:focus {
   .row .when {
     display: none;
   }
-  .row .x {
-    padding: 4px;
+  /* Drop the tag, keep the name. The tag is flex:none inside .name, so on a
+     narrow row it took the whole name column and left the up-next person
+     anonymous — the one row where that is unaffordable. The tint, the clay
+     border and the enlarged clay numeral already say "up next" three times
+     over; the name is the thing that cannot be inferred. */
+  .up-next-tag {
+    display: none;
   }
   .toggle {
     padding: 7px 10px;

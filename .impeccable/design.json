@@ -1,107 +1,172 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-29T17:35:49Z",
+  "generatedAt": "2026-07-30T15:44:23Z",
   "title": "Design System: Zoom Icebreaker Tracker",
   "extensions": {
     "colorMeta": {
       "paper": {
         "role": "neutral",
         "displayName": "Paper",
-        "canonical": "oklch(98% 0.005 50)",
+        "canonical": "oklch(97.7% 0.007 81)",
         "tonalRamp": [
-          "oklch(20% 0.022 40)",
-          "oklch(30% 0.020 40)",
-          "oklch(42% 0.018 45)",
-          "oklch(55% 0.016 45)",
-          "oklch(68% 0.014 48)",
-          "oklch(80% 0.012 50)",
-          "oklch(90% 0.010 50)",
-          "oklch(98% 0.005 50)"
+          "#0c0b09",
+          "#262522",
+          "#44423e",
+          "#63615d",
+          "#84827e",
+          "#a7a5a1",
+          "#cac9c6",
+          "#efeeec"
         ]
       },
       "surface": {
         "role": "neutral",
         "displayName": "Surface",
-        "canonical": "oklch(96% 0.008 50)",
+        "canonical": "oklch(95.1% 0.013 82)",
         "tonalRamp": [
-          "oklch(22% 0.022 42)",
-          "oklch(32% 0.020 42)",
-          "oklch(45% 0.018 45)",
-          "oklch(58% 0.016 48)",
-          "oklch(72% 0.014 50)",
-          "oklch(84% 0.012 50)",
-          "oklch(92% 0.010 50)",
-          "oklch(96% 0.008 50)"
+          "#0d0b08",
+          "#272520",
+          "#45423b",
+          "#656159",
+          "#86827b",
+          "#a8a59f",
+          "#cbc9c4",
+          "#f0eeea"
         ]
       },
       "hairline": {
         "role": "neutral",
         "displayName": "Hairline",
-        "canonical": "oklch(88% 0.012 50)",
+        "canonical": "oklch(87.0% 0.025 81)",
         "tonalRamp": [
-          "oklch(25% 0.020 45)",
-          "oklch(38% 0.018 45)",
-          "oklch(50% 0.016 48)",
-          "oklch(62% 0.014 48)",
-          "oklch(74% 0.013 50)",
-          "oklch(82% 0.013 50)",
-          "oklch(88% 0.012 50)",
-          "oklch(94% 0.010 50)"
+          "#0e0b05",
+          "#29241b",
+          "#484135",
+          "#696051",
+          "#898174",
+          "#aba499",
+          "#cec8bf",
+          "#f2eee7"
         ]
       },
       "soft-line": {
         "role": "neutral",
         "displayName": "Soft Line",
-        "canonical": "oklch(80% 0.015 50)"
+        "canonical": "oklch(79.9% 0.033 83)",
+        "tonalRamp": [
+          "#0f0a04",
+          "#2b2418",
+          "#494131",
+          "#6a604c",
+          "#8b816f",
+          "#aca495",
+          "#cfc8bc",
+          "#f3eee4"
+        ]
+      },
+      "hint-ink": {
+        "role": "neutral",
+        "displayName": "Hint Ink",
+        "canonical": "oklch(65.1% 0.033 82)",
+        "tonalRamp": [
+          "#0f0a04",
+          "#2b2418",
+          "#4a4131",
+          "#6b604c",
+          "#8b816f",
+          "#ada495",
+          "#cfc8bc",
+          "#f3eee4"
+        ]
       },
       "muted-ink": {
         "role": "neutral",
         "displayName": "Muted Ink",
-        "canonical": "oklch(50% 0.02 50)"
+        "canonical": "oklch(53.3% 0.026 78)",
+        "tonalRamp": [
+          "#0e0a05",
+          "#2a241b",
+          "#484135",
+          "#696051",
+          "#8a8174",
+          "#aca498",
+          "#cec8bf",
+          "#f2eee7"
+        ]
       },
       "dim-ink": {
         "role": "neutral",
         "displayName": "Dim Ink",
-        "canonical": "oklch(35% 0.018 40)"
+        "canonical": "oklch(37.9% 0.022 67)",
+        "tonalRamp": [
+          "#0f0a06",
+          "#2a241d",
+          "#494038",
+          "#6a5f55",
+          "#8a8077",
+          "#aca39b",
+          "#cfc8c1",
+          "#f3ede8"
+        ]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "oklch(20% 0.022 40)"
+        "canonical": "oklch(25.1% 0.017 59)",
+        "tonalRamp": [
+          "#0e0a08",
+          "#292420",
+          "#48403b",
+          "#695f58",
+          "#89807a",
+          "#aba39e",
+          "#cec8c3",
+          "#f2edea"
+        ]
       },
       "clay": {
         "role": "primary",
         "displayName": "Clay",
-        "canonical": "oklch(58% 0.14 38)",
+        "canonical": "oklch(59.7% 0.152 35)",
         "tonalRamp": [
-          "oklch(22% 0.06 38)",
-          "oklch(32% 0.09 38)",
-          "oklch(42% 0.12 38)",
-          "oklch(48% 0.14 38)",
-          "oklch(58% 0.14 38)",
-          "oklch(68% 0.12 38)",
-          "oklch(80% 0.08 38)",
-          "oklch(92% 0.04 38)"
+          "#240000",
+          "#4c0400",
+          "#771d03",
+          "#a5371a",
+          "#c46249",
+          "#e08c76",
+          "#fbb6a3",
+          "#ffe0d2"
         ]
       },
       "clay-deep": {
         "role": "primary",
         "displayName": "Clay Deep",
-        "canonical": "oklch(48% 0.14 38)"
+        "canonical": "oklch(50.6% 0.137 35)",
+        "tonalRamp": [
+          "#220000",
+          "#490b00",
+          "#73240f",
+          "#9f3e25",
+          "#be6650",
+          "#db8f7b",
+          "#f7b8a7",
+          "#ffe2d5"
+        ]
       },
       "up-next-tint": {
-        "role": "state-tint",
+        "role": "tertiary",
         "displayName": "Up-Next Tint",
         "canonical": "oklch(96.5% 0.04 44)",
         "tonalRamp": [
-          "oklch(30% 0.05 44)",
-          "oklch(42% 0.06 44)",
-          "oklch(55% 0.07 44)",
-          "oklch(68% 0.07 44)",
-          "oklch(80% 0.06 44)",
-          "oklch(89% 0.05 44)",
-          "oklch(96.5% 0.04 44)",
-          "oklch(99% 0.015 44)"
+          "#130805",
+          "#31211a",
+          "#523c33",
+          "#755a4f",
+          "#957c72",
+          "#b5a097",
+          "#d7c5be",
+          "#f9ebe6"
         ]
       }
     },
@@ -120,7 +185,7 @@
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Prose \u2014 empty-state copy and the completion callout. Default non-numeric text that isn't a name."
+        "purpose": "Prose — empty-state copy and the completion callout. Default non-numeric text that isn't a name."
       },
       "caption": {
         "displayName": "Caption",
@@ -145,38 +210,58 @@
       "numeric-emphasis": {
         "displayName": "Numeric Emphasis",
         "purpose": "Position number on the up-next row only. Half the up-next signal; the tint is the other half."
+      },
+      "label-loud": {
+        "displayName": "Label Loud",
+        "purpose": "The up-next tag only — the one uppercase string, and dropped below 640px."
+      },
+      "numeric-caption": {
+        "displayName": "Numeric Caption",
+        "purpose": "Joined-at timestamps on roster rows. First thing dropped below 640px."
       }
     },
     "shadows": [],
     "motion": [
       {
-        "name": "ease-out-quart",
-        "value": "cubic-bezier(0.165, 0.84, 0.44, 1)",
-        "purpose": "Default easing for state transitions (opacity, color, transform)."
+        "name": "ease-out-quint",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "The system's only easing curve. Every transition and animation uses it."
       },
       {
-        "name": "duration-state",
-        "value": "180ms",
-        "purpose": "Default duration for hover, focus, and toggle state changes."
+        "name": "t-fast",
+        "value": "140ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default transition: hover, focus, toggle, border, drop-indicator opacity."
       },
       {
-        "name": "duration-pulse",
-        "value": "2000ms",
-        "purpose": "Live-dot halo pulse. Decorative ambient motion, suppressed under prefers-reduced-motion."
+        "name": "t-medium",
+        "value": "200ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Row transforms, where a longer settle reads as deliberate rather than twitchy."
+      },
+      {
+        "name": "pulse",
+        "value": "2400ms cubic-bezier(0.22, 1, 0.36, 1) infinite",
+        "purpose": "Live-dot halo spreading to 9px and fading out. The only ambient motion."
+      },
+      {
+        "name": "mark-flash",
+        "value": "3000ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Introduced row settles from 16% clay in OKLAB through 7% to plain surface."
+      },
+      {
+        "name": "draw-check",
+        "value": "1000ms cubic-bezier(0.22, 1, 0.36, 1) 800ms forwards",
+        "purpose": "Checkmark draws itself via stroke-dashoffset 100 → 0, after the flash begins."
+      },
+      {
+        "name": "pos-cue",
+        "value": "520ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "New up-next position number scales 1 → 1.22 → 1 from its right edge."
       }
     ],
     "breakpoints": [
       {
         "name": "sm",
         "value": "640px"
-      },
-      {
-        "name": "md",
-        "value": "960px"
-      },
-      {
-        "name": "lg",
-        "value": "1280px"
       }
     ]
   },
@@ -185,96 +270,117 @@
       "name": "Roster Row (default)",
       "kind": "custom",
       "refersTo": "roster-row",
-      "description": "One participant, not yet introduced. The signature component.",
-      "html": "<div class=\"ds-row\"><span class=\"ds-row-name\">Alex Rivera</span><span class=\"ds-row-when\">10:04 \u00b7 just now</span><button class=\"ds-toggle\">Mark introduced</button></div>",
-      "css": ".ds-row { display: flex; align-items: center; gap: 16px; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 10px; padding: 14px 18px; font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; } .ds-row-name { flex: 1; font-size: 0.9375rem; font-weight: 500; color: #28201a; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-row-when { font-size: 0.75rem; color: #807666; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-feature-settings: 'tnum'; } .ds-toggle { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #807666; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: color 180ms cubic-bezier(0.165, 0.84, 0.44, 1), border-color 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-toggle:hover { color: #28201a; border-color: #c8bca6; } .ds-toggle:focus-visible { outline: 2px solid #c9573a; outline-offset: 2px; }"
+      "description": "A participant who has not been introduced yet. The system's signature component.",
+      "html": "<div class=\"ds-row\" tabindex=\"0\"><span class=\"ds-pos\">3</span><span class=\"ds-name\">Priya Shah</span><span class=\"ds-when\">10:04</span><button class=\"ds-toggle\">Mark introduced</button></div>",
+      "css": ".ds-row { display:grid; grid-template-columns:40px 1fr auto auto; align-items:center; gap:14px; border-radius:var(--rounded-sm,10px); padding:14px 18px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; background:var(--paper,#faf7f2); border:1px solid var(--hairline,#ddd3c2); color:var(--ink,#28201a); cursor:grab; outline:none; } .ds-row:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; } .ds-row .ds-pos { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:1.125rem; font-weight:500; line-height:1; font-feature-settings:'tnum' 1; text-align:right; user-select:none; color:var(--muted-ink,#756b5c); } .ds-row .ds-name { font-size:1.0625rem; font-weight:500; letter-spacing:-0.005em; color:var(--ink,#28201a); } .ds-row .ds-when { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:0.8125rem; font-feature-settings:'tnum' 1; color:var(--muted-ink,#756b5c); } .ds-row .ds-toggle { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--paper,#faf7f2); color:var(--muted-ink,#756b5c); border:1px solid var(--hairline,#ddd3c2); } .ds-row .ds-toggle:hover { border-color:var(--soft-line,#9a8e79); color:var(--ink,#28201a); } .ds-row .ds-toggle:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; }"
     },
     {
       "name": "Roster Row (introduced)",
       "kind": "custom",
       "refersTo": "roster-row-introduced",
-      "description": "A participant who has been marked introduced. Tonal shift + checkmark + weight; no color signal.",
-      "html": "<div class=\"ds-row-done\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg><span class=\"ds-row-name-done\">Alex Rivera</span><span class=\"ds-row-when-done\">10:04 \u00b7 6 min ago</span><button class=\"ds-toggle-on\">Introduced</button></div>",
-      "css": ".ds-row-done { display: flex; align-items: center; gap: 16px; background: #f3eee5; border: 1px solid #ddd3c2; border-radius: 10px; padding: 14px 18px; font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; } .ds-check { width: 16px; height: 16px; color: #807666; flex: none; } .ds-row-name-done { flex: 1; font-size: 0.9375rem; font-weight: 400; color: #807666; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-row-when-done { font-size: 0.75rem; color: #807666; font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-feature-settings: 'tnum'; } .ds-toggle-on { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #faf7f2; background: #28201a; border: 1px solid #28201a; border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: background 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-toggle-on:hover { background: #4a4036; }"
+      "description": "Already spoken. Surface fill, quieted ink, leading checkmark — no celebratory color.",
+      "html": "<div class=\"ds-row-done\"><span class=\"ds-pos\">1</span><span class=\"ds-name\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Marcus Feld</span><span class=\"ds-when\">10:01</span><button class=\"ds-toggle ds-on\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Introduced</button></div>",
+      "css": ".ds-row-done { display:grid; grid-template-columns:40px 1fr auto auto; align-items:center; gap:14px; border-radius:var(--rounded-sm,10px); padding:14px 18px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; background:var(--surface,#f3eee5); border:1px solid var(--hairline,#ddd3c2); color:var(--muted-ink,#756b5c); } .ds-row-done .ds-pos { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:1.125rem; font-weight:500; line-height:1; font-feature-settings:'tnum' 1; text-align:right; user-select:none; color:var(--soft-line,#9a8e79); } .ds-row-done .ds-name { font-size:1.0625rem; font-weight:500; letter-spacing:-0.005em; color:var(--muted-ink,#756b5c); display:flex; align-items:baseline; gap:10px; } .ds-row-done .ds-when { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:0.8125rem; font-feature-settings:'tnum' 1; color:var(--soft-line,#9a8e79); } .ds-row-done .ds-check { width:14px; height:14px; flex:none; } .ds-row-done .ds-toggle { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--ink,#28201a); color:var(--paper,#faf7f2); border:1px solid var(--ink,#28201a); } .ds-row-done .ds-toggle:hover { background:var(--dim-ink,#4a4036); border-color:var(--dim-ink,#4a4036); }"
     },
     {
       "name": "Roster Row (up next)",
       "kind": "custom",
-      "refersTo": "row-up-next",
-      "description": "The signature row: who speaks next, readable from across a compressed screen-share.",
-      "html": "<div class=\"ds-row-up-next\"><span class=\"ds-pos\">2</span><span class=\"ds-name\">Daniel Okonkwo-Williams</span><span class=\"ds-tag\">UP NEXT</span></div>",
-      "css": ".ds-row-up-next { display:flex; align-items:center; gap:14px; background: oklch(96.5% 0.04 44); border:1px solid var(--clay,#c9573a); border-radius:10px; padding:18px 16px; } .ds-pos { font-family:'Atkinson Hyperlegible Mono',ui-monospace,monospace; font-size:1.5rem; font-weight:600; font-feature-settings:'tnum' 1; color:var(--clay,#c9573a); } .ds-name { font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif; font-size:1.25rem; font-weight:600; color:var(--ink,#28201a); } .ds-tag { font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; background:var(--clay-deep,#a44128); color:var(--paper,#faf7f2); border-radius:999px; padding:3px 9px; }"
+      "refersTo": "roster-row-up-next",
+      "description": "The hand to the next speaker: warm tint, clay border, bigger numeral and name, one uppercase tag.",
+      "html": "<div class=\"ds-row-next\"><span class=\"ds-pos\">4</span><span class=\"ds-name\">Daniel Okonkwo-Williams</span><span class=\"ds-next-tag\">up next</span><button class=\"ds-toggle\">Mark introduced</button></div>",
+      "css": ".ds-row-next { display:grid; grid-template-columns:40px 1fr auto auto; align-items:center; gap:14px; border-radius:var(--rounded-sm,10px); padding:18px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; background:var(--up-next-tint,oklch(96.5% 0.04 44)); border:1px solid var(--clay,#c9573a); color:var(--ink,#28201a); } .ds-row-next .ds-pos { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:1.125rem; font-weight:500; line-height:1; font-feature-settings:'tnum' 1; text-align:right; user-select:none; font-size:1.5rem; font-weight:600; color:var(--clay,#c9573a); } .ds-row-next .ds-name { font-size:1.25rem; font-weight:600; letter-spacing:-0.01em; color:var(--ink,#28201a); } .ds-row-next .ds-next-tag { font-size:0.75rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px; border-radius:var(--rounded-xs,6px); flex:none; background:var(--clay-deep,#a44128); color:var(--paper,#faf7f2); } .ds-row-next .ds-toggle { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--paper,#faf7f2); color:var(--muted-ink,#756b5c); border:1px solid var(--hairline,#ddd3c2); } .ds-row-next .ds-toggle:hover { border-color:var(--soft-line,#9a8e79); color:var(--ink,#28201a); }"
+    },
+    {
+      "name": "Introduced Toggle",
+      "kind": "button",
+      "refersTo": "toggle-default",
+      "description": "The host's primary interaction, shown off and on. Neutral by design: the fill flips, the hue does not.",
+      "html": "<span class=\"ds-toggle-demo\"><button class=\"ds-tg\">Mark introduced</button><button class=\"ds-tg ds-tg-on\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Introduced</button></span>",
+      "css": ".ds-toggle-demo { display:inline-flex; gap:10px; align-items:center; } .ds-tg { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--paper,#faf7f2); color:var(--muted-ink,#756b5c); border:1px solid var(--hairline,#ddd3c2); } .ds-tg:hover { border-color:var(--soft-line,#9a8e79); color:var(--ink,#28201a); } .ds-tg:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; } .ds-tg-on { background:var(--ink,#28201a); color:var(--paper,#faf7f2); border-color:var(--ink,#28201a); } .ds-tg-on:hover { background:var(--dim-ink,#4a4036); border-color:var(--dim-ink,#4a4036); } .ds-tg .ds-check { width:14px; height:14px; flex:none; }"
     },
     {
       "name": "Stat Tile",
       "kind": "card",
       "refersTo": "stat-tile",
-      "description": "One of three tiles at the top: present count, introduced count, still-to-go count.",
+      "description": "One of three counts above the roster. Borderless: the tonal step is the only delimiter.",
       "html": "<div class=\"ds-stat\"><div class=\"ds-stat-n\">7</div><div class=\"ds-stat-l\">In the room</div></div>",
-      "css": ".ds-stat { background: #f3eee5; border-radius: 10px; padding: 16px 20px; font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; } .ds-stat-n { font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size: 2.25rem; font-weight: 500; line-height: 1; color: #28201a; letter-spacing: -0.01em; font-feature-settings: 'tnum'; } .ds-stat-l { margin-top: 8px; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #807666; }"
+      "css": ".ds-stat { background:var(--surface,#f3eee5); border-radius:var(--rounded-sm,10px); padding:16px 20px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; } .ds-stat-n { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:2.25rem; font-weight:500; line-height:1; letter-spacing:-0.01em; font-feature-settings:'tnum' 1; color:var(--ink,#28201a); } .ds-stat-l { margin-top:10px; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; color:var(--muted-ink,#756b5c); }"
     },
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Default action button (Add, Reset). Ink fill, paper text.",
-      "html": "<button class=\"ds-btn-primary\">Add</button>",
-      "css": ".ds-btn-primary { font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #faf7f2; background: #28201a; border: 1px solid #28201a; border-radius: 6px; padding: 10px 16px; cursor: pointer; transition: background 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-primary:hover { background: #4a4036; } .ds-btn-primary:focus-visible { outline: 2px solid #c9573a; outline-offset: 2px; }"
+      "description": "Ink fill, paper text. Used for Add — the only affirmative action in the footer.",
+      "html": "<button class=\"ds-btn\">Add</button>",
+      "css": ".ds-btn { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:10px 16px; border-radius:var(--rounded-xs,6px); background:var(--ink,#28201a); color:var(--paper,#faf7f2); border:1px solid var(--ink,#28201a); cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn:hover { background:var(--dim-ink,#4a4036); border-color:var(--dim-ink,#4a4036); } .ds-btn:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; }"
     },
     {
       "name": "Ghost Button",
       "kind": "button",
       "refersTo": "button-ghost",
-      "description": "Low-emphasis button (Reset session). Paper background, dim-ink text, hairline border.",
+      "description": "Paper fill, hairline border. Randomize order, Reset session, Exit demo.",
       "html": "<button class=\"ds-btn-ghost\">Reset session</button>",
-      "css": ".ds-btn-ghost { font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: #4a4036; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 6px; padding: 10px 16px; cursor: pointer; transition: background 180ms cubic-bezier(0.165, 0.84, 0.44, 1), color 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-btn-ghost:hover { background: #f3eee5; color: #28201a; } .ds-btn-ghost:focus-visible { outline: 2px solid #c9573a; outline-offset: 2px; }"
+      "css": ".ds-btn-ghost { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:10px 16px; border-radius:var(--rounded-xs,6px); background:var(--paper,#faf7f2); color:var(--dim-ink,#4a4036); border:1px solid var(--hairline,#ddd3c2); cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-ghost:hover { background:var(--surface,#f3eee5); color:var(--ink,#28201a); border-color:var(--soft-line,#9a8e79); } .ds-btn-ghost:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; }"
     },
     {
       "name": "Input Field",
       "kind": "input",
       "refersTo": "input-field",
-      "description": "Text input (Add someone manually). Paper background, hairline border, clay focus.",
-      "html": "<input class=\"ds-input\" placeholder=\"Add someone manually\" />",
-      "css": ".ds-input { font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; font-size: 0.9375rem; color: #28201a; background: #faf7f2; border: 1px solid #ddd3c2; border-radius: 6px; padding: 10px 14px; transition: border-color 180ms cubic-bezier(0.165, 0.84, 0.44, 1); } .ds-input::placeholder { color: #807666; } .ds-input:focus { outline: none; border-color: #c9573a; }"
+      "description": "Focus is a border shift to clay — no outline ring. The single color change is the whole treatment.",
+      "html": "<input class=\"ds-input\" placeholder=\"Add someone manually…\" />",
+      "css": ".ds-input { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.9375rem; color:var(--ink,#28201a); background:var(--paper,#faf7f2); border:1px solid var(--hairline,#ddd3c2); border-radius:var(--rounded-xs,6px); padding:10px 14px; min-width:0; transition:border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-input::placeholder { color:var(--muted-ink,#756b5c); } .ds-input:focus { outline:none; border-color:var(--clay,#c9573a); }"
     },
     {
       "name": "Waiting Callout",
       "kind": "custom",
       "refersTo": "callout-waiting",
-      "description": "The 'coming up' prompt to the host. Neutral tone; never spotlights people listed.",
-      "html": "<div class=\"ds-waiting\"><span class=\"ds-waiting-lead\">Coming up:</span> <span class=\"ds-waiting-names\">Priya Shah, Marcus Tan, Devi Kapoor</span></div>",
-      "css": ".ds-waiting { background: #f3eee5; border-radius: 10px; padding: 14px 18px; font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; font-size: 0.9375rem; line-height: 1.5; color: #4a4036; } .ds-waiting-lead { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.01em; color: #28201a; display: block; margin-bottom: 4px; } .ds-waiting-names { font-weight: 500; color: #28201a; }"
+      "description": "Who is still to go. Surface fill, no border, no counter — a prompt to the host, not a shame board.",
+      "html": "<div class=\"ds-waiting\"><span class=\"ds-waiting-lead\">Coming up:</span> <span class=\"ds-waiting-names\">Priya Shah, Marcus Feld, Zoe Adeyemi</span></div>",
+      "css": ".ds-waiting { background:var(--surface,#f3eee5); border-radius:var(--rounded-sm,10px); padding:14px 20px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.9375rem; line-height:1.5; color:var(--dim-ink,#4a4036); } .ds-waiting-names { font-weight:500; color:var(--ink,#28201a); }"
     },
     {
       "name": "Live Dot",
       "kind": "custom",
       "refersTo": "live-dot",
-      "description": "Pulsing clay indicator showing the SSE feed is connected. The only ambient motion in the system.",
+      "description": "Connection state. The only ambient motion in the system, and now composited rather than painted.",
       "html": "<span class=\"ds-dot\" aria-hidden=\"true\"></span><span class=\"ds-dot-label\">live</span>",
-      "css": ".ds-dot { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: #c9573a; box-shadow: 0 0 0 0 rgba(201, 87, 58, 0.5); animation: ds-pulse 2000ms cubic-bezier(0.165, 0.84, 0.44, 1) infinite; vertical-align: middle; margin-right: 6px; } @keyframes ds-pulse { 0% { box-shadow: 0 0 0 0 rgba(201, 87, 58, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(201, 87, 58, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 87, 58, 0); } } @media (prefers-reduced-motion: reduce) { .ds-dot { animation: none; } } .ds-dot-label { font-family: Atkinson Hyperlegible Next, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: #28201a; }"
+      "css": ".ds-dot { position:relative; display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--clay,#c9573a); } .ds-dot::after { content:''; position:absolute; inset:0; border-radius:inherit; background:var(--clay,#c9573a); opacity:0.45; animation:ds-pulse 2400ms cubic-bezier(0.22, 1, 0.36, 1) infinite; } @keyframes ds-pulse { 0% { transform:scale(1); opacity:0.45; } 70%, 100% { transform:scale(3.6); opacity:0; } } .ds-dot-label { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.8125rem; color:var(--muted-ink,#756b5c); margin-left:8px; } @media (prefers-reduced-motion: reduce) { .ds-dot::after { animation:none; opacity:0; } }"
+    },
+    {
+      "name": "Demo-Mode Bar",
+      "kind": "custom",
+      "refersTo": "demo-bar",
+      "description": "Makes sample data unmistakable from the back of the room. Soft-line border carries the warning; no clay fill.",
+      "html": "<div class=\"ds-demo\"><span class=\"ds-demo-label\"><span class=\"ds-demo-dot\" aria-hidden=\"true\"></span><span class=\"ds-demo-title\">Demo mode</span><span class=\"ds-demo-note\">Sample data you can play with. Nothing is saved.</span></span><button class=\"ds-btn-ghost\">Exit demo</button></div>",
+      "css": ".ds-demo { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; background:var(--surface,#f3eee5); border:1px solid var(--soft-line,#9a8e79); border-radius:var(--rounded-sm,10px); padding:12px 16px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; } .ds-demo-label { display:flex; align-items:center; gap:10px; flex-wrap:wrap; } .ds-demo-dot { width:8px; height:8px; border-radius:999px; background:var(--clay,#c9573a); flex:none; } .ds-demo-title { font-size:0.9375rem; font-weight:600; letter-spacing:-0.01em; color:var(--ink,#28201a); } .ds-demo-note { font-size:0.8125rem; color:var(--muted-ink,#756b5c); }"
     }
   ],
   "narrative": {
     "northStar": "The Quiet Operator",
-    "overview": "A small, considered utility that helps the host of a meeting without performing. Every choice on the page is in service of two simultaneous audiences: the host clicking up close, and the whole room watching the screen-share from across a Zoom feed. Nothing is decorative; nothing competes with the conversation in the room. The system is light, warm, and restrained. Paper-coded neutrals carry the canvas. A single sans-serif (Atkinson Hyperlegible Next) handles every text role; tabular numerics use its matching mono. One accent, clay terracotta, exists for moments of attention and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. This system explicitly rejects the gravitational pulls of its category: the dark-navy-and-amber dashboard look the current tracker shipped with, the gamified leaderboard chrome, and the generic SaaS hero-metric template. It also rejects the obvious icebreaker-orange reflex; the warm accent here is clay, not pumpkin.",
+    "overview": "A small, considered utility that helps the host of a meeting without performing. Every choice on the page is in service of two simultaneous audiences: the host clicking up close, and the whole room watching the screen-share from across a Zoom feed. Nothing is decorative; nothing competes with the conversation in the room.\n\nThe system is light, warm, and restrained. Paper-coded neutrals (faintly warm, never bleached white) carry the canvas. A single sans-serif (Atkinson Hyperlegible Next) handles every text role; tabular numerics use its matching mono. One accent, clay terracotta, exists for moments of attention (live indicator, focus outlines, identity badges) and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. The design wants to be remembered for *not* getting in the way.\n\nThis system explicitly rejects the gravitational pulls of its category: the dark-navy-and-amber dashboard look the current tracker shipped with, the gamified leaderboard chrome (avatars, points, badges), and the generic SaaS hero-metric template. It also rejects the obvious icebreaker-orange reflex; the warm accent here is clay, not pumpkin.",
     "keyCharacteristics": [
       "Light theme, warm paper neutrals, never #fff",
       "Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics",
       "Type is self-hosted, never fetched: the face is part of the build, not a CDN request",
       "One accent (clay), used sparingly and never as a state carrier",
       "Flat by default: no shadows, tonal layering only",
-      "Restrained motion: state transitions only, never decorative",
+      "Restrained motion: state transitions, plus three short completion gestures — never decoration",
       "Screen-share legibility is the design's first audience"
     ],
     "rules": [
       {
+        "name": "The One Curve Rule",
+        "body": "Every transition and animation in the system uses cubic-bezier(0.22, 1, 0.36, 1). A second easing curve is a second voice; add duration instead.",
+        "section": "overview"
+      },
+      {
         "name": "The Restrained Accent Rule",
-        "body": "Clay covers \u226410% of any rendered screen. If you find yourself reaching for a second accent, you're solving the wrong problem. Add weight, label, or tone instead.",
+        "body": "Clay covers ≤10% of any rendered screen. If you find yourself reaching for a second accent, you're solving the wrong problem. Add weight, label, or tone instead.",
         "section": "colors"
       },
       {
         "name": "The Tinted-Neutral Rule",
-        "body": "Every *neutral* has chroma between 0.005 and 0.022 in the clay hue family. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent. The Up-Next Tint (chroma 0.04) is the one sanctioned exception and is not a neutral: it is a state surface, and adding a second one requires retiring this rule rather than quietly widening it.",
+        "body": "Every neutral carries chroma between 0.007 and 0.033 in OKLCH, in a hue band of 59–83 — warmer and yellower than clay itself, which sits at hue 35. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent. The Up-Next Tint (chroma 0.04, hue 44) is the one sanctioned exception and is not a neutral: it is a state surface, and adding a second one requires retiring this rule rather than quietly widening it.",
         "section": "colors"
       },
       {
@@ -283,24 +389,49 @@
         "section": "colors"
       },
       {
+        "name": "The Clay-Deep-For-Text Rule",
+        "body": "Wherever clay meets text — behind it or as it — the darker step does the work. Paper text on plain clay fails 4.5:1, and plain clay as 12px text is 4.00:1, which is the same failure wearing the other hat. Clay-deep passes both directions (5.84:1 on paper), and the two are close enough in hue that nothing reads as a second accent. Plain clay is therefore reserved for what it was always for: borders, the live dot, focus rings, and the up-next numeral at display size, where the 3:1 floor applies.",
+        "section": "colors"
+      },
+      {
+        "name": "The Three-Ink Floor Rule",
+        "body": "Text answers to exactly three inks, and which one is legal depends only on size and role: ink and dim-ink anywhere, muted-ink for anything secondary, and hint-ink only for large text or a graphical control. Hairline and soft-line are borders. If a design needs a fourth, lighter ink, what it actually needs is less text.",
+        "section": "colors"
+      },
+      {
         "name": "The One-Family Rule",
-        "body": "Atkinson Hyperlegible Next (plus Atkinson Hyperlegible Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight. Two pairings are retired and must not return: Fraunces + IBM Plex Mono, and the Geist pair that replaced it \u2014 the latter was declared but never actually delivered, so the design only existed on machines that happened to have it installed.",
+        "body": "Atkinson Hyperlegible Next (plus Atkinson Hyperlegible Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight. Two pairings are retired and must not return: Fraunces + IBM Plex Mono, and the Geist pair that replaced it — the latter was declared but never actually delivered, so the design only existed on machines that happened to have it installed.",
         "section": "typography"
       },
       {
         "name": "The Tabular Numerics Rule",
-        "body": "Every number that updates live (counts on stat tiles, the joined-at timestamp) is rendered in Atkinson Mono with font-feature-settings 'tnum'. Numbers must not reflow their container when they tick.",
+        "body": "Every number that updates live (counts on stat tiles, position numbers, the joined-at timestamp) is rendered in Atkinson Mono with font-feature-settings: 'tnum'. Numbers must not reflow their container when they tick.",
         "section": "typography"
       },
       {
         "name": "The Self-Hosted Type Rule",
-        "section": "typography",
-        "body": "The face ships from this repo (fonts/, latin subset, ~50KB) and is never fetched from a CDN. Two reasons, and both are binding: a webfont request would break the promise that nothing leaves your machine, and a face that is merely named renders only for whoever already has it. If you change the typeface, you ship the file \u2014 declaring a family you do not deliver is the bug this rule exists to prevent."
+        "body": "The face ships from this repo (fonts/, latin subset, ~50KB) and is never fetched from a CDN. Two reasons, and both are binding: a webfont request would break the promise that nothing leaves your machine, and a face that is merely named renders only for whoever already has it. If you change the typeface, you ship the file — declaring a family you do not deliver is the bug this rule exists to prevent.",
+        "section": "typography"
       },
       {
         "name": "The Screen-Share Floor Rule",
-        "body": "Body type never goes below 15px. Labels never go below 12px. Anything smaller dies in the 1080p video pipeline. Test by downsampling a screenshot to 1280\u00d7720 and reading from 2m away.",
+        "body": "Body type never goes below 15px. Labels never go below 12px. Anything smaller dies in the 1080p video pipeline. Test by downsampling a screenshot to 1280×720 and reading from 2m away.",
         "section": "typography"
+      },
+      {
+        "name": "The One Uppercase Rule",
+        "body": "Exactly one string in the system is uppercase: the up-next tag. Uppercase is a shout, and a page shared into a meeting gets one.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Breakpoint Rule",
+        "body": "The system has exactly one breakpoint: 640px. Everything above it is one layout that flexes; everything below is the same layout with one column removed per grid. A second breakpoint means the column was never right.",
+        "section": "layout"
+      },
+      {
+        "name": "The Row-Never-Wraps Rule",
+        "body": "A roster row is one line at every width. When space runs out, drop something — never wrap, never shrink the name below Title size. The give-up order is fixed: timestamp first, then the up-next tag, and the name never. Anything flex: none sitting inside the name column is a candidate for that list, because it does not shrink — it evicts.",
+        "section": "layout"
       },
       {
         "name": "The Flat-By-Default Rule",
@@ -309,29 +440,52 @@
       },
       {
         "name": "The No-Decorative-Glow Rule",
-        "body": "Backdrop blurs, soft radial-gradient bloom behind hero text, glow-on-hover effects: forbidden. They survive a Figma file; they don't survive a screen-share.",
+        "body": "Backdrop blurs, soft radial-gradient bloom behind hero text, \"glow-on-hover\" effects: forbidden. They survive a Figma file; they don't survive a screen-share.",
         "section": "elevation"
+      },
+      {
+        "name": "The Two-Radius Rule",
+        "body": "Containers get 10px, controls get 6px. A third radius means a component is confused about which it is. The pill is reserved for annotations and dots.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Border-Carries-State Rule",
+        "body": "Reach for border color before background color when marking attention: hairline → soft-line → clay is the escalation ladder, and it survives compressed video better than a fill change of the same magnitude.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Sequenced-Not-Simultaneous Rule",
+        "body": "These three fire in a staggered order (background, then check, then the next row's cue). Firing them together would read as a single blink; staggering them lets the room follow the handoff.",
+        "section": "components"
       }
     ],
     "dos": [
-      "Do use Paper (#faf7f2) for the canvas and default row; Surface (#f3eee5) as the only second tonal layer.",
-      "Do carry the introduced-vs-waiting distinction in fill density + weight + icon. State must be legible on a deuteranopic monitor.",
-      "Do keep Clay accent under 10% of any rendered screen. Use it for the live dot, focus outlines, and the host identity label only.",
-      "Do render every live-updating number in Atkinson Mono with font-feature-settings 'tnum'.",
-      "Do test every screen by downsampling a screenshot to 1280\u00d7720 and reading it from 2m away.",
-      "Do treat reduced-motion as a hard mode switch: live dot stops pulsing, transitions drop to opacity-only, roster updates without animation."
+      "Do use Paper (#faf7f2) for the canvas and default row; Surface (#f3eee5) as the only second tonal layer. That two-step palette is the entire elevation system.",
+      "Do carry the introduced-vs-waiting distinction in *fill density + weight + icon* (paper→surface, regular→muted-ink, no checkmark→checkmark). The state must be legible on a deuteranopic monitor.",
+      "Do keep Clay accent under 10% of any rendered screen. Use it for the live dot, focus outlines, the host identity label, the up-next border, and the drag insertion line. Nowhere else.",
+      "Do step clay down to clay-deep wherever clay meets text, in either direction — behind paper-coloured text, or set as text itself.",
+      "Do measure a colour against the surface it will actually sit on, not against paper by default. Muted-ink reads 4.90:1 on paper but 4.53:1 on surface, and surface is the constraint that sets its value.",
+      "Do protect the name before any badge that decorates it. A flex: none tag inside the name column does not shrink, it evicts.",
+      "Do render every live-updating number in Atkinson Mono with font-feature-settings: 'tnum'. Numbers must not reflow their container.",
+      "Do keep every transition and animation on cubic-bezier(0.22, 1, 0.36, 1). One curve, varying durations.",
+      "Do drop a column before wrapping a roster row: the timestamp goes first, the name never shrinks below Title size.",
+      "Do test every screen by downsampling a screenshot to 1280×720 and reading it from 2m away. If you can't read a row name or a count, the type is too small.",
+      "Do treat reduced-motion as a hard mode switch: the live dot loses its halo, and every animation and transition is cut to 0.001ms — delays included — so the roster updates instantly rather than gently. Check that each animated element's *end* state is what remains; an animation whose meaning lives in its final frame must be pinned there, not left to a fill mode."
     ],
     "donts": [
-      "Don't ship a dark theme variant. The page is screen-shared into lit conference rooms.",
-      "Don't use #fff or #000. Every neutral is tinted toward the clay hue.",
+      "Don't ship a dark theme variant. The page is screen-shared into lit conference rooms during business hours; dark-mode-by-default is the previous tracker's mistake and a category reflex.",
+      "Don't use #fff or #000. Every neutral is tinted toward the clay hue (chroma 0.005–0.022). Pure gray reads cold against the accent.",
       "Don't use the green-vs-amber state vocabulary the previous tracker shipped with. Color-blind viewers can't distinguish them.",
-      "Don't reach for the generic SaaS dashboard idioms: hero-metric tiles with gradient accents, identical card grids, navy-and-indigo palette.",
-      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, ordering by speed.",
-      "Don't mimic Zoom or Slack chrome. The page is shared inside Zoom; it should feel like a separate, calmer artifact.",
-      "Don't use border-left or border-right greater than 1px as a colored stripe.",
-      "Don't put the 'still to go' people in a warning-colored frame.",
-      "Don't animate layout properties. Transitions are opacity, color, and transform only, ease-out-quart 150\u2013200ms.",
-      "Don't add an icon font, decorative SVG illustration, or hero image."
+      "Don't reach for the generic SaaS dashboard idioms PRODUCT.md names: hero-metric tiles with gradient accents, identical icon+heading+text card grids, navy-and-indigo reflex palette.",
+      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, \"🎉 first to introduce!\" animations, ordering by speed. Introductions are not a race; PRODUCT.md is explicit.",
+      "Don't mimic Zoom or Slack chrome. The page is shared *inside* Zoom; it should feel like a separate, calmer artifact, not an extension of the host app's UI.",
+      "Don't use border-left or border-right greater than 1px as a colored stripe on rows or callouts. Use full hairline borders or tonal background shifts instead.",
+      "Don't put the \"still to go\" people in a warning-colored frame. PRODUCT.md's \"No spotlight on absence\" principle forbids it.",
+      "Don't add a second breakpoint or a second easing curve. One of each is the system.",
+      "Don't animate layout properties, and keep ordinary state transitions in the 140–200ms band. The four named animations (pulse, mark-flash, draw-check, pos-cue) are the only sanctioned exceptions to that band, and adding a fifth requires retiring this rule rather than quietly widening it.",
+      "Don't uppercase a second string. The up-next tag holds that slot.",
+      "Don't set text in hairline or soft-line. They are border colours (1.39:1 and 1.75:1). If text needs to recede, muted-ink is the floor, and hint-ink only when the text is large or the mark is a control.",
+      "Don't add an icon font, decorative SVG illustration, or hero image. The page is text and state, by design."
     ]
   }
 }

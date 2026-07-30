@@ -163,9 +163,9 @@ Known limitations:
 - Virtualized participant lists may only expose names currently scrolled
   into view.
 - Dial-in users sometimes appear as phone numbers rather than names.
-- It reads who is *present*, not who has *spoken*. For an automatic
-  "who has actually spoken" signal, a saved Zoom transcript is the better
-  source — ask if you'd like that ingest added.
+- It reads who is *present*, not who has *spoken*. Marking someone introduced
+  is always the host's call, by design — there is no automatic detection of
+  who has actually taken their turn.
 
 ## Development
 

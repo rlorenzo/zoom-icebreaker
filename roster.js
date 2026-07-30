@@ -77,8 +77,11 @@ function rowClass(p, { isUpNext, upNextChanged, justIntroduced }) {
     .join(" ");
 }
 
+// A reorderable row is focusable, so it has to say what focusing it buys you.
+// Without the description it announced as an unlabelled group and the arrow-key
+// reorder was reachable but undiscoverable.
 function rowDragAttrs(p) {
-  return isReorderable(p) ? 'draggable="true" tabindex="0"' : "";
+  return isReorderable(p) ? 'draggable="true" tabindex="0" aria-describedby="reorderHint"' : "";
 }
 
 function toggleLabelHtml(p) {
@@ -94,7 +97,7 @@ export function rowHtml(p, { positionByPid, upNextPid, upNextChanged, prevIntrod
   const leftTag = p.present ? "" : `<span class="tag">left</span>`;
   const upNextTag = isUpNext && !p.is_host ? `<span class="up-next-tag">up next</span>` : "";
   return `
-    <div class="${cls}" data-pid="${p.id}" ${rowDragAttrs(p)}>
+    <li class="${cls}" data-pid="${p.id}" ${rowDragAttrs(p)}>
       <div class="pos">${num}</div>
       <div class="name">
         <span class="who">${escapeHtml(p.name)}</span>
@@ -104,10 +107,11 @@ export function rowHtml(p, { positionByPid, upNextPid, upNextChanged, prevIntrod
       </div>
       <div class="when">${fmtTime(p.joinTime)}</div>
       <button class="toggle ${p.introduced ? "on" : ""}" type="button"
-              data-act="toggle" data-pid="${p.id}" data-val="${!p.introduced}">
+              data-act="toggle" data-pid="${p.id}" data-val="${!p.introduced}"
+              aria-pressed="${p.introduced}">
         ${toggleLabelHtml(p)}
       </button>
       <button class="x" type="button" data-act="remove" data-pid="${p.id}"
               aria-label="Remove ${escapeHtml(p.name)}">${ICON_X}</button>
-    </div>`;
+    </li>`;
 }

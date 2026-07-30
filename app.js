@@ -12,7 +12,6 @@ import { isReorderable, permuteReorderable } from "./session.js";
 
 // ---- state cache & helpers --------------------------------------
 let state = { participants: [], prompt: "", startedAt: Date.now() };
-let lastFocusPid = null; // re-focus this row after the next render
 let dragPid = null;
 let dropTargetPid = null;
 let dropBefore = true;
@@ -215,20 +214,21 @@ function playReorder(rosterEl, oldTops) {
 // light line with the demo still one quiet click away. onboard.md: "First use"
 // vs "User cleared".
 function emptyStateHtml() {
+  // An <li>, because it renders inside the roster's <ul>.
   if (hasSeen()) {
     return `
-      <div class="empty">
+      <li class="empty">
         <p class="empty-lede">No one yet. Joins appear automatically, or add someone below.</p>
         <button class="text-link" type="button" data-act="demo">Try the demo</button>
-      </div>`;
+      </li>`;
   }
   return `
-    <div class="empty first-run">
+    <li class="empty first-run">
       <p class="empty-title">Your roster shows up here</p>
       <p class="empty-body">As people join, names fill in from Zoom automatically, or you add them by hand. You mark each person introduced as they speak, so the whole room can see who has gone and who is up next.</p>
       <button class="btn" type="button" data-act="demo">Try a demo</button>
       <p class="empty-foot">Opens a sample meeting you can click around. Nothing is saved, and leaving it clears the slate.</p>
-    </div>`;
+    </li>`;
 }
 
 // ---- render ------------------------------------------------------
@@ -238,9 +238,11 @@ function emptyStateHtml() {
 function capturePrev() {
   const prev = state.participants || [];
   return {
+    prevParticipants: prev,
     prevIntroduced: new Set(prev.filter((p) => p.introduced && p.present).map((p) => p.id)),
     prevUpNextPid: findUpNextPid(prev),
     oldTops: captureRowTops(roster),
+    focus: captureFocus(),
   };
 }
 
@@ -262,11 +264,69 @@ function renderRoster(participants, ctx, oldTops) {
   playReorder(roster, oldTops);
 }
 
-// Re-focus a row moved by keyboard, once it has re-rendered.
-function restoreFocus() {
-  if (!lastFocusPid) return;
-  document.querySelector(`.row[data-pid="${lastFocusPid}"]`)?.focus();
-  lastFocusPid = null;
+// Every render replaces the roster subtree, which silently drops keyboard focus
+// to the document. That is not only a reorder problem: in auto mode the Zoom
+// poller re-renders on its own schedule, so a host tabbing through the roster
+// was thrown back to the top by a background read they never initiated. Capture
+// which person had focus and which control on their row, then put it back.
+function captureFocus() {
+  const el = document.activeElement;
+  if (!el || !roster.contains(el)) return null;
+  const row = el.closest(".row[data-pid]");
+  if (!row) return null;
+  return { pid: row.dataset.pid, act: el === row ? null : el.dataset.act };
+}
+
+function restoreFocus(snap) {
+  if (!snap) return;
+  // Matched by property rather than by selector so a pid never has to be
+  // escaped into one.
+  const row = [...roster.querySelectorAll(".row[data-pid]")].find(
+    (r) => r.dataset.pid === snap.pid,
+  );
+  if (!row) return;
+  if (snap.act) {
+    row.querySelector(`[data-act="${snap.act}"]`)?.focus();
+    return;
+  }
+  // The row itself is only focusable while it is still reorderable; once the
+  // person is introduced it drops out of the tab order, so land on their toggle
+  // instead of losing the place entirely.
+  if (row.hasAttribute("tabindex")) row.focus();
+  else row.querySelector(".toggle")?.focus();
+}
+
+// One sentence per change, for assistive tech. The roster is no longer a live
+// region — it is rewritten wholesale, so announcing it re-read every name on
+// every frame. This says only what actually changed.
+export function describeChange(prev, next) {
+  const before = new Map(prev.map((p) => [p.id, p]));
+  const waiting = next.filter((p) => p.present && !p.introduced).length;
+
+  // Only someone already on the roster can have been marked. A name whose very
+  // first frame shows them introduced arrived that way — the opening snapshot,
+  // or entering the demo, whose sample roster seeds two people as done — and is
+  // reported as a join below rather than as a toggle nobody performed.
+  const known = next.filter((p) => before.has(p.id));
+
+  const introduced = known.find((p) => p.introduced && !before.get(p.id).introduced);
+  if (introduced) return `${introduced.name} introduced. ${waiting} still to go.`;
+
+  const undone = known.find((p) => !p.introduced && before.get(p.id).introduced);
+  if (undone) return `${undone.name} marked not introduced. ${waiting} still to go.`;
+
+  const joined = next.filter((p) => !before.has(p.id));
+  if (joined.length === 1) return `${joined[0].name} joined.`;
+  if (joined.length > 1) return `${joined.length} people joined.`;
+
+  // "Removed" is off the roster entirely, which is not the same as p.present —
+  // someone who leaves the call stays listed, greyed, and is not announced.
+  const stillListed = new Set(next.map((p) => p.id));
+  const removed = prev.filter((p) => !stillListed.has(p.id));
+  if (removed.length === 1) return `${removed[0].name} removed.`;
+  if (removed.length > 1) return `${removed.length} people removed.`;
+
+  return "";
 }
 
 export function render(s) {
@@ -275,7 +335,7 @@ export function render(s) {
 
   const positionByPid = assignPositions(s.participants);
   const displayList = sortForDisplay(s.participants);
-  const { prevIntroduced, prevUpNextPid, oldTops } = capturePrev();
+  const { prevParticipants, prevIntroduced, prevUpNextPid, oldTops, focus } = capturePrev();
 
   // Keep `state` in BACKEND order. The reorder handlers derive the posted
   // order from it, and posting the display-sorted list would renumber
@@ -298,7 +358,10 @@ export function render(s) {
     prevIntroduced,
   };
   renderRoster(displayList, ctx, oldTops);
-  restoreFocus();
+  restoreFocus(focus);
+
+  const message = describeChange(prevParticipants, s.participants);
+  if (message) $("srStatus").textContent = message;
 }
 
 // ---- drag and drop helpers --------------------------------------
@@ -471,7 +534,8 @@ function wireRosterActions() {
     e.preventDefault();
     const order = keyboardReorder(target.pid, delta);
     if (!order) return;
-    lastFocusPid = target.pid;
+    // No bookkeeping needed: the row is focused right now, so the render's own
+    // focus capture already knows where to put it back.
     postOrder(order);
   });
 }

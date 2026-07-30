@@ -342,3 +342,125 @@ describe("live stream", () => {
     expect(document.getElementById("live").textContent).toBe("live");
   });
 });
+
+// Every render replaces the roster subtree. These cover what that used to cost:
+// keyboard focus, and a live region that re-read every name on every frame.
+describe("accessibility of dynamic updates", () => {
+  const seed = () => app.render({ startedAt: Date.now(), prompt: "", participants: trio() });
+  const renderWith = (participants) =>
+    app.render({ startedAt: Date.now(), prompt: "", participants });
+  const introduce = (pid) => trio().map((p) => (p.id === pid ? { ...p, introduced: true } : p));
+
+  it("keeps focus on the same person when an unrelated re-render lands", () => {
+    seed();
+    document.querySelector('.row[data-pid="b"]').focus();
+    // A frame the host did not initiate — the Zoom poller adding someone.
+    renderWith([...trio(), P({ id: "d", name: "Dee" })]);
+    expect(document.activeElement.closest(".row").dataset.pid).toBe("b");
+  });
+
+  it("returns focus to the same control, not merely the same row", () => {
+    seed();
+    document.querySelector('.toggle[data-pid="c"]').focus();
+    renderWith(trio());
+    expect(document.activeElement.dataset.act).toBe("toggle");
+    expect(document.activeElement.dataset.pid).toBe("c");
+  });
+
+  it("falls back to the toggle when the focused row leaves the tab order", () => {
+    seed();
+    document.querySelector('.row[data-pid="b"]').focus();
+    renderWith(introduce("b")); // introduced rows are no longer reorderable
+    expect(document.activeElement.closest(".row").dataset.pid).toBe("b");
+    expect(document.activeElement.className).toContain("toggle");
+  });
+
+  it("leaves focus alone when it was never inside the roster", () => {
+    seed();
+    document.getElementById("addName").focus();
+    renderWith(trio());
+    expect(document.activeElement.id).toBe("addName");
+  });
+
+  it("drops focus quietly when the focused person is gone", () => {
+    seed();
+    document.querySelector('.row[data-pid="b"]').focus();
+    renderWith(trio().filter((p) => p.id !== "b"));
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("ignores focus that is inside the roster but on no one", () => {
+    // The empty state puts a button inside the roster that belongs to no row.
+    renderWith([]);
+    document.querySelector('#roster [data-act="demo"]').focus();
+    renderWith([]);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("points each row's reorder hint at real text on the page", () => {
+    seed();
+    const hintId = document.querySelector('.row[data-pid="b"]').getAttribute("aria-describedby");
+    expect(document.getElementById(hintId)?.textContent).toMatch(/arrow key/i);
+  });
+
+  it("announces only what changed", () => {
+    seed();
+    renderWith(introduce("b"));
+    expect(document.getElementById("srStatus").textContent).toBe("Bob introduced. 2 still to go.");
+  });
+
+  it("does not make the roster or the counts live regions", () => {
+    seed();
+    const roster = document.getElementById("roster");
+    expect(roster.getAttribute("aria-live")).toBeNull();
+    expect(roster.tagName).toBe("UL");
+    expect(roster.querySelectorAll(":scope > li.row")).toHaveLength(3);
+    expect(document.querySelector(".stats").getAttribute("aria-live")).toBeNull();
+  });
+});
+
+describe("describeChange", () => {
+  const A = P({ id: "a", name: "Ann" });
+  const B = P({ id: "b", name: "Bob" });
+
+  it("names a newly introduced person and what is left", () => {
+    expect(app.describeChange([A, B], [A, { ...B, introduced: true }])).toBe(
+      "Bob introduced. 1 still to go.",
+    );
+  });
+
+  it("reports a person unmarked by mistake", () => {
+    expect(app.describeChange([A, { ...B, introduced: true }], [A, B])).toBe(
+      "Bob marked not introduced. 2 still to go.",
+    );
+  });
+
+  it("names a single joiner and counts a crowd", () => {
+    expect(app.describeChange([A], [A, B])).toBe("Bob joined.");
+    expect(app.describeChange([A], [A, B, P({ id: "c", name: "Cy" })])).toBe("2 people joined.");
+  });
+
+  it("reports removals", () => {
+    expect(app.describeChange([A, B], [A])).toBe("Bob removed.");
+    expect(app.describeChange([A, B], [])).toBe("2 people removed.");
+  });
+
+  it("announces a toggle on someone who has already left the meeting", () => {
+    const gone = { ...B, present: false };
+    expect(app.describeChange([A, gone], [A, { ...gone, introduced: true }])).toBe(
+      "Bob introduced. 1 still to go.",
+    );
+  });
+
+  it("reads a wholesale roster swap as joins, not as a toggle nobody made", () => {
+    // Entering the demo replaces the roster with a sample where people are
+    // already introduced; announcing one of them as "just introduced" would
+    // describe an action the host never took.
+    expect(app.describeChange([], [{ ...A, introduced: true }, B])).toBe("2 people joined.");
+  });
+
+  it("stays silent when nothing material changed", () => {
+    expect(app.describeChange([A, B], [A, B])).toBe("");
+    expect(app.describeChange([A, B], [B, A])).toBe("");
+  });
+});
