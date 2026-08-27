@@ -28,35 +28,47 @@
 
 :root {
   /* The page is screen-shared into lit rooms and never ships a dark variant;
-     saying so stops Chrome's Auto Dark Theme force-inverting the paper world. */
+     saying so stops Chrome's Auto Dark Theme force-inverting the sky world. */
   color-scheme: only light;
 
-  --paper: #faf7f2;
-  --surface: #f3eee5;
-  --hairline: #ddd3c2;
-  --soft-line: #c8bca6;
-  /* Contrast floors, measured against the surface each colour actually sits on:
-     hint-ink 3.01:1 (non-text + large text), muted-ink 4.53:1 on surface and
-     4.90:1 on paper. soft-line is 1.6-1.7:1 and is therefore a BORDER colour
-     only — it was previously used for quieted numerals, which made them
-     effectively invisible. */
-  --hint-ink: #9a8e79;
-  --muted-ink: #756b5c;
-  --dim-ink: #4a4036;
-  --ink: #28201a;
-  --clay: #c9573a;
-  --clay-deep: #a44128;
-  /* The up-next wash. Deliberately out of sRGB: it clips to #ffecde on sRGB
-     displays and renders wider on P3, which is acceptable for a tint but is
-     why it is a token rather than a value repeated at each use site. */
-  --up-next-tint: oklch(96.5% 0.04 44);
+  /* Clear-sky palette. Every value below was contrast-checked against the
+     surface it actually sits on (see the pair notes at each use site):
+     ink 15.8:1 on ground, muted-ink 5.6:1 on surface, deep-blue 7.3:1 on
+     the gold wash. Gold never carries text on a light ground by itself —
+     it is a surface (wash, tag fill) under ink, or a mark on deep blue. */
+  --ground: #f4f9fd; /* page canvas: airy, blue-tinted, never gray */
+  --card: #ffffff; /* roster rows: crisp white against the sky */
+  --surface: #e3eef7; /* second tonal layer: tiles, introduced rows */
+  --hairline: #c9dcea; /* default 1px borders (border-only: 1.4:1) */
+  --soft-line: #9ec1d9; /* emphasized borders (border-only: 1.8:1) */
+  --hint-ink: #5b7a8c; /* 4.3:1 on ground — large text + control glyphs */
+  --muted-ink: #44616f; /* secondary text: 5.6:1 on surface, 6.2:1 ground */
+  --dim-ink: #1e3e4f; /* tertiary text, ghost-button text */
+  --ink: #002033; /* primary text; the deep end of the sky */
+
+  --deep-blue: #005581; /* the committed field: masthead, buttons, focus */
+  --deep-blue-hover: #0069a0;
+  --on-deep: #ffffff; /* text on deep blue: 8:1 */
+  --on-deep-dim: rgba(255, 255, 255, 0.35); /* separators on deep blue */
+  --bright-blue: #1295d8; /* live accents on white: 3.1:1 non-text floor */
+  --sky-text: #9adcf9; /* meta text on the deep-blue band: 5.3:1 */
+
+  --gold: #ffb511; /* the baton: up-next tag fill, dot on blue */
+  --gold-bright: #ffd200; /* placeholder + caret on blue; selection */
+  --gold-wash: #fff3ce; /* the up-next / celebration surface */
+  --sun-ink: #8a5b00; /* text & border on gold surfaces: 5.3:1 on wash */
 
   --rounded-xs: 6px;
   --rounded-sm: 10px;
   --rounded-pill: 999px;
 
-  --t-fast: 140ms cubic-bezier(0.22, 1, 0.36, 1);
-  --t-medium: 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Two curves, two jobs. Glide (ease-out-quint) carries every state change;
+     spring (back-out overshoot) is reserved for the happy moments — the baton
+     passing to whoever is up next. A third curve is a third voice. */
+  --glide: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-fast: 140ms var(--glide);
+  --t-medium: 200ms var(--glide);
 
   font-family: "Atkinson Hyperlegible Next", system-ui, sans-serif;
 }
@@ -69,16 +81,33 @@
 
 html,
 body {
-  background: var(--paper);
+  background: var(--ground);
+}
+html {
+  /* The scrollbar is a browser surface too: long rosters scroll, and a
+     default-gray bar is the one unthemed edge of the page. */
+  scrollbar-color: var(--soft-line) var(--ground);
+  /* The masthead bleeds with 50vw, which includes the scrollbar gutter under
+     classic (Windows / always-on) scrollbars — clip the few px of horizontal
+     overhang instead of letting them become a horizontal scrollbar. */
+  overflow-x: clip;
 }
 body {
   color: var(--ink);
   min-height: 100vh;
-  padding: 5vh 5vw;
+  /* No top padding: the deep-blue masthead bleeds to the viewport edge. */
+  padding: 0 5vw 5vh;
   font-size: 0.9375rem;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  caret-color: var(--deep-blue);
+}
+
+/* Even text selection is sunny: gold with deep ink (11:1). */
+::selection {
+  background: var(--gold-bright);
+  color: var(--ink);
 }
 
 .wrap {
@@ -102,20 +131,19 @@ body {
 }
 
 /* Demo-mode bar -------------------------------------------------- */
-/* A calm, unmistakable banner so the room never reads sample data as a real
-   meeting. Surface tone + soft-line border (the "reads from the back of the
-   room" weight) + one clay dot; no clay background, per the accent rule. */
+/* Sample data wears the sun: a gold wash with a sun-ink border, unmistakable
+   from the back of the room without borrowing the roster's own colors. */
 .demo-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  background: var(--surface);
-  border: 1px solid var(--soft-line);
+  background: var(--gold-wash);
+  border: 1px solid var(--sun-ink);
   border-radius: var(--rounded-sm);
   padding: 12px 16px;
-  margin-bottom: 24px;
+  margin: 16px 0;
 }
 .demo-bar[hidden] {
   /* Author display:flex would otherwise beat the UA [hidden] rule. */
@@ -132,7 +160,8 @@ body {
   width: 8px;
   height: 8px;
   border-radius: var(--rounded-pill);
-  background: var(--clay);
+  /* sun-ink, not gold: gold-on-gold-wash is invisible (1.5:1). */
+  background: var(--sun-ink);
   flex: none;
 }
 .demo-bar-title {
@@ -143,12 +172,23 @@ body {
 }
 .demo-bar-note {
   font-size: 0.8125rem;
-  color: var(--muted-ink);
+  color: var(--muted-ink); /* 5.95:1 on the wash */
 }
 
-/* Header --------------------------------------------------------- */
+/* Masthead ------------------------------------------------------- */
+/* The committed field: one deep-blue band owns the top of the page — meta
+   line and prompt together — and bleeds to the viewport edges. The margin/
+   padding pair cancels the centered column so the fill spans the viewport
+   while the text stays on the 880px grid. */
+header,
+.prompt-sticky {
+  background: var(--deep-blue);
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+}
+
 header {
-  margin-bottom: 40px;
+  padding-top: 22px;
 }
 
 .meta {
@@ -156,15 +196,15 @@ header {
   align-items: center;
   gap: 14px;
   font-size: 0.8125rem;
-  color: var(--muted-ink);
-  margin-bottom: 22px;
+  color: var(--sky-text); /* 5.3:1 on deep blue */
+  padding-bottom: 4px;
 }
 .meta b {
-  color: var(--dim-ink);
+  color: var(--on-deep);
   font-weight: 500;
 }
 .meta .sep {
-  color: var(--hairline);
+  color: var(--on-deep-dim);
 }
 
 /* The halo rides a composited pseudo-element (transform + opacity) rather than
@@ -177,7 +217,8 @@ header {
   width: 7px;
   height: 7px;
   border-radius: var(--rounded-pill);
-  background: var(--clay);
+  /* Gold on deep blue: 4.5:1, comfortably over the 3:1 non-text floor. */
+  background: var(--gold);
   flex: none;
 }
 .dot::after {
@@ -185,9 +226,9 @@ header {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: var(--clay);
+  background: var(--gold);
   opacity: 0.45;
-  animation: pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: pulse 2.4s var(--glide) infinite;
 }
 @keyframes pulse {
   0% {
@@ -205,14 +246,16 @@ header {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--paper);
-  padding: 14px 0 12px;
-  margin: -14px 0 10px;
-  border-bottom: 1px solid transparent;
-  transition: border-color var(--t-fast);
+  padding-top: 10px;
+  padding-bottom: 18px;
+  margin-bottom: 28px;
+  /* The band announces its own stickiness with a soft drop when pinned —
+     the one shadow in the system, and it is functional, not elevation. */
+  box-shadow: 0 4px 16px rgba(0, 32, 51, 0);
+  transition: box-shadow var(--t-fast);
 }
 .prompt-sticky.is-pinned {
-  border-bottom-color: var(--hairline);
+  box-shadow: 0 4px 16px rgba(0, 32, 51, 0.18);
 }
 
 .prompt {
@@ -220,10 +263,10 @@ header {
   width: 100%;
   font-family: inherit;
   font-size: clamp(2rem, 3.4vw, 2.75rem);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.015em;
-  color: var(--ink);
+  color: var(--on-deep);
   background: transparent;
   border: 0;
   padding: 0;
@@ -231,57 +274,83 @@ header {
   resize: none;
   overflow: hidden;
   outline: none;
+  caret-color: var(--gold-bright);
 }
 .prompt::placeholder {
-  /* Large text, so 3:1 is the floor; soft-line sat at 1.75:1 and read as an
-     empty field rather than an invitation to type. */
-  color: var(--hint-ink);
-  font-weight: 500;
+  /* Gold-bright on deep blue is 5.5:1 — well past the 3:1 large-text floor,
+     and it reads as an invitation rather than an empty field. */
+  color: var(--gold-bright);
+  font-weight: 600;
+  opacity: 1; /* Firefox dims placeholders by default */
 }
 .prompt:focus-visible {
-  outline: 2px solid var(--clay);
+  outline: 2px solid var(--gold-bright);
   outline-offset: 6px;
   border-radius: var(--rounded-xs);
 }
 
-/* Stats ---------------------------------------------------------- */
+/* Counts --------------------------------------------------------- */
+/* One continuous band, not three tiles: PRODUCT.md's anti-references name
+   the hero-metric tile grid outright, so the three counts read as a single
+   ledger strip — one surface, three inline groups on a shared baseline. */
 .stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  background: var(--surface);
+  border-radius: var(--rounded-sm);
+  padding: 14px 20px;
   margin-bottom: 28px;
 }
 .stat {
-  background: var(--surface);
-  border-radius: var(--rounded-sm);
-  padding: 16px 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
 }
 .stat .n {
   font-family: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
   font-size: 2.25rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.01em;
   font-feature-settings: "tnum" 1;
-  color: var(--ink);
+  /* Deep blue at display size: 6.8:1 on surface. The counts are the page's
+     only big numerals, and they carry the brand color instead of a border. */
+  color: var(--deep-blue);
 }
 .stat .l {
-  margin-top: 10px;
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   color: var(--muted-ink);
 }
 
-/* Coming-up callout ---------------------------------------------- */
+/* Completion callout --------------------------------------------- */
+/* The one whole-room celebration: when everyone has gone, the callout wears
+   the gold wash. Warm, not loud — no confetti, no exclamation chrome. */
 .callout {
-  background: var(--surface);
+  background: var(--gold-wash);
   border-radius: var(--rounded-sm);
   padding: 14px 20px;
   margin-bottom: 22px;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--dim-ink);
+  color: var(--ink); /* 15:1 on the wash */
+  /* One warm settle when it first appears — the whole-room finish deserves
+     the same breath the per-person gesture gets. app.js only rewrites the
+     callout when its content changes, so this never replays on the Zoom
+     poller's no-change renders. */
+  animation: callout-settle 1200ms var(--glide);
+}
+@keyframes callout-settle {
+  from {
+    background-color: color-mix(in oklab, var(--gold) 30%, var(--gold-wash));
+  }
+  to {
+    background-color: var(--gold-wash);
+  }
 }
 
 /* Roster --------------------------------------------------------- */
@@ -298,7 +367,7 @@ header {
   grid-template-columns: 40px 1fr auto auto auto;
   align-items: center;
   gap: 14px;
-  background: var(--paper);
+  background: var(--card);
   border: 1px solid var(--hairline);
   border-radius: var(--rounded-sm);
   padding: 14px 18px;
@@ -317,7 +386,7 @@ header {
   cursor: grabbing;
 }
 .row:focus-visible {
-  outline: 2px solid var(--clay);
+  outline: 2px solid var(--deep-blue);
   outline-offset: 2px;
 }
 
@@ -335,44 +404,58 @@ header {
   color: var(--dim-ink);
 }
 
-/* Up-next: the clear hand to the next speaker. Now that the roster carries the
-   whole "who's next" signal (no separate callout), this row is sized up and
-   warm-tinted so the room reads it instantly over compressed screen-share. */
+/* Up-next: the baton. The row that matters most on the page wears the gold
+   wash inside a deep-blue frame, so the room finds the next speaker through
+   compressed video by fill AND border AND size — never hue alone. */
 .row.up-next {
-  background: var(--up-next-tint);
-  border-color: var(--clay);
-  padding-top: 18px;
-  padding-bottom: 18px;
+  background: var(--gold-wash);
+  border: 2px solid var(--deep-blue); /* 7.3:1 on the wash */
+  padding: 17px; /* 18px minus the extra border px: rows stay aligned */
 }
 .row.up-next .pos {
-  color: var(--clay);
-  font-weight: 600;
+  color: var(--deep-blue);
+  font-weight: 700;
   font-size: 1.5rem;
 }
 .row.up-next .name {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 .up-next-tag {
-  font-size: 0.75rem; /* DESIGN.md floor: labels never go below 12px */
-  font-weight: 600;
+  font-size: 0.75rem; /* label floor: 12px, nothing smaller survives 720p */
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--paper);
-  /* clay-deep (not clay) so paper text clears 4.5:1 on the pill */
-  background: var(--clay-deep);
+  color: var(--ink); /* 9.5:1 on gold */
+  background: var(--gold);
   padding: 3px 9px;
   border-radius: var(--rounded-xs);
   flex: none;
 }
+/* The tag pops in on a spring the moment the baton arrives — one small
+   overshoot, scoped to the handoff, never looping. */
+.row.up-next.just-cued .up-next-tag {
+  animation: tag-pop 420ms var(--spring) backwards;
+}
+@keyframes tag-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
-/* Completion gesture: clay-tinted settle, then surface. ----------- */
+/* Completion gesture: a gold settle, then the check draws, then the baton
+   passes. Three beats on two curves — glide for the settle, spring for joy. */
 @keyframes mark-flash {
   0% {
-    background-color: color-mix(in oklab, var(--clay) 16%, var(--surface));
+    background-color: color-mix(in oklab, var(--gold) 34%, var(--surface));
   }
   60% {
-    background-color: color-mix(in oklab, var(--clay) 7%, var(--surface));
+    background-color: color-mix(in oklab, var(--gold) 12%, var(--surface));
   }
   100% {
     background-color: var(--surface);
@@ -392,7 +475,7 @@ header {
     opacity: 0.55;
   }
   45% {
-    transform: scale(1.22);
+    transform: scale(1.28);
     opacity: 1;
   }
   100% {
@@ -401,16 +484,16 @@ header {
   }
 }
 .row.just-introduced {
-  animation: mark-flash 3000ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: mark-flash 3000ms var(--glide);
 }
 .row.just-introduced .toggle .check path {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  animation: draw-check 1000ms cubic-bezier(0.22, 1, 0.36, 1) 800ms forwards;
+  animation: draw-check 1000ms var(--glide) 800ms forwards;
 }
 .row.up-next.just-cued .pos {
   transform-origin: center right;
-  animation: pos-cue 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: pos-cue 520ms var(--spring);
 }
 /* The Sequenced-Not-Simultaneous Rule: the cue is the third beat, so it waits
    for the checkmark to land (800ms delay + 1000ms draw). Scoped to renders that
@@ -418,7 +501,8 @@ header {
    someone leaves, and those carry no flash and no checkmark to follow, so an
    unconditional delay would strand the cue 1.8s after the gesture that caused
    it. Reduced motion zeroes this along with every other delay. */
-.roster:has(.just-introduced) .row.up-next.just-cued .pos {
+.roster:has(.just-introduced) .row.up-next.just-cued .pos,
+.roster:has(.just-introduced) .row.up-next.just-cued .up-next-tag {
   animation-delay: 1800ms;
 }
 
@@ -429,7 +513,7 @@ header {
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--clay);
+  background: var(--deep-blue);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--t-fast);
@@ -453,10 +537,8 @@ header {
   text-align: right;
   user-select: none;
 }
-/* Quieted, not erased. These were soft-line (1.62:1 on surface) which made the
-   standing position number unreadable; the row already reads as "done" through
-   its surface fill and muted name, so the numeral only has to step back, not
-   vanish. */
+/* Quieted, not erased: the introduced row already reads as "done" through its
+   surface fill and muted name; the numeral steps back with them. 5.6:1. */
 .row.introduced .pos,
 .row.left .pos {
   color: var(--muted-ink);
@@ -483,13 +565,12 @@ header {
 
 .host-pill {
   flex: none;
-  font-size: 0.75rem; /* DESIGN.md floor: labels never go below 12px */
+  font-size: 0.75rem; /* label floor: 12px */
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: lowercase;
-  /* clay-deep, not clay: the same 4.5:1 rule that governs paper text ON clay
-     also governs clay AS text. Plain clay is 4.00:1 on paper. */
-  color: var(--clay-deep);
+  /* Deep blue as identity text: 8:1 on the white row. */
+  color: var(--deep-blue);
   padding: 4px 6px;
 }
 
@@ -512,7 +593,7 @@ header {
 }
 
 .tag {
-  font-size: 0.75rem; /* DESIGN.md floor: labels never go below 12px */
+  font-size: 0.75rem; /* label floor: 12px */
   letter-spacing: 0.06em;
   color: var(--muted-ink);
   border: 1px solid var(--hairline);
@@ -530,7 +611,7 @@ header {
   padding: 8px 14px;
   border-radius: var(--rounded-xs);
   border: 1px solid var(--hairline);
-  background: var(--paper);
+  background: var(--card);
   color: var(--muted-ink);
   cursor: pointer;
   display: inline-flex;
@@ -546,29 +627,31 @@ header {
   color: var(--ink);
 }
 .toggle.on {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: var(--deep-blue);
+  color: var(--on-deep);
+  border-color: var(--deep-blue);
 }
 .toggle.on:hover {
-  background: var(--dim-ink);
-  border-color: var(--dim-ink);
+  background: var(--deep-blue-hover);
+  border-color: var(--deep-blue-hover);
 }
 .toggle.on .check {
-  color: var(--paper);
+  color: var(--on-deep);
 }
 .toggle:focus-visible {
-  outline: 2px solid var(--clay);
+  outline: 2px solid var(--deep-blue);
   outline-offset: 2px;
 }
 
 .x {
+  position: relative;
   flex: none;
   background: none;
   border: 0;
   padding: 6px;
-  /* The glyph is the only thing identifying this control, so it answers to the
-     3:1 non-text floor. soft-line was 1.75:1. */
+  /* The glyph is the only thing identifying this control, so it answers to
+     the 3:1 non-text floor: hint-ink clears it on every row fill it sits on
+     (4.3:1 on white, ~4:1 on surface and the gold wash). */
   color: var(--hint-ink);
   cursor: pointer;
   display: inline-flex;
@@ -579,32 +662,29 @@ header {
     background var(--t-fast);
 }
 .x:hover {
-  color: var(--clay-deep);
+  color: var(--deep-blue);
   background: var(--surface);
 }
 .x:focus-visible {
-  outline: 2px solid var(--clay);
+  outline: 2px solid var(--deep-blue);
   outline-offset: 2px;
 }
-/* hint-ink is measured on paper (3.01:1) and only just clears the 3:1 non-text
-   floor there. The introduced row fills with surface, which drops the glyph to
-   2.79:1, and the up-next tint drops it to 2.81:1 — so on those two fills it
-   steps up to muted-ink (4.53:1 and 4.56:1). Per DESIGN.md: measure a colour
-   against the surface it actually sits on, not against paper by default. */
-.row.introduced .x,
-.row.up-next .x {
-  color: var(--muted-ink);
-}
-/* Hover is restated because the two rules above outrank the base `.x:hover`;
-   without this the glyph would go inert on exactly the rows they cover. The
-   fill is paper rather than surface for the same reason the colour moved: on
-   these rows surface is the row's own background (the up-next tint matches its
-   luminance to within 1%), so the default chip is invisible. Paper is the only
-   other step the two-tone palette allows. */
+/* On the introduced row, surface IS the row fill, so the hover chip switches
+   to the white card step instead; same on the gold wash, where surface would
+   read as a smudge. */
 .row.introduced .x:hover,
 .row.up-next .x:hover {
-  color: var(--clay-deep);
-  background: var(--paper);
+  color: var(--deep-blue);
+  background: var(--card);
+}
+/* On touch, the destructive control earns a 44px hit area — an invisible
+   extension of the target, so the visual 24px chip and row layout don't move. */
+@media (pointer: coarse) {
+  .x::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+  }
 }
 
 .empty {
@@ -618,6 +698,7 @@ header {
   font-size: 0.9375rem;
   border: 1px dashed var(--hairline);
   border-radius: var(--rounded-sm);
+  background: var(--card);
 }
 .empty-lede {
   color: var(--muted-ink);
@@ -633,7 +714,7 @@ header {
 }
 .empty-title {
   font-size: 1.25rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -656,7 +737,7 @@ header {
   font-family: inherit;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--clay-deep);
+  color: var(--deep-blue); /* 7.6:1 */
   background: none;
   border: 0;
   /* 4px block padding puts the hit area at 28px, clearing the 24px minimum. */
@@ -668,12 +749,10 @@ header {
   transition: color var(--t-fast);
 }
 .text-link:hover {
-  /* Darkens to ink on hover, the same direction the sponsor link travels.
-     Brightening to clay dropped it to 4.00:1. */
   color: var(--ink);
 }
 .text-link:focus-visible {
-  outline: 2px solid var(--clay);
+  outline: 2px solid var(--deep-blue);
   outline-offset: 2px;
 }
 
@@ -704,6 +783,9 @@ footer {
   margin-top: 32px;
 }
 .sponsor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--muted-ink);
@@ -717,17 +799,17 @@ footer {
 }
 .sponsor:hover {
   color: var(--ink);
-  border-color: var(--clay);
+  border-color: var(--deep-blue);
 }
 
 input {
   font-family: inherit;
   font-size: 0.9375rem;
   color: var(--ink);
-  background: var(--paper);
+  background: var(--card);
   /* A field's boundary is the only thing that says "type here", so unlike the
      buttons (which have their own text) it answers to the 3:1 non-text floor.
-     hairline is 1.39:1. */
+     hint-ink is 4.3:1 on the ground; hairline is 1.4:1 and stays decorative. */
   border: 1px solid var(--hint-ink);
   padding: 10px 14px;
   border-radius: var(--rounded-xs);
@@ -739,20 +821,25 @@ input::placeholder {
   color: var(--muted-ink);
 }
 input:focus {
-  outline: none;
-  border-color: var(--clay);
+  border-color: var(--deep-blue);
+}
+/* Keyboard focus gets the system's full 2px ring, same as every other
+   control; the border shift alone was thinner than the system's own bar. */
+input:focus-visible {
+  outline: 2px solid var(--deep-blue);
+  outline-offset: 2px;
 }
 
 .btn {
   font-family: inherit;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.04em;
   padding: 10px 16px;
   border-radius: var(--rounded-xs);
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+  border: 1px solid var(--deep-blue);
+  background: var(--deep-blue);
+  color: var(--on-deep);
   cursor: pointer;
   transition:
     background var(--t-fast),
@@ -760,16 +847,16 @@ input:focus {
     color var(--t-fast);
 }
 .btn:hover {
-  background: var(--dim-ink);
-  border-color: var(--dim-ink);
+  background: var(--deep-blue-hover);
+  border-color: var(--deep-blue-hover);
 }
 .btn:focus-visible {
-  outline: 2px solid var(--clay);
+  outline: 2px solid var(--deep-blue);
   outline-offset: 2px;
 }
 
 .btn.ghost {
-  background: var(--paper);
+  background: var(--card);
   color: var(--dim-ink);
   border-color: var(--hairline);
 }
@@ -813,14 +900,21 @@ input:focus {
 /* Narrow screens ------------------------------------------------- */
 @media (max-width: 640px) {
   body {
-    padding: 4vh 4vw;
+    padding: 0 4vw 4vh;
+  }
+  header {
+    padding-top: 16px;
   }
   .stats {
-    grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
-  }
-  .stat {
     padding: 12px 14px;
+    align-items: flex-start;
+  }
+  /* Narrow band: each group stacks its label under the numeral — still one
+     shared surface, never three tiles. */
+  .stat {
+    flex-direction: column;
+    gap: 6px;
   }
   .stat .n {
     font-size: 1.75rem;
@@ -830,14 +924,17 @@ input:focus {
     gap: 10px;
     padding: 12px 14px;
   }
+  .row.up-next {
+    padding: 11px 13px; /* 12/14 minus the extra border px */
+  }
   .row .when {
     display: none;
   }
   /* Drop the tag, keep the name. The tag is flex:none inside .name, so on a
      narrow row it took the whole name column and left the up-next person
-     anonymous — the one row where that is unaffordable. The tint, the clay
-     border and the enlarged clay numeral already say "up next" three times
-     over; the name is the thing that cannot be inferred. */
+     anonymous — the one row where that is unaffordable. The wash, the blue
+     frame and the enlarged numeral already say "up next" three times over;
+     the name is the thing that cannot be inferred. */
   .up-next-tag {
     display: none;
   }

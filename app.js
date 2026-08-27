@@ -218,13 +218,13 @@ function emptyStateHtml() {
   if (hasSeen()) {
     return `
       <li class="empty">
-        <p class="empty-lede">No one yet. Joins appear automatically, or add someone below.</p>
+        <p class="empty-lede">No one here yet. As people join, they&rsquo;ll appear on their own, or add someone below.</p>
         <button class="text-link" type="button" data-act="demo">Try the demo</button>
       </li>`;
   }
   return `
     <li class="empty first-run">
-      <p class="empty-title">Your roster shows up here</p>
+      <h2 class="empty-title">Welcome. Your attendance list is here.</h2>
       <p class="empty-body">As people join, names fill in from Zoom automatically, or you add them by hand. You mark each person introduced as they speak, so the whole room can see who has gone and who is up next.</p>
       <button class="btn" type="button" data-act="demo">Try a demo</button>
       <p class="empty-foot">Opens a sample meeting you can click around. Nothing is saved, and leaving it clears the slate.</p>
@@ -252,7 +252,12 @@ function updateStats(participants) {
   $("s-present").textContent = present.length;
   $("s-done").textContent = present.length - waiting.length;
   $("s-wait").textContent = waiting.length;
-  $("calloutBox").innerHTML = calloutHtml(present, waiting);
+  // Only rewrite the callout when it actually changes: a rewrite replays its
+  // one-shot settle animation, and in auto mode the Zoom poller re-renders
+  // every few seconds whether or not anything happened.
+  const box = $("calloutBox");
+  const callout = calloutHtml(present, waiting);
+  if (box.innerHTML !== callout) box.innerHTML = callout;
 }
 
 function renderRoster(participants, ctx, oldTops) {
