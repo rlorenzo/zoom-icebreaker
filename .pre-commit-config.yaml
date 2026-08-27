@@ -96,6 +96,11 @@ repos:
         name: vitest (web unit + jsdom integration)
         entry: vitest run
         language: node
+        # Pinned to CI's Node line (ci.yml sets node-version: 24). Left alone
+        # this env installed Node 26, where a built-in global localStorage
+        # shadows the one the jsdom environment installs — 61 DOM tests failed
+        # on push while the same suite passed locally.
+        language_version: "24.19.0"
         additional_dependencies: ["vitest@4.1.10", "jsdom@29.1.1"]
         pass_filenames: false
         types_or: [javascript, jsx, ts, tsx]
