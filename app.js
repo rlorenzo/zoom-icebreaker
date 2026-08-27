@@ -285,15 +285,16 @@ function restoreFocus(snap) {
     (r) => r.dataset.pid === snap.pid,
   );
   if (!row) return;
-  if (snap.act) {
-    row.querySelector(`[data-act="${snap.act}"]`)?.focus();
-    return;
-  }
   // The row itself is only focusable while it is still reorderable; once the
   // person is introduced it drops out of the tab order, so land on their toggle
   // instead of losing the place entirely.
-  if (row.hasAttribute("tabindex")) row.focus();
-  else row.querySelector(".toggle")?.focus();
+  const rowTarget = row.hasAttribute("tabindex") ? row : row.querySelector(".toggle");
+  const target = snap.act ? row.querySelector(`[data-act="${snap.act}"]`) : rowTarget;
+  // preventScroll because marking someone introduced re-ranks their row below
+  // everyone still waiting, and a bare focus() scrolls that new position into
+  // view — one click threw the shared screen to the bottom of the roster
+  // mid-meeting. Focus still moves for the keyboard; the viewport stays put.
+  target?.focus({ preventScroll: true });
 }
 
 // One sentence per change, for assistive tech. The roster is no longer a live
