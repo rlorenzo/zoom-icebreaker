@@ -27,8 +27,9 @@
 }
 
 :root {
-  /* The page is screen-shared into lit rooms and never ships a dark variant;
-     saying so stops Chrome's Auto Dark Theme force-inverting the sky world. */
+  /* Dark arrives only as the authored After Dark theme below, never as the
+     browser's inversion; declaring the scheme stops Chrome's Auto Dark Theme
+     force-inverting whichever sky the host chose. */
   color-scheme: only light;
 
   /* Clear-sky palette. Every value below was contrast-checked against the
@@ -46,17 +47,31 @@
   --dim-ink: #1e3e4f; /* tertiary text, ghost-button text */
   --ink: #002033; /* primary text; the deep end of the sky */
 
-  --deep-blue: #005581; /* the committed field: masthead, buttons, focus */
-  --deep-blue-hover: #0069a0;
+  --field: #005581; /* the committed field: masthead, buttons, focus */
+  --field-hover: #0069a0;
   --on-deep: #ffffff; /* text on deep blue: 8:1 */
   --on-deep-dim: rgba(255, 255, 255, 0.35); /* separators on deep blue */
   --bright-blue: #1295d8; /* live accents on white: 3.1:1 non-text floor */
-  --sky-text: #9adcf9; /* meta text on the deep-blue band: 5.3:1 */
+  --field-text: #9adcf9; /* meta text on the deep-blue band: 5.3:1 */
 
-  --gold: #ffb511; /* the baton: up-next tag fill, dot on blue */
-  --gold-bright: #ffd200; /* placeholder + caret on blue; selection */
-  --gold-wash: #fff3ce; /* the up-next / celebration surface */
-  --sun-ink: #8a5b00; /* text & border on gold surfaces: 5.3:1 on wash */
+  --baton: #ffb511; /* the baton: up-next tag fill, dot on blue */
+  --baton-bright: #ffd200; /* placeholder + caret on blue; selection */
+  --baton-wash: #fff3ce; /* the up-next / celebration surface */
+  --baton-ink: #8a5b00; /* text & border on baton-wash surfaces: 5.3:1 */
+
+  /* Two derived roles the dark theme forced apart. In every light theme they
+     simply alias the token they were born from; After Dark rebinds them.
+     - accent-ink: the field color's OTHER job — text, borders, and focus
+       rings ON light surfaces (host pill, counts, up-next frame, text
+       links). A dark ground needs that role bright while the filled
+       masthead stays deep.
+     - on-gold: ink sitting on the baton's own fill (tag text, selection).
+       The dark theme's ink is near-white, which would vanish on it. */
+  --accent-ink: var(--field);
+  --on-gold: var(--ink);
+  /* The pinned prompt band's one functional shadow, per theme: an ink-tinted
+     drop on light grounds, a true black one after dark. */
+  --pin-shadow: rgba(0, 32, 51, 0.18);
 
   --rounded-xs: 6px;
   --rounded-sm: 10px;
@@ -71,6 +86,88 @@
   --t-medium: 200ms var(--glide);
 
   font-family: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+}
+
+/* Themes ---------------------------------------------------------------
+   Four skies, one system. Every component reads the same token roles, so a
+   theme is nothing but a re-lit palette: the structure (radii, motion, type,
+   spacing) never changes, and every value below was contrast-checked against
+   the same floors as the default sky (4.5:1 text, 3:1 large text and
+   non-text, on the surface it actually sits on). The picker below the footer
+   writes data-theme on <html>; a saved choice is re-applied before first
+   paint by the inline script in index.html, so no flash of the default.
+
+   Clear Sky is the default and lives on :root above — no attribute needed. */
+
+/* Dawn: the sky before sunrise — lavender air, plum field, rose baton. */
+:root[data-theme="dawn"] {
+  --ground: #faf6fb;
+  --card: #ffffff;
+  --surface: #f0e6f2;
+  --hairline: #ddcbe0;
+  --soft-line: #c0a3c6;
+  --hint-ink: #7c6486; /* 4.9:1 on ground */
+  --muted-ink: #5f4a68; /* 6.5:1 on surface */
+  --dim-ink: #3a2545;
+  --ink: #22102e;
+  --field: #6d2d80; /* the committed field turns plum: 9:1 under white */
+  --field-hover: #84399a;
+  --field-text: #e5b8f0; /* 5.3:1 on the plum band */
+  --baton: #ff8fb2; /* the baton is first light: rose, 4.2:1 on plum */
+  --baton-bright: #ffb3cb; /* placeholder + caret: 5.4:1 on plum */
+  --baton-wash: #ffe6ee; /* the celebration surface */
+  --baton-ink: #a13c62; /* dot + border on the rose wash: 5.3:1 */
+}
+
+/* Golden Hour: late sun — warm cream, rust field, amber baton. */
+:root[data-theme="dusk"] {
+  --ground: #fdf7ee;
+  --card: #ffffff;
+  --surface: #f6e9d6;
+  --hairline: #e6d2b4;
+  --soft-line: #cfa877;
+  --hint-ink: #8a6a45; /* 4.7:1 on ground */
+  --muted-ink: #6b5136; /* 6.1:1 on surface */
+  --dim-ink: #46311b;
+  --ink: #2b1a08;
+  --field: #9c4907; /* the field turns rust: 6.2:1 under white */
+  --field-hover: #b95a10;
+  --field-text: #ffd9b0; /* 4.7:1 on the rust band */
+  --baton: #ffa02e; /* amber baton: 3.1:1 on rust */
+  --baton-bright: #ffc14d; /* placeholder + caret: 3.9:1, display size */
+  --baton-wash: #ffeacb;
+  --baton-ink: #8a5200; /* 5.4:1 on the wash */
+}
+
+/* After Dark: the same sky at night. Deliberately authored, never the
+   browser's inversion: the ground is a lifted blue-black (#0e1c26, not #000 —
+   crushed blacks die in the screen-share pipeline), the masthead keeps its
+   deep-blue field, and gold stays the baton because gold is what lights are
+   at night. This is the one theme where deep-blue's two jobs split: the fill
+   stays deep while accent-ink goes bright for text and frames on the dark
+   ground, and on-gold goes dark so tag text survives on the gold fill. */
+:root[data-theme="night"] {
+  color-scheme: dark;
+  --ground: #0e1c26;
+  --card: #16293a; /* rows step LIGHTER than the ground after dark */
+  --surface: #213950;
+  --hairline: #2e4a63;
+  --soft-line: #4a6a85;
+  --hint-ink: #8aa7bd; /* 6.9:1 on ground */
+  --muted-ink: #a7c0d2; /* 6.3:1 on surface */
+  --dim-ink: #cfe0ec;
+  --ink: #eef6fc; /* near-white, never #fff — 15.9:1 on ground */
+  --field: #0a5c8c; /* the filled field, a step up from the ground */
+  --field-hover: #0d6ea7;
+  --field-text: #9adcf9; /* 4.8:1 on the night band */
+  --baton: #ffb511; /* unchanged: the baton reads as light after dark */
+  --baton-bright: #ffd200;
+  --baton-wash: #524012; /* the celebration surface: warm ember, not mud —
+     luminous enough to stay a happy moment rather than a caution strip */
+  --baton-ink: #ffcf66; /* dot + border on the ember wash: 6.8:1 */
+  --accent-ink: #6cc4f5; /* the field's text/border job, brightened: 9:1 */
+  --on-gold: #0e1c26; /* the night ground itself: 9.8:1 on gold */
+  --pin-shadow: rgba(0, 0, 0, 0.55);
 }
 
 * {
@@ -101,13 +198,13 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  caret-color: var(--deep-blue);
+  caret-color: var(--accent-ink);
 }
 
 /* Even text selection is sunny: gold with deep ink (11:1). */
 ::selection {
-  background: var(--gold-bright);
-  color: var(--ink);
+  background: var(--baton-bright);
+  color: var(--on-gold);
 }
 
 .wrap {
@@ -139,8 +236,8 @@ body {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  background: var(--gold-wash);
-  border: 1px solid var(--sun-ink);
+  background: var(--baton-wash);
+  border: 1px solid var(--baton-ink);
   border-radius: var(--rounded-sm);
   padding: 12px 16px;
   margin: 16px 0;
@@ -161,7 +258,7 @@ body {
   height: 8px;
   border-radius: var(--rounded-pill);
   /* sun-ink, not gold: gold-on-gold-wash is invisible (1.5:1). */
-  background: var(--sun-ink);
+  background: var(--baton-ink);
   flex: none;
 }
 .demo-bar-title {
@@ -182,7 +279,7 @@ body {
    while the text stays on the 880px grid. */
 header,
 .prompt-sticky {
-  background: var(--deep-blue);
+  background: var(--field);
   margin-inline: calc(50% - 50vw);
   padding-inline: calc(50vw - 50%);
 }
@@ -196,7 +293,7 @@ header {
   align-items: center;
   gap: 14px;
   font-size: 0.8125rem;
-  color: var(--sky-text); /* 5.3:1 on deep blue */
+  color: var(--field-text); /* 5.3:1 on deep blue */
   padding-bottom: 4px;
 }
 .meta b {
@@ -218,7 +315,7 @@ header {
   height: 7px;
   border-radius: var(--rounded-pill);
   /* Gold on deep blue: 4.5:1, comfortably over the 3:1 non-text floor. */
-  background: var(--gold);
+  background: var(--baton);
   flex: none;
 }
 .dot::after {
@@ -226,7 +323,7 @@ header {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: var(--gold);
+  background: var(--baton);
   opacity: 0.45;
   animation: pulse 2.4s var(--glide) infinite;
 }
@@ -251,11 +348,11 @@ header {
   margin-bottom: 28px;
   /* The band announces its own stickiness with a soft drop when pinned —
      the one shadow in the system, and it is functional, not elevation. */
-  box-shadow: 0 4px 16px rgba(0, 32, 51, 0);
+  box-shadow: 0 4px 16px transparent;
   transition: box-shadow var(--t-fast);
 }
 .prompt-sticky.is-pinned {
-  box-shadow: 0 4px 16px rgba(0, 32, 51, 0.18);
+  box-shadow: 0 4px 16px var(--pin-shadow);
 }
 
 .prompt {
@@ -274,17 +371,17 @@ header {
   resize: none;
   overflow: hidden;
   outline: none;
-  caret-color: var(--gold-bright);
+  caret-color: var(--baton-bright);
 }
 .prompt::placeholder {
   /* Gold-bright on deep blue is 5.5:1 — well past the 3:1 large-text floor,
      and it reads as an invitation rather than an empty field. */
-  color: var(--gold-bright);
+  color: var(--baton-bright);
   font-weight: 600;
   opacity: 1; /* Firefox dims placeholders by default */
 }
 .prompt:focus-visible {
-  outline: 2px solid var(--gold-bright);
+  outline: 2px solid var(--baton-bright);
   outline-offset: 6px;
   border-radius: var(--rounded-xs);
 }
@@ -316,9 +413,10 @@ header {
   line-height: 1;
   letter-spacing: -0.01em;
   font-feature-settings: "tnum" 1;
-  /* Deep blue at display size: 6.8:1 on surface. The counts are the page's
-     only big numerals, and they carry the brand color instead of a border. */
-  color: var(--deep-blue);
+  /* Accent ink at display size: 6.8:1 on surface (deep blue by day, bright
+     blue after dark). The counts are the page's only big numerals, and they
+     carry the theme's accent instead of a border. */
+  color: var(--accent-ink);
 }
 .stat .l {
   font-size: 0.75rem;
@@ -331,7 +429,7 @@ header {
 /* The one whole-room celebration: when everyone has gone, the callout wears
    the gold wash. Warm, not loud — no confetti, no exclamation chrome. */
 .callout {
-  background: var(--gold-wash);
+  background: var(--baton-wash);
   border-radius: var(--rounded-sm);
   padding: 14px 20px;
   margin-bottom: 22px;
@@ -346,10 +444,10 @@ header {
 }
 @keyframes callout-settle {
   from {
-    background-color: color-mix(in oklab, var(--gold) 30%, var(--gold-wash));
+    background-color: color-mix(in oklab, var(--baton) 30%, var(--baton-wash));
   }
   to {
-    background-color: var(--gold-wash);
+    background-color: var(--baton-wash);
   }
 }
 
@@ -386,7 +484,7 @@ header {
   cursor: grabbing;
 }
 .row:focus-visible {
-  outline: 2px solid var(--deep-blue);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -408,12 +506,12 @@ header {
    wash inside a deep-blue frame, so the room finds the next speaker through
    compressed video by fill AND border AND size — never hue alone. */
 .row.up-next {
-  background: var(--gold-wash);
-  border: 2px solid var(--deep-blue); /* 7.3:1 on the wash */
+  background: var(--baton-wash);
+  border: 2px solid var(--accent-ink); /* 7.3:1 on the wash */
   padding: 17px; /* 18px minus the extra border px: rows stay aligned */
 }
 .row.up-next .pos {
-  color: var(--deep-blue);
+  color: var(--accent-ink);
   font-weight: 700;
   font-size: 1.5rem;
 }
@@ -426,8 +524,8 @@ header {
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--ink); /* 9.5:1 on gold */
-  background: var(--gold);
+  color: var(--on-gold); /* 9.5:1 on gold */
+  background: var(--baton);
   padding: 3px 9px;
   border-radius: var(--rounded-xs);
   flex: none;
@@ -452,10 +550,10 @@ header {
    passes. Three beats on two curves — glide for the settle, spring for joy. */
 @keyframes mark-flash {
   0% {
-    background-color: color-mix(in oklab, var(--gold) 34%, var(--surface));
+    background-color: color-mix(in oklab, var(--baton) 34%, var(--surface));
   }
   60% {
-    background-color: color-mix(in oklab, var(--gold) 12%, var(--surface));
+    background-color: color-mix(in oklab, var(--baton) 12%, var(--surface));
   }
   100% {
     background-color: var(--surface);
@@ -513,7 +611,7 @@ header {
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--deep-blue);
+  background: var(--accent-ink);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--t-fast);
@@ -562,6 +660,15 @@ header {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The up-next name never truncates — it wraps. Ordinary rows may ellipsize a
+   long name (the roster's rhythm matters more than a rare tail), but up-next
+   is the row the whole room is reading for exactly that name; "Daniel Ok…"
+   is unaffordable there at any width. The narrow-screen block below already
+   drops the tag on the same reasoning. */
+.row.up-next .name .who {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 
 .host-pill {
   flex: none;
@@ -569,8 +676,8 @@ header {
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: lowercase;
-  /* Deep blue as identity text: 8:1 on the white row. */
-  color: var(--deep-blue);
+  /* Accent ink as identity text: 8:1 on the row fill. */
+  color: var(--accent-ink);
   padding: 4px 6px;
 }
 
@@ -627,19 +734,19 @@ header {
   color: var(--ink);
 }
 .toggle.on {
-  background: var(--deep-blue);
+  background: var(--field);
   color: var(--on-deep);
-  border-color: var(--deep-blue);
+  border-color: var(--field);
 }
 .toggle.on:hover {
-  background: var(--deep-blue-hover);
-  border-color: var(--deep-blue-hover);
+  background: var(--field-hover);
+  border-color: var(--field-hover);
 }
 .toggle.on .check {
   color: var(--on-deep);
 }
 .toggle:focus-visible {
-  outline: 2px solid var(--deep-blue);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -662,11 +769,11 @@ header {
     background var(--t-fast);
 }
 .x:hover {
-  color: var(--deep-blue);
+  color: var(--accent-ink);
   background: var(--surface);
 }
 .x:focus-visible {
-  outline: 2px solid var(--deep-blue);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 /* On the introduced row, surface IS the row fill, so the hover chip switches
@@ -674,7 +781,7 @@ header {
    read as a smudge. */
 .row.introduced .x:hover,
 .row.up-next .x:hover {
-  color: var(--deep-blue);
+  color: var(--accent-ink);
   background: var(--card);
 }
 /* On touch, the destructive control earns a 44px hit area — an invisible
@@ -737,7 +844,7 @@ header {
   font-family: inherit;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--deep-blue); /* 7.6:1 */
+  color: var(--accent-ink); /* 7.6:1 */
   background: none;
   border: 0;
   /* 4px block padding puts the hit area at 28px, clearing the 24px minimum. */
@@ -752,7 +859,7 @@ header {
   color: var(--ink);
 }
 .text-link:focus-visible {
-  outline: 2px solid var(--deep-blue);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -799,10 +906,122 @@ footer {
 }
 .sponsor:hover {
   color: var(--ink);
-  border-color: var(--deep-blue);
+  border-color: var(--accent-ink);
 }
 
-input {
+/* Theme picker ---------------------------------------------------- */
+/* Four skies in a quiet row between the footer and the sponsor line — a page
+   preference, not a session control, so it lives below the working surface.
+   Each chip previews its own theme (its swatch colors are pinned, never the
+   live tokens): a horizon disc, field above ground, with the baton as the sun
+   on the line. Native radios inside labels — the browser owns the group's
+   tab stop and arrow keys; the invisible input stretched over the chip is
+   the real control, and the chip reads its state through :has(). */
+.theme-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  border: 0; /* it's a fieldset; the grouping is semantic, not drawn */
+}
+.theme-bar-label {
+  font-size: 0.75rem; /* label floor: 12px */
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted-ink);
+  margin-right: 4px;
+}
+.theme-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted-ink);
+  /* Transparent at rest so only the chosen sky carries a visible edge. */
+  border: 1px solid transparent;
+  border-radius: var(--rounded-xs);
+  padding: 6px 10px;
+  cursor: pointer;
+  transition:
+    color var(--t-fast),
+    background var(--t-fast),
+    border-color var(--t-fast);
+}
+/* The native input IS the control — stretched invisibly over the whole chip
+   so the hit target, focus, and keyboard behavior are all the browser's. Not
+   display:none or visibility:hidden, which would drop it from the tab order. */
+.theme-chip input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.theme-chip:hover {
+  color: var(--ink);
+  border-color: var(--hairline);
+}
+.theme-chip:has(input:checked) {
+  color: var(--ink);
+  background: var(--card);
+  border-color: var(--accent-ink);
+}
+.theme-chip:has(input:focus-visible) {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+}
+.theme-swatch {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: var(--rounded-pill);
+  /* Field over ground, split on the horizon. */
+  background: linear-gradient(to bottom, var(--sw-deep) 50%, var(--sw-ground) 50%);
+  /* soft-line, not hairline: the disc is a meaningful glyph and its light
+     half disappears into the page without a real edge. */
+  border: 1px solid var(--soft-line);
+}
+.theme-swatch::after {
+  /* The baton as the sun sitting on the horizon line. */
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: inherit;
+  background: var(--sw-gold);
+}
+/* Pinned previews: each chip shows its own sky whatever theme is active. */
+.theme-chip:has(input[value="sky"]) {
+  --sw-deep: #005581;
+  --sw-ground: #f4f9fd;
+  --sw-gold: #ffb511;
+}
+.theme-chip:has(input[value="dawn"]) {
+  --sw-deep: #6d2d80;
+  --sw-ground: #faf6fb;
+  --sw-gold: #ff8fb2;
+}
+.theme-chip:has(input[value="dusk"]) {
+  --sw-deep: #9c4907;
+  --sw-ground: #fdf7ee;
+  --sw-gold: #ffa02e;
+}
+.theme-chip:has(input[value="night"]) {
+  --sw-deep: #0a5c8c;
+  --sw-ground: #0e1c26;
+  --sw-gold: #ffb511;
+}
+
+input[type="text"] {
   font-family: inherit;
   font-size: 0.9375rem;
   color: var(--ink);
@@ -817,16 +1036,16 @@ input {
   min-width: 0;
   transition: border-color var(--t-fast);
 }
-input::placeholder {
+input[type="text"]::placeholder {
   color: var(--muted-ink);
 }
-input:focus {
-  border-color: var(--deep-blue);
+input[type="text"]:focus {
+  border-color: var(--accent-ink);
 }
 /* Keyboard focus gets the system's full 2px ring, same as every other
    control; the border shift alone was thinner than the system's own bar. */
-input:focus-visible {
-  outline: 2px solid var(--deep-blue);
+input[type="text"]:focus-visible {
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -837,8 +1056,8 @@ input:focus-visible {
   letter-spacing: 0.04em;
   padding: 10px 16px;
   border-radius: var(--rounded-xs);
-  border: 1px solid var(--deep-blue);
-  background: var(--deep-blue);
+  border: 1px solid var(--field);
+  background: var(--field);
   color: var(--on-deep);
   cursor: pointer;
   transition:
@@ -847,11 +1066,11 @@ input:focus-visible {
     color var(--t-fast);
 }
 .btn:hover {
-  background: var(--deep-blue-hover);
-  border-color: var(--deep-blue-hover);
+  background: var(--field-hover);
+  border-color: var(--field-hover);
 }
 .btn:focus-visible {
-  outline: 2px solid var(--deep-blue);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 

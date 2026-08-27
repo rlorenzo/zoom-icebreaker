@@ -13,6 +13,21 @@
 <link rel="preload" as="font" type="font/woff2" href="fonts/atkinson-next-var-latin.woff2" crossorigin />
 <link rel="preload" as="font" type="font/woff2" href="fonts/atkinson-mono-var-latin.woff2" crossorigin />
 <link rel="stylesheet" href="styles.css" />
+<script>
+  // Re-apply the saved theme before first paint so a host who chose Dawn,
+  // Golden Hour, or After Dark never sees the default sky flash in. Inline and
+  // synchronous on purpose — theme.js (a deferred module) owns everything
+  // else; this is only the anti-flash mirror of its whitelist. A blocked
+  // localStorage degrades to the default theme, which is fine.
+  try {
+    var savedTheme = localStorage.getItem("icebreaker.theme");
+    if (savedTheme === "dawn" || savedTheme === "dusk" || savedTheme === "night") {
+      document.documentElement.dataset.theme = savedTheme;
+    }
+  } catch (e) {
+    /* storage unavailable — the clear sky is the fallback */
+  }
+</script>
 </head>
 <body>
 <!--
@@ -108,6 +123,33 @@ provenance.
       <button class="btn ghost" id="resetBtn" type="button">Reset session</button>
     </div>
   </footer>
+
+  <!-- Four skies, one tracker. A page preference rather than a session
+       control, so it sits below the working surface. Native radio inputs —
+       the browser owns the group semantics, the single tab stop, and the
+       arrow keys, all working before theme.js loads; the module only
+       applies the choice and persists it to localStorage, and the head
+       script re-applies it before paint on the next load. -->
+  <fieldset class="theme-bar" id="themeBar">
+    <legend class="sr-only">Color theme</legend>
+    <span class="theme-bar-label" aria-hidden="true">Theme</span>
+    <label class="theme-chip">
+      <input type="radio" name="theme" value="sky" checked />
+      <span class="theme-swatch" aria-hidden="true"></span>Clear sky
+    </label>
+    <label class="theme-chip">
+      <input type="radio" name="theme" value="dawn" />
+      <span class="theme-swatch" aria-hidden="true"></span>Dawn
+    </label>
+    <label class="theme-chip">
+      <input type="radio" name="theme" value="dusk" />
+      <span class="theme-swatch" aria-hidden="true"></span>Golden hour
+    </label>
+    <label class="theme-chip">
+      <input type="radio" name="theme" value="night" />
+      <span class="theme-swatch" aria-hidden="true"></span>After dark
+    </label>
+  </fieldset>
 
   <div class="sponsor-bar">
     <!-- A plain link, not the sponsors iframe: an embedded iframe phones

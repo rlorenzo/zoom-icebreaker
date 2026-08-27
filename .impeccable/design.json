@@ -1,142 +1,502 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-27T04:16:51Z",
+  "generatedAt": "2026-08-27T16:25:21Z",
   "title": "Design System: Zoom Icebreaker Tracker",
   "extensions": {
     "colorMeta": {
-      "deep-blue": {
+      "field": {
         "role": "primary",
-        "displayName": "Deep Blue",
+        "displayName": "Field — Deep Blue",
         "canonical": "oklch(43.0% 0.100 241.0)",
-        "tonalRamp": ["#000830", "#002750", "#004772", "#1f6794", "#4589b9", "#68adde", "#8cd2ff", "#b1f8ff"]
+        "tonalRamp": [
+          "#000830",
+          "#002750",
+          "#004772",
+          "#1f6794",
+          "#4589b9",
+          "#68adde",
+          "#8cd2ff",
+          "#b1f8ff"
+        ]
       },
-      "deep-blue-hover": {
+      "field-hover": {
         "role": "primary",
-        "displayName": "Deep Blue Hover",
+        "displayName": "Field Hover",
         "canonical": "oklch(49.9% 0.119 242.1)",
-        "tonalRamp": ["#000537", "#002658", "#00467a", "#00679e", "#348ac3", "#5bade9", "#80d2ff", "#a5f9ff"]
+        "tonalRamp": [
+          "#000537",
+          "#002658",
+          "#00467a",
+          "#00679e",
+          "#348ac3",
+          "#5bade9",
+          "#80d2ff",
+          "#a5f9ff"
+        ]
       },
-      "gold": {
+      "accent-ink": {
+        "role": "primary",
+        "displayName": "Accent Ink",
+        "canonical": "oklch(43.0% 0.100 241.0)",
+        "tonalRamp": [
+          "#000830",
+          "#002750",
+          "#004772",
+          "#1f6794",
+          "#4589b9",
+          "#68adde",
+          "#8cd2ff",
+          "#b1f8ff"
+        ]
+      },
+      "baton": {
         "role": "secondary",
-        "displayName": "Gold",
+        "displayName": "Baton — Gold",
         "canonical": "oklch(82.2% 0.169 78.5)",
-        "tonalRamp": ["#2b0000", "#4d0600", "#6f2d00", "#934f00", "#b77100", "#dd9500", "#ffba1e", "#ffdf56"]
+        "tonalRamp": [
+          "#2b0000",
+          "#4d0600",
+          "#6f2d00",
+          "#934f00",
+          "#b77100",
+          "#dd9500",
+          "#ffba1e",
+          "#ffdf56"
+        ]
       },
-      "gold-bright": {
+      "baton-bright": {
         "role": "secondary",
-        "displayName": "Gold Bright",
+        "displayName": "Baton Bright",
         "canonical": "oklch(87.7% 0.180 93.1)",
-        "tonalRamp": ["#230000", "#421700", "#633800", "#845900", "#a77c00", "#cca000", "#f1c400", "#ffea3e"]
+        "tonalRamp": [
+          "#230000",
+          "#421700",
+          "#633800",
+          "#845900",
+          "#a77c00",
+          "#cca000",
+          "#f1c400",
+          "#ffea3e"
+        ]
       },
-      "gold-wash": {
+      "baton-wash": {
         "role": "secondary",
-        "displayName": "Gold Wash",
+        "displayName": "Baton Wash",
         "canonical": "oklch(96.4% 0.050 92.2)",
-        "tonalRamp": ["#130a00", "#2e2404", "#4b4122", "#6b6140", "#8d8260", "#b0a582", "#d4c9a5", "#faeec9"]
+        "tonalRamp": [
+          "#130a00",
+          "#2e2404",
+          "#4b4122",
+          "#6b6140",
+          "#8d8260",
+          "#b0a582",
+          "#d4c9a5",
+          "#faeec9"
+        ]
       },
-      "sun-ink": {
+      "baton-ink": {
         "role": "secondary",
-        "displayName": "Sun Ink",
+        "displayName": "Baton Ink",
         "canonical": "oklch(51.0% 0.108 74.2)",
-        "tonalRamp": ["#220000", "#421700", "#633600", "#855600", "#a8782d", "#cd9b53", "#f3bf77", "#ffe49b"]
+        "tonalRamp": [
+          "#220000",
+          "#421700",
+          "#633600",
+          "#855600",
+          "#a8782d",
+          "#cd9b53",
+          "#f3bf77",
+          "#ffe49b"
+        ]
+      },
+      "on-gold": {
+        "role": "secondary",
+        "displayName": "On Gold",
+        "canonical": "oklch(23.2% 0.052 239.1)",
+        "tonalRamp": [
+          "#000d1e",
+          "#07283c",
+          "#26465b",
+          "#45667c",
+          "#65879f",
+          "#87aac3",
+          "#abcfe8",
+          "#cff4ff"
+        ]
       },
       "bright-blue": {
         "role": "secondary",
         "displayName": "Bright Blue (declared, unused)",
         "canonical": "oklch(63.9% 0.142 239.7)",
-        "tonalRamp": ["#00003f", "#002561", "#004684", "#0068a8", "#008bce", "#3caff4", "#66d5ff", "#8efbff"]
+        "tonalRamp": [
+          "#00003f",
+          "#002561",
+          "#004684",
+          "#0068a8",
+          "#008bce",
+          "#3caff4",
+          "#66d5ff",
+          "#8efbff"
+        ]
       },
       "ground": {
         "role": "neutral",
         "displayName": "Ground",
         "canonical": "oklch(98.0% 0.008 241.7)",
-        "tonalRamp": ["#080c0e", "#222628", "#3f4346", "#5e6265", "#7e8386", "#a1a6a9", "#c5cace", "#eaeff3"]
+        "tonalRamp": [
+          "#080c0e",
+          "#222628",
+          "#3f4346",
+          "#5e6265",
+          "#7e8386",
+          "#a1a6a9",
+          "#c5cace",
+          "#eaeff3"
+        ]
       },
       "card": {
         "role": "neutral",
         "displayName": "Card",
         "canonical": "#ffffff",
-        "tonalRamp": ["#0b0b0b", "#252525", "#424242", "#616161", "#828282", "#a5a5a5", "#c9c9c9", "#eeeeee"]
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
       },
       "surface": {
         "role": "neutral",
         "displayName": "Surface",
         "canonical": "oklch(94.4% 0.017 242.4)",
-        "tonalRamp": ["#050c12", "#1e262d", "#3a434a", "#59636a", "#7a848c", "#9ca7af", "#c0cbd3", "#e5f0f9"]
+        "tonalRamp": [
+          "#050c12",
+          "#1e262d",
+          "#3a434a",
+          "#59636a",
+          "#7a848c",
+          "#9ca7af",
+          "#c0cbd3",
+          "#e5f0f9"
+        ]
       },
       "hairline": {
         "role": "neutral",
         "displayName": "Hairline",
         "canonical": "oklch(88.5% 0.028 239.7)",
-        "tonalRamp": ["#020d16", "#182731", "#344450", "#536470", "#748592", "#96a8b5", "#b9ccda", "#def2ff"]
+        "tonalRamp": [
+          "#020d16",
+          "#182731",
+          "#344450",
+          "#536470",
+          "#748592",
+          "#96a8b5",
+          "#b9ccda",
+          "#def2ff"
+        ]
       },
       "soft-line": {
         "role": "neutral",
         "displayName": "Soft Line",
         "canonical": "oklch(79.3% 0.051 238.2)",
-        "tonalRamp": ["#000d1e", "#07283b", "#26465a", "#45667b", "#66879e", "#88aac2", "#abcfe7", "#d0f4ff"]
+        "tonalRamp": [
+          "#000d1e",
+          "#07283b",
+          "#26465a",
+          "#45667b",
+          "#66879e",
+          "#88aac2",
+          "#abcfe7",
+          "#d0f4ff"
+        ]
       },
       "hint-ink": {
         "role": "neutral",
         "displayName": "Hint Ink",
         "canonical": "oklch(56.2% 0.045 234.1)",
-        "tonalRamp": ["#000d1b", "#0a2838", "#294656", "#476677", "#68879a", "#8aaabd", "#adcfe3", "#d2f4ff"]
+        "tonalRamp": [
+          "#000d1b",
+          "#0a2838",
+          "#294656",
+          "#476677",
+          "#68879a",
+          "#8aaabd",
+          "#adcfe3",
+          "#d2f4ff"
+        ]
       },
       "muted-ink": {
         "role": "neutral",
         "displayName": "Muted Ink",
         "canonical": "oklch(47.5% 0.041 229.4)",
-        "tonalRamp": ["#000e19", "#0c2935", "#2a4654", "#496674", "#698796", "#8baaba", "#afcfdf", "#d3f4ff"]
+        "tonalRamp": [
+          "#000e19",
+          "#0c2935",
+          "#2a4654",
+          "#496674",
+          "#698796",
+          "#8baaba",
+          "#afcfdf",
+          "#d3f4ff"
+        ]
       },
       "dim-ink": {
         "role": "neutral",
         "displayName": "Dim Ink",
         "canonical": "oklch(34.7% 0.048 233.7)",
-        "tonalRamp": ["#000d1c", "#072939", "#264658", "#456679", "#66889b", "#88abbf", "#abcfe4", "#d0f5ff"]
+        "tonalRamp": [
+          "#000d1c",
+          "#072939",
+          "#264658",
+          "#456679",
+          "#66889b",
+          "#88abbf",
+          "#abcfe4",
+          "#d0f5ff"
+        ]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
         "canonical": "oklch(23.2% 0.052 239.1)",
-        "tonalRamp": ["#000d1e", "#07283c", "#26465b", "#45667c", "#65879f", "#87aac3", "#abcfe8", "#cff4ff"]
+        "tonalRamp": [
+          "#000d1e",
+          "#07283c",
+          "#26465b",
+          "#45667c",
+          "#65879f",
+          "#87aac3",
+          "#abcfe8",
+          "#cff4ff"
+        ]
       },
-      "sky-text": {
+      "field-text": {
         "role": "neutral",
-        "displayName": "Sky Text",
+        "displayName": "Field Text",
         "canonical": "oklch(86.0% 0.078 227.2)",
-        "tonalRamp": ["#000e24", "#002b42", "#004962", "#276a83", "#4b8ca7", "#6eafcb", "#92d4f1", "#b7faff"]
+        "tonalRamp": [
+          "#000e24",
+          "#002b42",
+          "#004962",
+          "#276a83",
+          "#4b8ca7",
+          "#6eafcb",
+          "#92d4f1",
+          "#b7faff"
+        ]
+      },
+      "on-deep": {
+        "role": "neutral",
+        "displayName": "On Deep",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "on-deep-dim": {
+        "role": "neutral",
+        "displayName": "On Deep Dim",
+        "canonical": "rgba(255, 255, 255, 0.35)",
+        "tonalRamp": [
+          "rgba(255,255,255,0.10)",
+          "rgba(255,255,255,0.20)",
+          "rgba(255,255,255,0.35)",
+          "rgba(255,255,255,0.45)",
+          "rgba(255,255,255,0.55)",
+          "rgba(255,255,255,0.70)",
+          "rgba(255,255,255,0.85)",
+          "#ffffff"
+        ]
+      },
+      "pin-shadow": {
+        "role": "neutral",
+        "displayName": "Pin Shadow",
+        "canonical": "rgba(0, 32, 51, 0.18)",
+        "tonalRamp": [
+          "rgba(0,32,51,0.06)",
+          "rgba(0,32,51,0.12)",
+          "rgba(0,32,51,0.18)",
+          "rgba(0,32,51,0.24)",
+          "rgba(0,0,0,0.30)",
+          "rgba(0,0,0,0.40)",
+          "rgba(0,0,0,0.55)",
+          "rgba(0,0,0,0.70)"
+        ]
       }
     },
+    "themes": [
+      {
+        "name": "sky",
+        "displayName": "Clear Sky",
+        "selector": ":root",
+        "note": "The default, expressed as NO data-theme attribute so the markup's resting state and the default theme cannot disagree. All colorMeta values above are this theme's.",
+        "keyValues": {
+          "ground": "#f4f9fd",
+          "card": "#ffffff",
+          "surface": "#e3eef7",
+          "field": "#005581",
+          "baton": "#ffb511",
+          "baton-wash": "#fff3ce",
+          "accent-ink": "#005581",
+          "on-gold": "#002033",
+          "pin-shadow": "rgba(0, 32, 51, 0.18)"
+        }
+      },
+      {
+        "name": "dawn",
+        "displayName": "Dawn",
+        "selector": ":root[data-theme=\"dawn\"]",
+        "note": "The sky before sunrise: lavender air, plum field, rose baton. accent-ink and on-gold still alias field and ink.",
+        "keyValues": {
+          "ground": "#faf6fb",
+          "card": "#ffffff",
+          "surface": "#f0e6f2",
+          "field": "#6d2d80",
+          "baton": "#ff8fb2",
+          "baton-wash": "#ffe6ee",
+          "baton-ink": "#a13c62",
+          "field-text": "#e5b8f0"
+        }
+      },
+      {
+        "name": "dusk",
+        "displayName": "Golden Hour",
+        "selector": ":root[data-theme=\"dusk\"]",
+        "note": "Late sun: warm cream, rust field, amber baton. accent-ink and on-gold still alias field and ink.",
+        "keyValues": {
+          "ground": "#fdf7ee",
+          "card": "#ffffff",
+          "surface": "#f6e9d6",
+          "field": "#9c4907",
+          "baton": "#ffa02e",
+          "baton-wash": "#ffeacb",
+          "baton-ink": "#8a5200",
+          "field-text": "#ffd9b0"
+        }
+      },
+      {
+        "name": "night",
+        "displayName": "After Dark",
+        "selector": ":root[data-theme=\"night\"]",
+        "note": "The one theme where the field's two jobs split apart, and the only one that declares color-scheme: dark. The tonal ladder inverts — rows step LIGHTER than the ground (#0e1c26 to #16293a to #213950) — the ground is a lifted blue-black rather than #000 because crushed blacks die in the screen-share pipeline, and baton-wash becomes a warm ember rather than a pale tint.",
+        "keyValues": {
+          "ground": "#0e1c26",
+          "card": "#16293a",
+          "surface": "#213950",
+          "hairline": "#2e4a63",
+          "soft-line": "#4a6a85",
+          "ink": "#eef6fc",
+          "muted-ink": "#a7c0d2",
+          "field": "#0a5c8c",
+          "field-text": "#9adcf9",
+          "baton": "#ffb511",
+          "baton-wash": "#524012",
+          "baton-ink": "#ffcf66",
+          "accent-ink": "#6cc4f5",
+          "on-gold": "#0e1c26",
+          "pin-shadow": "rgba(0, 0, 0, 0.55)"
+        }
+      }
+    ],
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "The icebreaker prompt only, set in white on the deep-blue masthead. One per page." },
-      "headline": { "displayName": "Headline", "purpose": "First-run welcome title only." },
-      "title": { "displayName": "Title", "purpose": "Roster names at rest — the words the room reads through compressed video." },
-      "body": { "displayName": "Body", "purpose": "Prose: empty-state copy, the completion callout, the demo-bar title." },
-      "caption": { "displayName": "Caption", "purpose": "Secondary information: the masthead meta line, demo-bar note, footnotes." },
-      "label": { "displayName": "Label", "purpose": "Small roles: count labels, toggle text, host pill, left tag." },
-      "label-strong": { "displayName": "Label Strong", "purpose": "Button text, primary and ghost alike." },
-      "label-loud": { "displayName": "Label Loud", "purpose": "The up-next tag only — the system's one uppercase string." },
-      "numeric": { "displayName": "Numeric", "purpose": "The three big counts, set in deep-blue with tabular figures." },
-      "numeric-compact": { "displayName": "Numeric Compact", "purpose": "The counts below 640px." },
-      "numeric-row": { "displayName": "Numeric Row", "purpose": "The standing position number on an ordinary roster row." },
-      "numeric-emphasis": { "displayName": "Numeric Emphasis", "purpose": "The position number on the up-next row only." },
-      "numeric-caption": { "displayName": "Numeric Caption", "purpose": "The joined-at timestamp; first thing dropped below 640px." }
+      "display": {
+        "displayName": "Display",
+        "purpose": "The icebreaker prompt only, set in On Deep on the masthead field. One per page."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "First-run welcome title only."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Roster names at rest — the words the room reads through compressed video."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose: empty-state copy, the completion callout, the demo-bar title."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Secondary information: the masthead meta line, demo-bar note, footnotes, the text link."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Small roles: count labels, toggle text, host pill, left tag, the theme picker's chips and caption."
+      },
+      "label-strong": {
+        "displayName": "Label Strong",
+        "purpose": "Button text, primary and ghost alike."
+      },
+      "label-loud": {
+        "displayName": "Label Loud",
+        "purpose": "The up-next tag only — the system's one uppercase string."
+      },
+      "numeric": {
+        "displayName": "Numeric",
+        "purpose": "The three big counts, set in accent-ink with tabular figures."
+      },
+      "numeric-compact": {
+        "displayName": "Numeric Compact",
+        "purpose": "The counts below 640px."
+      },
+      "numeric-row": {
+        "displayName": "Numeric Row",
+        "purpose": "The standing position number on an ordinary roster row."
+      },
+      "numeric-emphasis": {
+        "displayName": "Numeric Emphasis",
+        "purpose": "The position number on the up-next row only, in accent-ink."
+      },
+      "numeric-caption": {
+        "displayName": "Numeric Caption",
+        "purpose": "The joined-at timestamp; first thing dropped below 640px."
+      }
     },
     "shadows": [
       {
         "name": "prompt-pinned",
-        "value": "0 4px 16px rgba(0, 32, 51, 0.18)",
-        "purpose": "The system's only box-shadow. Announces that the sticky prompt band has detached from normal flow and pinned to the viewport top; transitions in from 0 4px 16px rgba(0,32,51,0) over 140ms."
+        "value": "0 4px 16px var(--pin-shadow)",
+        "purpose": "The system's only box-shadow. Announces that the sticky prompt band has detached from normal flow and pinned to the viewport top. The geometry is constant and only the color moves: the band always carries 0 4px 16px, transparent at rest, transitioning to var(--pin-shadow) over 140ms when .is-pinned lands. Per-theme color: rgba(0, 32, 51, 0.18) in the three light skies, rgba(0, 0, 0, 0.55) after dark."
       }
     ],
     "motion": [
-      { "name": "glide", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Every state transition and most animations: hover, focus, toggle, border, drop-indicator, row-position glide, the completion gesture's three beats, the live-dot pulse, the callout settle." },
-      { "name": "spring", "value": "cubic-bezier(0.34, 1.56, 0.64, 1)", "purpose": "Reserved for exactly two celebration animations tied to the baton arriving: tag-pop and pos-cue. Nothing else uses it." },
-      { "name": "t-fast", "value": "140ms cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Default duration for hover, focus, toggle, border, and drop-indicator transitions." },
-      { "name": "t-medium", "value": "200ms cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Row transform duration; matches the JS-driven FLIP reorder glide in app.js exactly." }
+      {
+        "name": "glide",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Every state transition and most animations: hover, focus, toggle, border, drop-indicator, row-position glide, the completion gesture's three beats, the live-dot pulse, the callout settle, the theme chips."
+      },
+      {
+        "name": "spring",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "purpose": "Reserved for exactly two celebration animations tied to the baton arriving: tag-pop and pos-cue. Nothing else uses it."
+      },
+      {
+        "name": "t-fast",
+        "value": "140ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default duration for hover, focus, toggle, border, drop-indicator, and pin-shadow transitions."
+      },
+      {
+        "name": "t-medium",
+        "value": "200ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Row transform duration; matches the JS-driven FLIP reorder glide in app.js exactly."
+      }
     ],
     "breakpoints": [
-      { "name": "sm", "value": "640px" }
+      {
+        "name": "sm",
+        "value": "640px"
+      }
     ]
   },
   "components": [
@@ -144,9 +504,9 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The Add button and every other primary action. Deep-blue fill, white text.",
+      "description": "The Add button and every other primary action. Field fill, On Deep text.",
       "html": "<button class=\"ds-btn-primary\" type=\"button\">Add</button>",
-      "css": ".ds-btn-primary { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--deep-blue, #005581); background: var(--deep-blue, #005581); color: #ffffff; cursor: pointer; transition: background 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { background: var(--deep-blue-hover, #0069a0); border-color: var(--deep-blue-hover, #0069a0); } .ds-btn-primary:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
+      "css": ".ds-btn-primary { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--field, #005581); background: var(--field, #005581); color: var(--on-deep, #ffffff); cursor: pointer; transition: background 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { background: var(--field-hover, #0069a0); border-color: var(--field-hover, #0069a0); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent-ink, #005581); outline-offset: 2px; }"
     },
     {
       "name": "Ghost Button",
@@ -154,47 +514,47 @@
       "refersTo": "button-ghost",
       "description": "Secondary actions: Randomize order, Reset session, Exit demo.",
       "html": "<button class=\"ds-btn-ghost\" type=\"button\">Randomize order</button>",
-      "css": ".ds-btn-ghost { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--dim-ink, #1e3e4f); cursor: pointer; transition: background 140ms cubic-bezier(0.22,1,0.36,1), color 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-ghost:hover { background: var(--surface, #e3eef7); color: var(--ink, #002033); border-color: var(--soft-line, #9ec1d9); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
+      "css": ".ds-btn-ghost { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--dim-ink, #1e3e4f); cursor: pointer; transition: background 140ms cubic-bezier(0.22,1,0.36,1), color 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-ghost:hover { background: var(--surface, #e3eef7); color: var(--ink, #002033); border-color: var(--soft-line, #9ec1d9); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--accent-ink, #005581); outline-offset: 2px; }"
     },
     {
       "name": "Introduced Toggle",
       "kind": "button",
       "refersTo": "toggle-default",
-      "description": "The host's primary per-person interaction. Shown at rest; add .on for the introduced state (deep-blue fill, white text).",
+      "description": "The host's primary per-person interaction. Shown at rest; add .on for the introduced state (field fill, On Deep text).",
       "html": "<button class=\"ds-toggle\" type=\"button\" aria-pressed=\"false\"><span>Mark introduced</span></button>",
-      "css": ".ds-toggle { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--muted-ink, #44616f); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 140ms cubic-bezier(0.22,1,0.36,1), color 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-toggle:hover { border-color: var(--soft-line, #9ec1d9); color: var(--ink, #002033); } .ds-toggle.on { background: var(--deep-blue, #005581); color: #ffffff; border-color: var(--deep-blue, #005581); } .ds-toggle:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
+      "css": ".ds-toggle { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--muted-ink, #44616f); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 140ms cubic-bezier(0.22,1,0.36,1), color 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-toggle:hover { border-color: var(--soft-line, #9ec1d9); color: var(--ink, #002033); } .ds-toggle.on { background: var(--field, #005581); color: var(--on-deep, #ffffff); border-color: var(--field, #005581); } .ds-toggle.on:hover { background: var(--field-hover, #0069a0); border-color: var(--field-hover, #0069a0); } .ds-toggle:focus-visible { outline: 2px solid var(--accent-ink, #005581); outline-offset: 2px; }"
     },
     {
       "name": "Up-Next Roster Row",
       "kind": "custom",
       "refersTo": "roster-row-up-next",
-      "description": "The signature component. The baton lands on this row: gold wash, 2px deep-blue frame, enlarged type — three signals at once, never hue alone.",
+      "description": "The signature component. The baton lands on this row: baton wash, 2px accent-ink frame, enlarged type — three signals at once, never hue alone.",
       "html": "<div class=\"ds-row-upnext\"><div class=\"ds-pos\">3</div><div class=\"ds-name\">Priya Shah<span class=\"ds-tag\">you&rsquo;re up next</span></div></div>",
-      "css": ".ds-row-upnext { display: flex; align-items: center; gap: 14px; background: var(--gold-wash, #fff3ce); border: 2px solid var(--deep-blue, #005581); border-radius: 10px; padding: 17px; } .ds-pos { font-family: \"Atkinson Hyperlegible Mono\", ui-monospace, monospace; font-size: 1.5rem; font-weight: 700; color: var(--deep-blue, #005581); font-feature-settings: 'tnum' 1; } .ds-name { display: flex; align-items: baseline; gap: 10px; font-size: 1.25rem; font-weight: 700; color: var(--ink, #002033); } .ds-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink, #002033); background: var(--gold, #ffb511); padding: 3px 9px; border-radius: 6px; }"
+      "css": ".ds-row-upnext { display: flex; align-items: center; gap: 14px; background: var(--baton-wash, #fff3ce); border: 2px solid var(--accent-ink, #005581); border-radius: 10px; padding: 17px; } .ds-pos { font-family: \"Atkinson Hyperlegible Mono\", ui-monospace, monospace; font-size: 1.5rem; font-weight: 700; color: var(--accent-ink, #005581); font-feature-settings: 'tnum' 1; } .ds-name { display: flex; align-items: baseline; gap: 10px; font-size: 1.25rem; font-weight: 700; color: var(--ink, #002033); } .ds-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--on-gold, #002033); background: var(--baton, #ffb511); padding: 3px 9px; border-radius: 6px; }"
     },
     {
       "name": "Count Band",
       "kind": "custom",
       "refersTo": "count-band",
-      "description": "The three roster counts as one continuous flex row, never separate tiles — a direct rejection of the hero-metric-tile pattern.",
+      "description": "The three roster counts as one continuous flex row, never separate tiles — a direct rejection of the hero-metric-tile pattern. The numerals carry the theme's accent instead of a border.",
       "html": "<div class=\"ds-counts\"><div class=\"ds-stat\"><div class=\"ds-stat-n\">5</div><div class=\"ds-stat-l\">In the room</div></div><div class=\"ds-stat\"><div class=\"ds-stat-n\">2</div><div class=\"ds-stat-l\">Introduced</div></div><div class=\"ds-stat\"><div class=\"ds-stat-n\">3</div><div class=\"ds-stat-l\">Still to go</div></div></div>",
-      "css": ".ds-counts { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; background: var(--surface, #e3eef7); border-radius: 10px; padding: 14px 20px; } .ds-stat { display: flex; align-items: baseline; gap: 10px; min-width: 0; } .ds-stat-n { font-family: \"Atkinson Hyperlegible Mono\", ui-monospace, monospace; font-size: 2.25rem; font-weight: 600; line-height: 1; letter-spacing: -0.01em; font-feature-settings: 'tnum' 1; color: var(--deep-blue, #005581); } .ds-stat-l { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: var(--muted-ink, #44616f); }"
+      "css": ".ds-counts { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; background: var(--surface, #e3eef7); border-radius: 10px; padding: 14px 20px; } .ds-stat { display: flex; align-items: baseline; gap: 10px; min-width: 0; } .ds-stat-n { font-family: \"Atkinson Hyperlegible Mono\", ui-monospace, monospace; font-size: 2.25rem; font-weight: 600; line-height: 1; letter-spacing: -0.01em; font-feature-settings: 'tnum' 1; color: var(--accent-ink, #005581); } .ds-stat-l { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: var(--muted-ink, #44616f); }"
     },
     {
       "name": "Completion Callout",
       "kind": "custom",
       "refersTo": "callout",
-      "description": "The one whole-room celebration, shown when everyone present has introduced themselves. Wears the gold wash; arrives with a one-shot 1200ms settle.",
+      "description": "The one whole-room celebration, shown when everyone present has introduced themselves. Wears the baton wash; arrives with a one-shot 1200ms settle.",
       "html": "<div class=\"ds-callout\">Everyone has introduced themselves &mdash; that&rsquo;s the whole room. Enjoy the meeting!</div>",
-      "css": ".ds-callout { background: var(--gold-wash, #fff3ce); border-radius: 10px; padding: 14px 20px; font-size: 0.9375rem; line-height: 1.5; color: var(--ink, #002033); }"
+      "css": ".ds-callout { background: var(--baton-wash, #fff3ce); border-radius: 10px; padding: 14px 20px; font-size: 0.9375rem; line-height: 1.5; color: var(--ink, #002033); }"
     },
     {
       "name": "Demo-Mode Bar",
       "kind": "custom",
       "refersTo": "demo-bar",
-      "description": "Makes sample data unmistakable. The one border in the system that isn't hairline, soft-line, or deep-blue.",
+      "description": "Makes sample data unmistakable. The one border in the system that isn't hairline, soft-line, or accent-ink.",
       "html": "<div class=\"ds-demo-bar\"><div class=\"ds-demo-label\"><span class=\"ds-demo-dot\" aria-hidden=\"true\"></span><span class=\"ds-demo-title\">Demo mode</span><span class=\"ds-demo-note\">Sample data you can play with. Nothing is saved.</span></div><button class=\"ds-demo-exit\" type=\"button\">Exit demo</button></div>",
-      "css": ".ds-demo-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: var(--gold-wash, #fff3ce); border: 1px solid var(--sun-ink, #8a5b00); border-radius: 10px; padding: 12px 16px; } .ds-demo-label { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } .ds-demo-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--sun-ink, #8a5b00); } .ds-demo-title { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink, #002033); } .ds-demo-note { font-size: 0.8125rem; color: var(--muted-ink, #44616f); } .ds-demo-exit { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--dim-ink, #1e3e4f); cursor: pointer; } .ds-demo-exit:hover { background: var(--surface, #e3eef7); color: var(--ink, #002033); border-color: var(--soft-line, #9ec1d9); }"
+      "css": ".ds-demo-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: var(--baton-wash, #fff3ce); border: 1px solid var(--baton-ink, #8a5b00); border-radius: 10px; padding: 12px 16px; } .ds-demo-label { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } .ds-demo-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--baton-ink, #8a5b00); } .ds-demo-title { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink, #002033); } .ds-demo-note { font-size: 0.8125rem; color: var(--muted-ink, #44616f); } .ds-demo-exit { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--dim-ink, #1e3e4f); cursor: pointer; } .ds-demo-exit:hover { background: var(--surface, #e3eef7); color: var(--ink, #002033); border-color: var(--soft-line, #9ec1d9); }"
     },
     {
       "name": "Text Input",
@@ -202,7 +562,7 @@
       "refersTo": "input-field",
       "description": "Add-someone field. Border answers the 3:1 non-text floor since the field has no label of its own to lean on.",
       "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Add someone by name&hellip;\" />",
-      "css": ".ds-input { font-family: inherit; font-size: 0.9375rem; color: var(--ink, #002033); background: var(--card, #ffffff); border: 1px solid var(--hint-ink, #5b7a8c); padding: 10px 14px; border-radius: 6px; transition: border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-input::placeholder { color: var(--muted-ink, #44616f); } .ds-input:focus { outline: none; border-color: var(--deep-blue, #005581); }"
+      "css": ".ds-input { font-family: inherit; font-size: 0.9375rem; color: var(--ink, #002033); background: var(--card, #ffffff); border: 1px solid var(--hint-ink, #5b7a8c); padding: 10px 14px; border-radius: 6px; transition: border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-input::placeholder { color: var(--muted-ink, #44616f); } .ds-input:focus { outline: none; border-color: var(--accent-ink, #005581); } .ds-input:focus-visible { outline: 2px solid var(--accent-ink, #005581); outline-offset: 2px; }"
     },
     {
       "name": "Text Link",
@@ -210,70 +570,158 @@
       "refersTo": "text-link",
       "description": "The third emphasis level. Re-offers the demo after first run.",
       "html": "<button class=\"ds-text-link\" type=\"button\">Try the demo</button>",
-      "css": ".ds-text-link { font-family: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--deep-blue, #005581); background: none; border: 0; padding: 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; border-radius: 6px; transition: color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-text-link:hover { color: var(--ink, #002033); } .ds-text-link:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
+      "css": ".ds-text-link { font-family: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--accent-ink, #005581); background: none; border: 0; padding: 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; border-radius: 6px; transition: color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-text-link:hover { color: var(--ink, #002033); } .ds-text-link:focus-visible { outline: 2px solid var(--accent-ink, #005581); outline-offset: 2px; }"
     },
     {
       "name": "Masthead Live Meta",
       "kind": "custom",
       "refersTo": "masthead-band",
-      "description": "The live-status line on the full-bleed deep-blue masthead: a gold dot with a composited pulse halo, plus sky-text meta.",
+      "description": "The live-status line on the full-bleed field: a baton dot with a composited pulse halo, plus field-text meta.",
       "html": "<div class=\"ds-meta\"><span class=\"ds-dot\" aria-hidden=\"true\"></span><span>live</span></div>",
-      "css": ".ds-meta { display: inline-flex; align-items: center; gap: 14px; font-size: 0.8125rem; color: var(--sky-text, #9adcf9); background: var(--deep-blue, #005581); padding: 10px 16px; border-radius: 6px; } .ds-dot { position: relative; width: 7px; height: 7px; border-radius: 999px; background: var(--gold, #ffb511); } .ds-dot::after { content: \"\"; position: absolute; inset: 0; border-radius: inherit; background: var(--gold, #ffb511); opacity: 0.45; animation: ds-pulse 2.4s cubic-bezier(0.22,1,0.36,1) infinite; } @keyframes ds-pulse { 0% { transform: scale(1); opacity: 0.45; } 70%, 100% { transform: scale(3.6); opacity: 0; } }"
+      "css": ".ds-meta { display: inline-flex; align-items: center; gap: 14px; font-size: 0.8125rem; color: var(--field-text, #9adcf9); background: var(--field, #005581); padding: 10px 16px; border-radius: 6px; } .ds-dot { position: relative; width: 7px; height: 7px; border-radius: 999px; background: var(--baton, #ffb511); } .ds-dot::after { content: \"\"; position: absolute; inset: 0; border-radius: inherit; background: var(--baton, #ffb511); opacity: 0.45; animation: ds-pulse 2.4s cubic-bezier(0.22,1,0.36,1) infinite; } @keyframes ds-pulse { 0% { transform: scale(1); opacity: 0.45; } 70%, 100% { transform: scale(3.6); opacity: 0; } }"
+    },
+    {
+      "name": "Theme Picker",
+      "kind": "chip",
+      "refersTo": "theme-chip",
+      "description": "The four-sky picker below the footer: a fieldset of native radio inputs, each label wrapping an invisible radio stretched over the chip and a horizon disc — the theme's field over its ground, its baton as the sun on the line — in pinned preview colors that ignore the active theme. Transparent-bordered at rest so only the chosen sky shows an edge; the chip holding the checked input (via :has()) carries a card fill and an accent-ink border.",
+      "html": "<fieldset class=\"ds-theme-bar\"><legend class=\"ds-sr-only\">Color theme</legend><span class=\"ds-theme-label\" aria-hidden=\"true\">Theme</span><label class=\"ds-theme-chip\"><input type=\"radio\" name=\"ds-theme\" value=\"sky\" checked><span class=\"ds-theme-swatch\" aria-hidden=\"true\"></span>Clear sky</label><label class=\"ds-theme-chip\"><input type=\"radio\" name=\"ds-theme\" value=\"dawn\"><span class=\"ds-theme-swatch\" aria-hidden=\"true\"></span>Dawn</label><label class=\"ds-theme-chip\"><input type=\"radio\" name=\"ds-theme\" value=\"dusk\"><span class=\"ds-theme-swatch\" aria-hidden=\"true\"></span>Golden hour</label><label class=\"ds-theme-chip\"><input type=\"radio\" name=\"ds-theme\" value=\"night\"><span class=\"ds-theme-swatch\" aria-hidden=\"true\"></span>After dark</label></fieldset>",
+      "css": ".ds-theme-bar { border: 0; display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; } .ds-theme-label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: var(--muted-ink, #44616f); margin-right: 4px; } .ds-theme-chip { position: relative; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: var(--muted-ink, #44616f); background: none; border: 1px solid transparent; border-radius: 6px; padding: 6px 10px; cursor: pointer; transition: color 140ms cubic-bezier(0.22,1,0.36,1), background 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-theme-chip input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; } .ds-theme-chip:hover { color: var(--ink, #002033); border-color: var(--hairline, #c9dcea); } .ds-theme-chip:has(input:checked) { color: var(--ink, #002033); background: var(--card, #ffffff); border-color: var(--accent-ink, #005581); } .ds-theme-chip:has(input:focus-visible) { outline: 2px solid var(--accent-ink, #005581); outline-offset: 2px; } .ds-theme-swatch { position: relative; width: 14px; height: 14px; flex: none; border-radius: 999px; background: linear-gradient(to bottom, var(--sw-deep) 50%, var(--sw-ground) 50%); border: 1px solid var(--soft-line, #9ec1d9); } .ds-theme-swatch::after { content: \"\"; position: absolute; width: 5px; height: 5px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: inherit; background: var(--sw-gold); } .ds-theme-chip:has(input[value=\"sky\"]) { --sw-deep: #005581; --sw-ground: #f4f9fd; --sw-gold: #ffb511; } .ds-theme-chip:has(input[value=\"dawn\"]) { --sw-deep: #6d2d80; --sw-ground: #faf6fb; --sw-gold: #ff8fb2; } .ds-theme-chip:has(input[value=\"dusk\"]) { --sw-deep: #9c4907; --sw-ground: #fdf7ee; --sw-gold: #ffa02e; } .ds-theme-chip:has(input[value=\"night\"]) { --sw-deep: #0a5c8c; --sw-ground: #0e1c26; --sw-gold: #ffb511; } .ds-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }"
     }
   ],
   "narrative": {
     "northStar": "Clear Sky, Gold Baton",
-    "overview": "A round-robin tracker rebuilt as a clear California day. One deep-blue masthead — the band that holds the live indicator and the icebreaker prompt — bleeds full-width across the top of the page and owns every primary control below it. Gold appears nowhere as decoration; it exists for exactly one job, marking whoever holds the baton right now: the up-next row, the completion callout, the demo-mode bar, text selection. Everything else on the page is sky-tinted blue-on-white, calm enough to sit in the corner of a meeting without competing with the conversation in the room.\n\nThis system explicitly retires two prior worlds rather than blending with either: the beige-ledger warm-paper system it replaced (clay accent, paper neutrals, no blue at all), and the navy-dashboard reflex the category defaults to. Neither survives in any token here. The palette is airy and blue rather than warm and paper-toned; the accent is a genuine gold rather than a clay terracotta; and for the first time the system gives its primary color — deep blue — a full-bleed structural role (the masthead) rather than confining it to small controls.\n\nState is still never read through hue alone. Introduced vs. waiting pairs a fill change with an ink-color shift and a checkmark icon; up-next pairs a wash, a 2px deep-blue frame, and larger type, three signals at once. Motion carries exactly two curves: a glide that moves every piece of state, and a spring reserved for precisely two celebration animations. The design wants the room to find the next speaker in one glance and the host to never wonder what a color means.",
+    "overview": "A round-robin tracker rebuilt as a clear California day. One deep-blue masthead — the band that holds the live indicator and the icebreaker prompt — bleeds full-width across the top of the page and owns every primary control below it. Gold appears nowhere as decoration; it exists for exactly one job, marking whoever holds the baton right now: the up-next row, the completion callout, the demo-mode bar, text selection. Everything else on the page is sky-tinted blue-on-white, calm enough to sit in the corner of a meeting without competing with the conversation in the room.\n\nThe two nouns in the north star are now the two token names. What was --deep-blue is --field — the committed structural fill — and what was --gold is --baton — the mark that moves. The rename happened when the world grew from one sky into four (Clear Sky, Dawn, Golden Hour, After Dark), because at dawn the field is plum and the baton is rose: the hue is a theme's business, the role is the system's. Everything below describes roles first and Clear Sky's values second.\n\nThis system explicitly retires two prior worlds rather than blending with either: the beige-ledger warm-paper system it replaced (clay accent, paper neutrals, no blue at all), and the navy-dashboard reflex the category defaults to. Neither survives in any token here. The palette is airy and blue rather than warm and paper-toned; the accent is a genuine gold rather than a clay terracotta; and for the first time the system gives its primary color — deep blue — a full-bleed structural role (the masthead) rather than confining it to small controls.\n\nState is still never read through hue alone — which is what makes four skies affordable in the first place. Introduced vs. waiting pairs a fill change with an ink-color shift and a checkmark icon; up-next pairs a wash, a 2px accent-ink frame, and larger type, three signals at once. Motion carries exactly two curves: a glide that moves every piece of state, and a spring reserved for precisely two celebration animations. The design wants the room to find the next speaker in one glance and the host to never wonder what a color means.",
     "keyCharacteristics": [
       "Sky-tinted ground (#f4f9fd), never gray, never warm paper",
-      "Full-bleed deep-blue masthead owns the live indicator, the prompt, and every primary button",
-      "Gold is reserved for happy moments only: up-next, completion, demo mode, selection — never a default UI color",
+      "Full-bleed field-colored masthead owns the live indicator, the prompt, and every primary button",
+      "The baton is reserved for happy moments only: up-next, completion, demo mode, selection — never a default UI color",
+      "Four themes on one day-cycle arc (Clear Sky, Dawn, Golden Hour, After Dark), all re-lit from the same token roles — no theme adds a selector",
       "Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics, both self-hosted",
       "One functional shadow in the entire stylesheet (the pinned prompt band); everything else is flat",
       "Two motion curves: glide for all state, spring for exactly two one-shot celebrations",
-      "No dark theme, ever — the page ships color-scheme: only light specifically to stop browsers from force-inverting it",
+      "No forced dark, ever — :root declares color-scheme: only light so browsers cannot force-invert whichever sky is chosen; dark exists only as the deliberately authored After Dark theme, whose block opts back in with color-scheme: dark",
       "Screen-share legibility at 720p is the design's first audience"
     ],
     "rules": [
-      { "name": "The Glide-Everywhere, Spring-Once Rule", "body": "If it isn't tag-pop or pos-cue, it moves on glide. A third animation reaching for spring needs a reason as strong as \"the baton just landed here\".", "section": "motion" },
-      { "name": "The Sequenced-Not-Simultaneous Rule", "body": "Marking someone introduced fires three beats in order, not at once: background settle, then checkmark draw, then — only if a new person becomes up-next — their position number and tag, delayed to 1800ms and scoped with :has(.just-introduced).", "section": "motion" },
-      { "name": "The Gold-Under-Ink Rule", "body": "Gold never carries text on a light ground by itself. It is either a surface that ink sits on top of, or a mark against deep blue — never the text color itself against a light background.", "section": "colors" },
-      { "name": "The No-Hue-Alone Rule", "body": "Introduced vs. waiting vs. up-next is never read through color alone. Each state pairs a fill change with an ink-color shift and an icon, or a wash with a border and a size change.", "section": "colors" },
-      { "name": "Blue Owns the Structure, Gold Owns the Moment", "body": "Deep blue is the default state of every primary control and the masthead field, present at rest. Gold only appears in response to something happening. A new element with nothing to celebrate reaches for deep blue or a neutral, never gold.", "section": "colors" },
-      { "name": "The Three-Ink Floor Rule", "body": "Text answers to exactly three inks depending on role: ink and dim-ink anywhere, muted-ink for secondary text, hint-ink only for a graphical control glyph or where the 3:1 floor applies. Hairline and soft-line are borders only.", "section": "colors" },
-      { "name": "The One-Family Rule", "body": "Atkinson Hyperlegible Next plus Atkinson Hyperlegible Mono is the entire type system. No serif, no second sans, no icon font carrying glyph weight.", "section": "typography" },
-      { "name": "The Tabular Numerics Rule", "body": "Every number that updates live renders in Atkinson Mono with font-feature-settings: 'tnum' 1. Numbers must not reflow their container.", "section": "typography" },
-      { "name": "The Self-Hosted Type Rule", "body": "Both faces ship from fonts/ as the latin subset, preloaded from index.html, and are never fetched from a CDN.", "section": "typography" },
-      { "name": "The Screen-Share Floor Rule", "body": "Body type never goes below 15px; labels never go below 12px. Test by downsampling a screenshot to 1280x720 and reading it from 2m away.", "section": "typography" },
-      { "name": "The One Uppercase Rule", "body": "Exactly one string in the system is uppercase: the up-next tag, also the single heaviest label weight (700) in the scale.", "section": "typography" },
-      { "name": "The Counts-Are-a-Band Rule", "body": "The three counts render as one continuous flex row on a shared baseline, never as three separate tiles — a direct rejection of PRODUCT.md's named hero-metric-tile anti-reference.", "section": "layout" },
-      { "name": "The One Breakpoint Rule", "body": "The system has exactly one breakpoint: 640px. Above it, one layout flexes; below it, the same layout drops columns.", "section": "layout" },
-      { "name": "The Row-Never-Wraps Rule", "body": "A roster row stays one line at every width. Below 640px, the timestamp and the up-next tag are both dropped simultaneously so the row keeps its shape; the name never shrinks below Title size.", "section": "layout" },
-      { "name": "The One Functional Shadow Rule", "body": "The system's only shadow exists to announce that the sticky prompt band has detached from normal flow. It is not decorative and does not appear anywhere else.", "section": "elevation" },
-      { "name": "The No-Decorative-Glow Rule", "body": "Backdrop blurs, ambient bloom, hover glows: none survive a screen-share, so none are in the system.", "section": "elevation" },
-      { "name": "The Two-Radius Rule", "body": "Containers get 10px, controls get 6px. The pill is reserved for annotations and dots.", "section": "shapes" },
-      { "name": "The Border Escalation Rule", "body": "Reach for border color before background color when marking attention: hairline to soft-line to deep-blue is the fixed ladder. Up-next skips straight to deep-blue at 2px because it is the page's single most important signal.", "section": "shapes" }
+      {
+        "name": "The Glide-Everywhere, Spring-Once Rule",
+        "body": "If it isn't tag-pop or pos-cue, it moves on glide. A third animation reaching for spring needs a reason as strong as \"the baton just landed here\".",
+        "section": "motion"
+      },
+      {
+        "name": "The Sequenced-Not-Simultaneous Rule",
+        "body": "Marking someone introduced fires three beats in order, not at once: background settle, then checkmark draw, then — only if a new person becomes up-next — their position number and tag, delayed to 1800ms and scoped with :has(.just-introduced).",
+        "section": "motion"
+      },
+      {
+        "name": "The Re-Lit, Never Re-Built Rule",
+        "body": "A theme may change what a role's color is, never what the role does. The baton stays the happy-moment mark in every sky (gold at midday and midnight, rose at dawn, amber at golden hour); the field stays the committed structural fill; state keeps all of its non-hue carriers in all four themes. A theme that needs a new selector rather than a new token value is not a theme.",
+        "section": "colors"
+      },
+      {
+        "name": "The Gold-Under-Ink Rule",
+        "body": "The baton never carries text on a light ground by itself. It is either a surface that ink sits on top of (the wash, the tag fill under --on-gold), or a mark against the field (the dot, the placeholder, the caret) — never the text color itself against a light background.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Hue-Alone Rule",
+        "body": "Introduced vs. waiting vs. up-next is never read through color alone. Introduced pairs a fill change with an ink-color shift and a checkmark icon; up-next pairs a wash, a 2px accent-ink frame, and larger type. This rule is what makes four skies affordable: a theme can re-light every hue on the page without touching a single one of these carriers.",
+        "section": "colors"
+      },
+      {
+        "name": "Blue Owns the Structure, Gold Owns the Moment",
+        "body": "The field is the default state of every primary control and the masthead band, present at rest. The baton only ever appears in response to something happening. If a new element needs a color and nothing has happened yet, reach for the field, accent-ink, or a neutral, never the baton. The rule keeps its Clear Sky name because Clear Sky is the default; at dawn read it as \"plum owns the structure, rose owns the moment\".",
+        "section": "colors"
+      },
+      {
+        "name": "The Three-Ink Floor Rule",
+        "body": "Text answers to exactly three inks depending on role: ink and dim-ink anywhere, muted-ink for secondary text, hint-ink only for a graphical control glyph or where the 3:1 floor applies. Hairline and soft-line are borders only.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Family Rule",
+        "body": "Atkinson Hyperlegible Next plus Atkinson Hyperlegible Mono is the entire type system. No serif, no second sans, no icon font carrying glyph weight.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Numerics Rule",
+        "body": "Every number that updates live renders in Atkinson Mono with font-feature-settings: 'tnum' 1. Numbers must not reflow their container.",
+        "section": "typography"
+      },
+      {
+        "name": "The Self-Hosted Type Rule",
+        "body": "Both faces ship from fonts/ as the latin subset, preloaded from index.html, and are never fetched from a CDN.",
+        "section": "typography"
+      },
+      {
+        "name": "The Screen-Share Floor Rule",
+        "body": "Body type never goes below 15px; labels never go below 12px. Test by downsampling a screenshot to 1280x720 and reading it from 2m away.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Uppercase Rule",
+        "body": "Exactly one string in the system is uppercase: the up-next tag, also the single heaviest label weight (700) in the scale.",
+        "section": "typography"
+      },
+      {
+        "name": "The Counts-Are-a-Band Rule",
+        "body": "The three counts render as one continuous flex row on a shared baseline, never as three separate tiles — a direct rejection of PRODUCT.md's named hero-metric-tile anti-reference.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Breakpoint Rule",
+        "body": "The system has exactly one breakpoint: 640px. Above it, one layout flexes; below it, the same layout drops columns.",
+        "section": "layout"
+      },
+      {
+        "name": "The Row-Never-Wraps Rule",
+        "body": "A roster row stays one line at every width. Below 640px, the timestamp and the up-next tag are both dropped simultaneously so the row keeps its shape; the name never shrinks below Title size. Ordinary rows ellipsize a long name; the up-next row is the one exception — its name wraps instead of truncating, at every width, because the room is reading that row for exactly that name.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Functional Shadow Rule",
+        "body": "The system's only shadow is 0 4px 16px var(--pin-shadow) on .prompt-sticky.is-pinned, and it exists to announce that the band has detached from normal flow. The geometry is constant and only the color moves — transparent at rest, --pin-shadow when pinned. A new shadow also owes every sky a value: hard-coding an ink-tinted rgba is exactly the thing --pin-shadow exists to prevent.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No-Decorative-Glow Rule",
+        "body": "Backdrop blurs, ambient bloom, hover glows: none survive a screen-share, so none are in the system.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Two-Radius Rule",
+        "body": "Containers get 10px, controls get 6px. The pill is reserved for annotations and dots.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Border Escalation Rule",
+        "body": "Reach for border color before background color when marking attention: hairline to soft-line to accent-ink is the fixed ladder. Up-next skips straight to accent-ink at 2px because it is the page's single most important signal. The demo bar's baton-ink border is the ladder's one documented exception, not a fourth rung.",
+        "section": "shapes"
+      }
     ],
     "dos": [
-      "Do use Ground (#f4f9fd) for the canvas and Card (#ffffff) for content surfaces; Surface (#e3eef7) is the only second tonal layer.",
+      "Do reach for a role token, never a literal: --ground for the canvas, --card for content surfaces, --surface as the only second tonal layer, --field for structural fills, --accent-ink for marks and rings on light surfaces. A hard-coded hex is a bug in three of the four skies.",
+      "Do check any new surface in all four themes before calling it done — especially After Dark, where the tonal ladder climbs instead of descending and every derived role (--accent-ink, --on-gold, --pin-shadow) has a different value than it aliases by day.",
       "Do carry introduced-vs-waiting-vs-up-next through at least two non-hue signals together: fill + ink color + icon, or wash + border + size.",
-      "Do treat gold as a response to something happening, never a resting-state color. Deep blue is what the page looks like when nothing has happened yet.",
+      "Do treat the baton as a response to something happening, never a resting-state color. The field is what the page looks like when nothing has happened yet.",
       "Do keep every state transition on --glide. Reserve --spring for tag-pop and pos-cue only.",
       "Do render every live-updating number in Atkinson Mono with tabular figures.",
       "Do drop the timestamp and the up-next tag together below 640px; the name never shrinks below Title size.",
-      "Do zero animation delays as well as durations under reduced motion, and pin any animation whose meaning lives in its end state explicitly rather than trusting fill-mode.",
+      "Do zero animation delays as well as durations under reduced motion, and pin any animation whose meaning lives in its end state (the drawn checkmark) explicitly rather than trusting fill-mode.",
       "Do test every screen downsampled to 1280x720, read from 2m away."
     ],
     "donts": [
-      "Don't ship a dark theme. color-scheme: only light is set specifically to stop the browser from force-inverting the palette.",
-      "Don't use gold as a default UI color on any surface that isn't tied to a happy moment (up-next, completion, demo mode, selection).",
+      "Don't let the browser invent a dark theme. :root sets color-scheme: only light specifically to stop Chrome's Auto Dark Theme force-inverting whichever sky the host chose; the only dark rendition is the authored After Dark theme, which opts back in with color-scheme: dark on its own block, over a lifted blue-black ground with re-checked contrast throughout.",
+      "Don't add a theme by adding a selector. A new sky is a :root[data-theme=\"...\"] block of token values and a chip with pinned preview colors — nothing more. If a sky needs a rule of its own, the component is reading a color it should be reading as a role.",
+      "Don't use the baton as a default UI color on any surface that isn't tied to a happy moment (up-next, completion, demo mode, selection).",
       "Don't set text in hairline or soft-line — they are border-only colors (1.4:1 and 1.8:1).",
       "Don't reach for --bright-blue; it is declared but unused in the shipped stylesheet. Give it a real role before treating it as part of the working palette.",
       "Don't put a warning color, countdown, or shaming microcopy on anyone still \"to go.\" PRODUCT.md's no-spotlight-on-absence principle forbids it.",
       "Don't reach for the generic SaaS dashboard idioms PRODUCT.md names by name: hero-metric tiles, identical icon+heading+text card grids, a navy-and-indigo reflex palette.",
-      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, celebration animations tied to speed.",
+      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, celebration animations tied to speed. Introductions are not a race.",
       "Don't mimic Zoom or Slack chrome. The page is shared inside Zoom; it should feel like a separate artifact.",
-      "Don't add a second breakpoint, a third border-escalation color, or a third motion curve.",
+      "Don't add a second breakpoint, a third border-escalation color, or a third motion curve. One of each beyond what's documented here means a component is confused about its own role.",
       "Don't add a shadow anywhere but the pinned prompt band without first asking whether it's signaling something or just decorating."
     ]
   }
