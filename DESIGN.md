@@ -2,36 +2,44 @@
 name: Zoom Icebreaker Tracker
 description: A per-meeting utility that shows a whole room who has and hasn't introduced themselves yet.
 colors:
-  paper: "#faf7f2"
-  surface: "#f3eee5"
-  hairline: "#ddd3c2"
-  soft-line: "#c8bca6"
-  hint-ink: "#9a8e79"
-  muted-ink: "#756b5c"
-  dim-ink: "#4a4036"
-  ink: "#28201a"
-  clay: "#c9573a"
-  clay-deep: "#a44128"
-  up-next-tint: "oklch(96.5% 0.04 44)"
+  ground: "#f4f9fd"
+  card: "#ffffff"
+  surface: "#e3eef7"
+  hairline: "#c9dcea"
+  soft-line: "#9ec1d9"
+  hint-ink: "#5b7a8c"
+  muted-ink: "#44616f"
+  dim-ink: "#1e3e4f"
+  ink: "#002033"
+  deep-blue: "#005581"
+  deep-blue-hover: "#0069a0"
+  on-deep: "#ffffff"
+  on-deep-dim: "rgba(255, 255, 255, 0.35)"
+  bright-blue: "#1295d8"
+  sky-text: "#9adcf9"
+  gold: "#ffb511"
+  gold-bright: "#ffd200"
+  gold-wash: "#fff3ce"
+  sun-ink: "#8a5b00"
 typography:
   display:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "clamp(2rem, 3.4vw, 2.75rem)"
-    fontWeight: 600
+    fontWeight: 700
     lineHeight: 1.05
     letterSpacing: "-0.015em"
   headline:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "1.25rem"
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1.2
     letterSpacing: "-0.01em"
   title:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "1.0625rem"
     fontWeight: 500
-    lineHeight: 1.3
-    letterSpacing: "-0.005em"
+    lineHeight: 1.5
+    letterSpacing: "0"
   body:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "0.9375rem"
@@ -42,31 +50,37 @@ typography:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "0.8125rem"
     fontWeight: 400
-    lineHeight: 1.4
+    lineHeight: 1.5
     letterSpacing: "0"
   label:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 500
-    lineHeight: 1.3
+    lineHeight: 1.5
+    letterSpacing: "0.04em"
+  label-strong:
+    fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
+    fontSize: "0.75rem"
+    fontWeight: 600
+    lineHeight: 1.5
     letterSpacing: "0.04em"
   label-loud:
     fontFamily: "Atkinson Hyperlegible Next, system-ui, sans-serif"
     fontSize: "0.75rem"
-    fontWeight: 600
-    lineHeight: 1.3
+    fontWeight: 700
+    lineHeight: 1.5
     letterSpacing: "0.05em"
   numeric:
     fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
     fontSize: "2.25rem"
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1
     letterSpacing: "-0.01em"
     fontFeature: "'tnum' 1"
   numeric-compact:
     fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
     fontSize: "1.75rem"
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1
     letterSpacing: "-0.01em"
     fontFeature: "'tnum' 1"
@@ -79,14 +93,14 @@ typography:
   numeric-emphasis:
     fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
     fontSize: "1.5rem"
-    fontWeight: 600
+    fontWeight: 700
     lineHeight: 1
     fontFeature: "'tnum' 1"
   numeric-caption:
     fontFamily: "Atkinson Hyperlegible Mono, ui-monospace, monospace"
     fontSize: "0.8125rem"
     fontWeight: 400
-    lineHeight: 1.4
+    lineHeight: 1.5
     fontFeature: "'tnum' 1"
 rounded:
   xs: "6px"
@@ -102,41 +116,53 @@ spacing:
   gutter: "32px"
   section: "48px"
 components:
+  masthead-band:
+    backgroundColor: "{colors.deep-blue}"
+    textColor: "#ffffff"
+    padding: "22px 0 18px"
+  prompt-input:
+    backgroundColor: "transparent"
+    textColor: "#ffffff"
+    typography: "{typography.display}"
+    padding: "0"
   button-primary:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.paper}"
-    typography: "{typography.label}"
+    backgroundColor: "{colors.deep-blue}"
+    textColor: "#ffffff"
+    typography: "{typography.label-strong}"
     rounded: "{rounded.xs}"
     padding: "10px 16px"
   button-primary-hover:
-    backgroundColor: "{colors.dim-ink}"
-    textColor: "{colors.paper}"
+    backgroundColor: "{colors.deep-blue-hover}"
+    textColor: "#ffffff"
   button-ghost:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.dim-ink}"
-    typography: "{typography.label}"
+    typography: "{typography.label-strong}"
     rounded: "{rounded.xs}"
     padding: "10px 16px"
   button-ghost-hover:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
   toggle-default:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.muted-ink}"
     typography: "{typography.label}"
     rounded: "{rounded.xs}"
     padding: "8px 14px"
   toggle-hover:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.ink}"
-  toggle-introduced:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.paper}"
+  toggle-on:
+    backgroundColor: "{colors.deep-blue}"
+    textColor: "#ffffff"
     typography: "{typography.label}"
     rounded: "{rounded.xs}"
     padding: "8px 14px"
+  toggle-on-hover:
+    backgroundColor: "{colors.deep-blue-hover}"
+    textColor: "#ffffff"
   roster-row:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.ink}"
     rounded: "{rounded.sm}"
     padding: "14px 18px"
@@ -144,65 +170,65 @@ components:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.muted-ink}"
   roster-row-up-next:
-    backgroundColor: "{colors.up-next-tint}"
+    backgroundColor: "{colors.gold-wash}"
     textColor: "{colors.ink}"
     rounded: "{rounded.sm}"
-    padding: "18px 18px"
+    padding: "17px"
   roster-row-left:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.dim-ink}"
   up-next-tag:
-    backgroundColor: "{colors.clay-deep}"
-    textColor: "{colors.paper}"
+    backgroundColor: "{colors.gold}"
+    textColor: "{colors.ink}"
     typography: "{typography.label-loud}"
     rounded: "{rounded.xs}"
     padding: "3px 9px"
-  host-label:
-    textColor: "{colors.clay}"
+  host-pill:
+    textColor: "{colors.deep-blue}"
     typography: "{typography.label}"
     padding: "4px 6px"
   tag-left:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.muted-ink}"
     typography: "{typography.label}"
     rounded: "{rounded.pill}"
     padding: "2px 8px"
-  stat-tile:
+  count-band:
     backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
+    textColor: "{colors.deep-blue}"
     rounded: "{rounded.sm}"
-    padding: "16px 20px"
+    padding: "14px 20px"
   input-field:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.ink}"
     rounded: "{rounded.xs}"
     padding: "10px 14px"
-  callout-waiting:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.dim-ink}"
+  callout:
+    backgroundColor: "{colors.gold-wash}"
+    textColor: "{colors.ink}"
     rounded: "{rounded.sm}"
     padding: "14px 20px"
   demo-bar:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.gold-wash}"
     textColor: "{colors.ink}"
     rounded: "{rounded.sm}"
     padding: "12px 16px"
   empty-state:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.muted-ink}"
     rounded: "{rounded.sm}"
     padding: "48px 24px"
   empty-state-first-run:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "{colors.card}"
     textColor: "{colors.dim-ink}"
     rounded: "{rounded.sm}"
     padding: "48px 32px"
   text-link:
-    textColor: "{colors.clay-deep}"
+    textColor: "{colors.deep-blue}"
     typography: "{typography.caption}"
-    padding: "2px 4px"
+    padding: "4px"
   live-dot:
-    backgroundColor: "{colors.clay}"
+    backgroundColor: "{colors.gold}"
     rounded: "{rounded.pill}"
     size: "7px"
 ---
@@ -211,306 +237,285 @@ components:
 
 ## Overview
 
-### Creative North Star: "The Quiet Operator"
+### Creative North Star: "Clear Sky, Gold Baton"
 
-A small, considered utility that helps the host of a meeting without performing. Every choice on the page is in service of two simultaneous audiences: the host clicking up close, and the whole room watching the screen-share from across a Zoom feed. Nothing is decorative; nothing competes with the conversation in the room.
+A round-robin tracker rebuilt as a clear California day. One deep-blue masthead — the band that holds the live indicator and the icebreaker prompt — bleeds full-width across the top of the page and owns every primary control below it. Gold appears nowhere as decoration; it exists for exactly one job, marking whoever holds the baton right now: the up-next row, the completion callout, the demo-mode bar, text selection. Everything else on the page is sky-tinted blue-on-white, calm enough to sit in the corner of a meeting without competing with the conversation in the room.
 
-The system is light, warm, and restrained. Paper-coded neutrals (faintly warm, never bleached white) carry the canvas. A single sans-serif (Atkinson Hyperlegible Next) handles every text role; tabular numerics use its matching mono. One accent, clay terracotta, exists for moments of attention (live indicator, focus outlines, identity badges) and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. The design wants to be remembered for *not* getting in the way.
+This system explicitly retires two prior worlds rather than blending with either: the beige-ledger warm-paper system it replaced (clay accent, paper neutrals, no blue at all), and the navy-dashboard reflex the category defaults to. Neither survives in any token here. The palette is airy and blue rather than warm and paper-toned; the accent is a genuine gold rather than a clay terracotta; and for the first time the system gives its primary color — deep blue — a full-bleed structural role (the masthead) rather than confining it to small controls.
 
-This system explicitly rejects the gravitational pulls of its category: the dark-navy-and-amber dashboard look the current tracker shipped with, the gamified leaderboard chrome (avatars, points, badges), and the generic SaaS hero-metric template. It also rejects the obvious icebreaker-orange reflex; the warm accent here is clay, not pumpkin.
+State is still never read through hue alone. Introduced vs. waiting pairs a fill change with an ink-color shift and a checkmark icon; up-next pairs a wash, a 2px deep-blue frame, and larger type, three signals at once. Motion carries exactly two curves: a glide that moves every piece of state, and a spring reserved for precisely two celebration animations. The design wants the room to find the next speaker in one glance and the host to never wonder what a color means.
 
 ### Key Characteristics
 
-- Light theme, warm paper neutrals, never `#fff`
-- Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics
-- Type is self-hosted, never fetched: the face is part of the build, not a CDN request
-- One accent (clay), used sparingly and never as a state carrier
-- Flat by default: no shadows, tonal layering only
-- Restrained motion: state transitions, plus three short completion gestures — never decoration
-- Screen-share legibility is the design's first audience
+- Sky-tinted ground (`#f4f9fd`), never gray, never warm paper
+- Full-bleed deep-blue masthead owns the live indicator, the prompt, and every primary button
+- Gold is reserved for happy moments only: up-next, completion, demo mode, selection — never a default UI color
+- Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics, both self-hosted
+- One functional shadow in the entire stylesheet (the pinned prompt band); everything else is flat
+- Two motion curves: glide for all state, spring for exactly two one-shot celebrations
+- No dark theme, ever — the page ships `color-scheme: only light` specifically to stop browsers from force-inverting it
+- Screen-share legibility at 720p is the design's first audience
 
 ### Motion
 
-Two easing tokens carry every interaction, both on the same curve so the system moves as one object:
+Two easing tokens, and they answer to different jobs rather than different durations:
 
-- **`--t-fast`** (`140ms cubic-bezier(0.22, 1, 0.36, 1)`): the default. Hover, focus, toggle, border, and drop-indicator changes.
-- **`--t-medium`** (`200ms cubic-bezier(0.22, 1, 0.36, 1)`): row transforms, where a slightly longer settle reads as deliberate rather than twitchy.
+- **`--glide`** (`cubic-bezier(0.22, 1, 0.36, 1)`, ease-out-quint): every state transition in the system — hover, focus, toggle, border, drop-indicator, the row-position glide, the completion gesture's three beats, the live-dot pulse, the callout's one-shot settle. `--t-fast` (140ms) and `--t-medium` (200ms) both ride this curve.
+- **`--spring`** (`cubic-bezier(0.34, 1.56, 0.64, 1)`, back-out overshoot): reserved for exactly two animations, both tied to the baton arriving at the next person — `tag-pop` (420ms, the up-next tag) and `pos-cue` (520ms, the up-next position number). Nothing else in the stylesheet references `--spring`.
 
-The curve is **ease-out-quint** — front-loaded, arriving early and settling slowly. Beyond those two, exactly four named animations exist, all documented with the components they belong to: the live-dot `pulse` (2.4s, infinite), and the three completion gestures `mark-flash` (3s), `draw-check` (1s after an 800ms delay), and `pos-cue` (520ms).
+**The Glide-Everywhere, Spring-Once Rule.** If it isn't `tag-pop` or `pos-cue`, it moves on glide. A third animation reaching for spring needs a reason as strong as "the baton just landed here" — spring is a celebration signature, not a general-purpose bounce.
 
-**The One Curve Rule.** Every transition and animation in the system uses `cubic-bezier(0.22, 1, 0.36, 1)`. A second easing curve is a second voice; add duration instead.
+The app's one piece of JavaScript-driven motion — the FLIP roster-reorder glide in `app.js`'s `playReorder` — uses the identical values as `--t-medium`: `200ms`, `cubic-bezier(0.22, 1, 0.36, 1)`. The Web Animations API call bypasses the row's own CSS transition on purpose (it would otherwise fight the slide), but the curve and duration stay the same token in spirit, so a row settling into a new position reads as the same object moving as a hover state changing.
 
-**Reduced motion removes the movement, never the message.** Every state this system animates is also carried by fill, weight, an icon, or a label, so under `prefers-reduced-motion` durations collapse and the change simply lands instantly. Two details make that true rather than merely intended: **delays are zeroed along with durations** — `draw-check` waits 800ms, so zeroing only its duration left the checkmark invisible for those 800ms, hiding the confirmation from exactly the people who asked for it plainly — and the checkmark is explicitly set to its drawn state rather than trusting an animation's fill mode.
+Named, sequenced animations beyond the two curve tokens: `pulse` (2.4s, infinite, the live dot's halo), `mark-flash` (3000ms, the just-introduced row's background settle), `draw-check` (1000ms, 800ms delay, the toggle's checkmark draw), `pos-cue` (520ms, 1800ms delay), `tag-pop` (420ms), and `callout-settle` (1200ms, the whole-room completion callout's one-shot arrival).
 
-> An earlier version of this section carried a "150–200ms, opacity/colour/transform only" band that three shipped animations already broke. The band was the thing that was wrong, not the animations: on a surface watched through compressed video, a 3s settle is what makes a change survive the codec. The four named animations are now sanctioned by name in the Don'ts below, and a fifth requires retiring that rule rather than quietly widening it.
+**The Sequenced-Not-Simultaneous Rule.** Marking someone introduced fires three beats in order, not at once: the row's background settles (`mark-flash`), then the checkmark draws (`draw-check`, 800ms in), then — only if a new person becomes up-next — their position number and tag animate in (`pos-cue` / `tag-pop`, both delayed to 1800ms). The 1800ms delay is scoped with `:has(.just-introduced)` so it only applies to a render that actually contains an introduction; up-next also changes on a plain reorder or a departure, and an unconditional delay would strand the cue 1.8s after a gesture that never happened.
+
+**Reduced motion removes the movement, never the message.** Every state this system animates is also carried by fill, ink color, or an icon, so under `prefers-reduced-motion` durations collapse and the change lands instantly. Two details make that true rather than merely intended: **animation delays are zeroed along with durations** (`draw-check` waits 800ms before it starts — zeroing only the duration would leave the checkmark invisible for that entire window), and the checkmark path is explicitly forced to its drawn state (`stroke-dashoffset: 0`) rather than trusting an animation's fill mode to hold it there. The JS-driven FLIP reorder checks the same media query and skips the animation call outright rather than relying on CSS to neutralize it.
 
 ## Colors
 
-A small, hand-picked palette tuned for daylight rooms and compressed video. Every neutral is tinted toward the clay accent's hue family (~40° in OKLCH) so the system reads as one warm object rather than a stack of gray rectangles.
+An airy, blue-tinted palette built around a single structural role reversal: deep blue is no longer a small accent, it is the field the masthead and every primary control sit on. Gold is the accent, and it is licensed for happy moments only.
 
 ### Primary
 
-- **Clay** (`#c9573a`): the single accent. Used for the live indicator dot, focus outlines, the active "host" badge, the drag insertion line, and ≤10% of any surface. Never carries state on its own. Never used as decoration.
-- **Clay Deep** (`#a44128`): the pressed and active state for clay-tinted controls, the hover treatment for clay borders, and any place clay must sit *behind* paper-colored text — the up-next tag and the text link both step down to clay-deep so their text clears 4.5:1, which plain clay would not.
+- **Deep Blue** (`#005581`): the committed field. Fills the full-bleed masthead and sticky prompt band, every primary button, the "on" state of the introduced toggle, the up-next row's 2px frame, focus rings on everything except the prompt itself, and the drag-drop insertion line. Text on deep blue uses the **On Deep** token (`#ffffff`, 8:1) with **On Deep Dim** (`rgba(255,255,255,.35)`) for separators; white-on-blue is a named role, never a literal.
+- **Deep Blue Hover** (`#0069a0`): the pressed/hover step for every deep-blue-filled control — the primary button, the "on" toggle.
+
+### Secondary
+
+- **Gold** (`#ffb511`): the baton. Reserved for happy-moment surfaces and marks: the live dot (on deep blue, 4.5:1), the up-next tag's fill (with ink text at 9.5:1), and nothing that isn't a moment of attention.
+- **Gold Bright** (`#ffd200`): the prompt's placeholder text and caret (5.5:1 on deep blue, clearing the 3:1 large-text floor) and the system's text-selection background. A step brighter than plain gold because it has to read as an invitation against the masthead's deep field, not just as a mark.
+- **Gold Wash** (`#fff3ce`): the celebration surface — the up-next row's background, the completion callout, and the demo-mode bar. The one place besides deep blue where a whole surface (not just a mark) carries the accent.
+- **Sun Ink** (`#8a5b00`): a small, deliberately scoped ink for gold-wash content that needs a border or a mark rather than the body's default ink color — currently the demo-mode bar's dot and border only. It is not the default text color on gold surfaces: the completion callout and the up-next row both set body text in plain `ink`, and the up-next row's border is deep-blue, not sun-ink. Reach for sun-ink specifically when gold itself would be illegible on a gold ground (a gold dot on a gold wash is 1.5:1), not as a general "text on gold" rule.
+- **Bright Blue** (`#1295d8`): declared in `:root` with a documented 3.1:1 non-text-floor intent ("live accents on white") but not yet consumed by any selector in the stylesheet. Treat it as reserved, not load-bearing — do not point new work at it as though it already carries a role.
 
 ### Neutral
 
-- **Paper** (`#faf7f2`): canvas. Page background and the default row surface. Warm enough to read as paper, never sterile.
-- **Surface** (`#f3eee5`): the second tonal layer. Stat tiles, the "waiting" callout, the demo-mode bar, and the introduced-row treatment. Sits 2% darker than paper; depth without elevation.
-- **Hairline** (`#ddd3c2`): default 1px borders. Visible at desktop, recedes gracefully under compressed video. A border colour only — at 1.39:1 it can never carry text.
-- **Soft Line** (`#c8bca6`): emphasized borders. The host row ring, the demo bar, and any divider that needs to read from the back of a conference room. **Borders only.** It previously doubled as the "quieted numeral" ink and the display-size placeholder, where it measured 1.62–1.75:1 and effectively erased the text it set.
-- **Hint Ink** (`#9a8e79`): the lightest ink the system allows, at 3.01:1 on paper. It is licensed for exactly three jobs, all of which answer to the 3:1 floor rather than 4.5:1 — the display-size prompt placeholder (large text), the remove glyph (a graphical control), and the input's boundary. Never body text.
-- **Muted Ink** (`#756b5c`): secondary text. Timestamps, labels, position numbers, the introduced-row name colour. Set at the lightest value that still clears 4.5:1 on *surface* (4.53:1), which is the tighter of its two backgrounds; on paper it reads 4.90:1.
-- **Dim Ink** (`#4a4036`): tertiary text and ghost-button text. Always paired with a paper or surface background.
-- **Ink** (`#28201a`): primary text and the primary-button fill. Never `#000`. The brown undertone is what makes the page feel warm even in monochrome moments.
-
-### State Tint
-
-- **Up-Next Tint** (`oklch(96.5% 0.04 44)`): the warm wash behind the up-next roster row, and the only surface in the system that carries chroma above the neutral ceiling. It exists because the room — not the host — has to find the next speaker instantly through compressed video, where a tonal step alone is the first thing the codec eats. Paired with a clay border and a larger position number, never load-bearing on its own.
+- **Ground** (`#f4f9fd`): the page canvas. Airy and faintly blue, never gray, never the old system's warm paper. Ink measures 15.8:1 on it.
+- **Card** (`#ffffff`): true white, reserved for roster rows and every other content surface sitting on the sky-tinted ground — the crispness reads as "content" against the softer canvas.
+- **Surface** (`#e3eef7`): the second tonal layer. The count band, the introduced-row fill. A step darker than ground, depth without elevation.
+- **Hairline** (`#c9dcea`): default 1px borders. Border-only — 1.4:1, cannot carry text.
+- **Soft Line** (`#9ec1d9`): emphasized borders — the host row's ring, the themed scrollbar. Border-only — 1.8:1.
+- **Hint Ink** (`#5b7a8c`): the lightest text-capable ink, 4.3:1 on ground. Licensed for the remove-glyph icon (a graphical control, answering the 3:1 floor) and the regular input's border, which — unlike a button with its own label — needs to clear the 3:1 non-text floor on its own.
+- **Muted Ink** (`#44616f`): secondary text — timestamps, labels, position numbers, the introduced-row's name color, the count band's labels. 5.6:1 on surface, 6.2:1 on ground.
+- **Dim Ink** (`#1e3e4f`): tertiary text and ghost-button text.
+- **Ink** (`#002033`): primary text, and the deep end of the sky palette. Never `#000`.
+- **Sky Text** (`#9adcf9`): meta text set directly on the deep-blue masthead band (5.3:1) — the "Started ·· ago" line and its separator.
 
 ### Named Rules: Colors
 
-**The Restrained Accent Rule.** Clay covers ≤10% of any rendered screen. If you find yourself reaching for a second accent, you're solving the wrong problem. Add weight, label, or tone instead.
+**The Gold-Under-Ink Rule.** Gold never carries text on a light ground by itself. It is either a surface that ink sits on top of (the wash, the tag fill), or a mark against deep blue (the dot, the placeholder, the caret) — never the text color itself against a light background.
 
-**The Tinted-Neutral Rule.** Every *neutral* carries chroma between **0.007 and 0.033** in OKLCH, in a **hue band of 59–83** — warmer and yellower than clay itself, which sits at hue 35. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent. The Up-Next Tint (chroma 0.04, hue 44) is the one sanctioned exception and is not a neutral: it is a state surface, and adding a second one requires retiring this rule rather than quietly widening it.
+**The No-Hue-Alone Rule.** Introduced vs. waiting vs. up-next is never read through color alone. Introduced pairs a fill change (card → surface) with an ink-color shift (ink → muted-ink) and a checkmark icon on the toggle. Up-next pairs a wash, a 2px deep-blue frame, and larger type (name steps to 1.25rem/700, position number to `numeric-emphasis`) — three simultaneous signals, never the wash alone.
 
-> These numbers are measured from the hex tokens, which are normative. An earlier version of this file stated a 0.005–0.022 band at hue 40–50; that was written from intent and never checked, and it excluded three of the very neutrals it governed. If you change a token, re-measure rather than re-estimate — the palette does not sit where a first guess puts it.
+**Blue Owns the Structure, Gold Owns the Moment.** Deep blue is the default state of every primary control and the masthead field; it is present on the page at rest, in every session, whether or not anyone has been marked introduced yet. Gold only ever appears in response to something happening — someone becomes up next, everyone finishes, a sample session is loaded. If a new element needs a color and nothing has happened yet, reach for deep blue or a neutral, never gold.
 
-**The No-Hue-Borne-State Rule.** Introduced vs. waiting is never carried by hue alone. State pairs fill density (paper vs. surface), weight (regular vs. medium), and an explicit icon. A deuteranopic viewer must distinguish the two on first glance.
-
-**The Clay-Deep-For-Text Rule.** Wherever clay meets text — behind it or *as* it — the darker step does the work. Paper text on plain clay fails 4.5:1, and plain clay as 12px text is 4.00:1, which is the same failure wearing the other hat. Clay-deep passes both directions (5.84:1 on paper), and the two are close enough in hue that nothing reads as a second accent. Plain clay is therefore reserved for what it was always for: borders, the live dot, focus rings, and the up-next numeral at display size, where the 3:1 floor applies.
-
-**The Three-Ink Floor Rule.** Text answers to exactly three inks, and which one is legal depends only on size and role: **ink** and **dim-ink** anywhere, **muted-ink** for anything secondary, and **hint-ink** only for large text or a graphical control. Hairline and soft-line are borders. If a design needs a fourth, lighter ink, what it actually needs is less text.
+**The Three-Ink Floor Rule.** Text answers to exactly three inks depending on role: **ink** and **dim-ink** anywhere, **muted-ink** for secondary text, and **hint-ink** only for a graphical control glyph or where the 3:1 (not 4.5:1) floor applies. Hairline and soft-line are borders only.
 
 ## Typography
 
 **Display Font:** Atkinson Hyperlegible Next (with system-ui, sans-serif fallback)
 **Body Font:** Atkinson Hyperlegible Next (same family, regular weight)
-**Numeric Font:** Atkinson Hyperlegible Mono (with ui-monospace fallback) for counts, times, and other tabular data
+**Numeric Font:** Atkinson Hyperlegible Mono (with ui-monospace fallback) for every number that updates live
 
-**Character:** A single humanist sans carries every text role. Atkinson Hyperlegible was drawn by the Braille Institute for readers with low vision, which makes it unusually well suited to a surface whose primary audience is watching through compressed video: the characters that collapse into each other in most sans faces — `I` / `l` / `1`, `O` / `0`, `b` / `d` — are drawn apart on purpose. It reads as warm and slightly informal rather than clinical, which suits a page that sits in the corner of a meeting. The matching mono provides tabular alignment for the counts (3 / 7 / 4) without introducing a second voice.
-
-Both faces ship as variable fonts declaring the full `wght` axis (200–800), so no weight the face can render is clamped away, and both use `font-display: swap` — the roster is readable before the typeface arrives.
+**Character:** A single humanist sans, drawn by the Braille Institute for readers with low vision, carries every text role. The characters that collapse into each other in most sans faces — `I` / `l` / `1`, `O` / `0`, `b` / `d` — are drawn apart on purpose, which matters directly to a page whose primary audience reads it through a compressed 720p video pipeline. The matching mono gives the counts and position numbers tabular alignment without introducing a second voice. Both faces are variable, declaring the full `wght` axis (200–800) so no renderable weight is clamped away, and both use `font-display: swap`.
 
 ### Hierarchy
 
-- **Display** (Atkinson Next, 600, `clamp(2rem, 3.4vw, 2.75rem)`, line-height 1.05, letter-spacing -0.015em): the icebreaker prompt at the top of the page, which doubles as the page title. One per page, ever. It is an editable `textarea` styled to look like nothing — transparent background, no border, no resize handle — so the host types directly into the headline.
-- **Headline** (Atkinson Next, 500, 1.25rem, line-height 1.2): the name on the up-next row (at 600), and the first-run welcome title (at 500). Sized up so the room reads the next speaker before the host says anything.
-- **Title** (Atkinson Next, 500, 1.0625rem / 17px, line-height 1.3): the roster names. Two points above body because these are the words the room actually reads through a compressed feed; every other text role can afford to be quieter, this one cannot.
-- **Body** (Atkinson Next, 400, 0.9375rem / 15px, line-height 1.5): prose — empty-state copy, the coming-up callout, the demo-bar title (at 600). Default for any non-numeric text that isn't a name. Measure is capped between 42ch and 50ch wherever prose runs more than a line.
-- **Caption** (Atkinson Next, 400, 0.8125rem / 13px, line-height 1.4): the header meta line, the demo-bar note, empty-state footnotes. Secondary information the host may want and the room can ignore.
-- **Label** (Atkinson Next, 500, 0.75rem / 12px, letter-spacing 0.04em): the small roles on stat tiles, buttons, and the introduced toggle. Never used as long-form text. Two tracked variants exist for identity tags: the host label (lowercase, 0.06em) and the `[left]` tag (0.06em).
-- **Label Loud** (Atkinson Next, 600, 0.75rem / 12px, letter-spacing 0.05em, uppercase): reserved for the up-next tag, the one uppercase string in the system. Uppercase is the signal of last resort here, used once.
-- **Numeric** (Atkinson Mono, 500, 2.25rem / 36px, line-height 1, font-feature `tnum`): the big counts on stat tiles. Tabular figures so widths don't reflow when numbers update. Drops to **Numeric Compact** (1.75rem / 28px) below 640px, where three full-size counts would crowd the row.
-- **Numeric Row** (Atkinson Mono, 500, 1.125rem / 18px, font-feature `tnum`): the standing position number on each roster row, right-aligned in its column and `user-select: none` so dragging a row never starts a text selection.
-- **Numeric Emphasis** (Atkinson Mono, 600, 1.5rem / 24px, font-feature `tnum`): the position number on the up-next row only. The size step is half the up-next signal; the tint is the other half.
-- **Numeric Caption** (Atkinson Mono, 400, 0.8125rem / 13px, font-feature `tnum`): the joined-at timestamp on each row. Mono because it is a number that updates, caption-sized because only the host needs it — and it is the first thing dropped below 640px.
+- **Display** (Atkinson Next, 700, `clamp(2rem, 3.4vw, 2.75rem)`, line-height 1.05, letter-spacing -0.015em): the icebreaker prompt, set in white on the deep-blue masthead band. A borderless, transparent `textarea` the host types directly into. One per page.
+- **Headline** (Atkinson Next, 600, 1.25rem, line-height 1.2, letter-spacing -0.01em): the first-run welcome title only.
+- **Title** (Atkinson Next, 500, 1.0625rem / 17px): the roster names at rest — the words the room actually reads through a compressed feed.
+- **Body** (Atkinson Next, 400, 0.9375rem / 15px, line-height 1.5): prose — empty-state copy, the completion callout, the demo-bar title (which steps up to 600 weight for emphasis within body size).
+- **Caption** (Atkinson Next, 400, 0.8125rem / 13px): the masthead's meta line ("live · Started ··"), the demo-bar note, the first-run footnote.
+- **Label** (Atkinson Next, 500, 0.75rem / 12px, letter-spacing 0.04em): the count band's labels, the toggle's default text. The host pill uses the same size and weight at a wider 0.06em tracking; the `[left]` tag uses the same size at 0.06em tracking but regular (400) weight.
+- **Label Strong** (Atkinson Next, 600, 0.75rem / 12px, letter-spacing 0.04em): button text — primary and ghost alike.
+- **Label Loud** (Atkinson Next, 700, 0.75rem / 12px, letter-spacing 0.05em, uppercase): the up-next tag only. The one uppercase string in the system, and the boldest label weight in the type scale.
+- **Numeric** (Atkinson Mono, 600, 2.25rem / 36px, tabular): the count band's three big figures, set in deep-blue rather than ink — the counts carry the brand color directly instead of a border or a background shift. Drops to **Numeric Compact** (1.75rem / 28px) below 640px.
+- **Numeric Row** (Atkinson Mono, 500, 1.125rem / 18px, tabular): the standing position number on each roster row, right-aligned, `user-select: none`.
+- **Numeric Emphasis** (Atkinson Mono, 700, 1.5rem / 24px, tabular): the position number on the up-next row only, in deep-blue. Bolder than the base numeric-row weight — the size step and the weight step both say "this one."
+- **Numeric Caption** (Atkinson Mono, 400, 0.8125rem / 13px, tabular): the joined-at timestamp. First thing dropped below 640px.
 
 ### Named Rules: Typography
 
-**The One-Family Rule.** Atkinson Hyperlegible Next (plus Atkinson Hyperlegible Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight. Two pairings are retired and must not return: Fraunces + IBM Plex Mono, and the Geist pair that replaced it — the latter was declared but never actually delivered, so the design only existed on machines that happened to have it installed.
+**The One-Family Rule.** Atkinson Hyperlegible Next plus Atkinson Hyperlegible Mono is the entire type system. No serif, no second sans, no icon font carrying glyph weight.
 
-**The Tabular Numerics Rule.** Every number that updates live (counts on stat tiles, position numbers, the joined-at timestamp) is rendered in Atkinson Mono with `font-feature-settings: 'tnum'`. Numbers must not reflow their container when they tick.
+**The Tabular Numerics Rule.** Every number that updates live — the three counts, both position-number roles, the timestamp — renders in Atkinson Mono with `font-feature-settings: 'tnum' 1'`. Numbers must not reflow their container.
 
-**The Self-Hosted Type Rule.** The face ships from this repo (`fonts/`, latin subset, ~50KB) and is never fetched from a CDN. Two reasons, and both are binding: a webfont request would break the promise that nothing leaves your machine, and a face that is merely *named* renders only for whoever already has it. If you change the typeface, you ship the file — declaring a family you do not deliver is the bug this rule exists to prevent.
+**The Self-Hosted Type Rule.** Both faces ship from `fonts/` as the latin subset, `crossorigin`-preloaded from `index.html`, and are never fetched from a CDN — PRODUCT.md's no-third-party-request promise is a build constraint, not a marketing line, and a webfont request would break it silently.
 
-**The Screen-Share Floor Rule.** Body type never goes below 15px. Labels never go below 12px. Anything smaller dies in the 1080p video pipeline. Test by downsampling a screenshot to 1280×720 and reading from 2m away.
+**The Screen-Share Floor Rule.** Body type never goes below 15px; labels never go below 12px. Test by downsampling a screenshot to 1280×720 and reading it from 2m away.
 
-**The One Uppercase Rule.** Exactly one string in the system is uppercase: the up-next tag. Uppercase is a shout, and a page shared into a meeting gets one.
+**The One Uppercase Rule.** Exactly one string in the system is uppercase: the up-next tag. It is also the single heaviest label weight (700) in the scale — uppercase and maximum weight are spent together, once, on the moment that matters most.
 
 ## Layout
 
-A single centered column, sized to be read from across a room rather than to fill a monitor.
+A single centered column with a full-bleed exception at the very top.
 
-**Container.** `max-width: 880px`, centered, inside a viewport-relative page gutter of `5vh 5vw` (`4vh 4vw` below 640px). The measure is deliberately narrow for a "dashboard": the room is reading names, and a wider column would push the position number and the name apart until they stopped reading as one row.
+**Container.** `max-width: 880px`, centered, inside a viewport-relative gutter of `5vw` horizontally and `5vh 0` vertically below the masthead (`4vw 4vh` under 640px). Body carries no top padding — the masthead bleeds flush to the viewport edge, then the centered column resumes underneath it.
 
-**Vertical rhythm.** The page is a stack of blocks separated by generous, deliberately uneven space: header 40px, meta line 22px, stats 28px, callout 22px, demo bar 24px, footer 32px, sponsor bar 32px. Roster rows sit 8px apart — tight enough to read as one list, loose enough that each row keeps its own border.
+**The full-bleed masthead.** `header` and `.prompt-sticky` share a `background: var(--deep-blue)` with a `margin-inline: calc(50% - 50vw)` / `padding-inline: calc(50vw - 50%)` pair that cancels the centered column, so the fill spans the full viewport width while the live-meta line and the prompt text stay aligned to the 880px grid. This is the system's one full-bleed device, and it exists for a single reason: the masthead is a structural commitment, not a decorated header.
 
-**The spacing scale** (4 / 8 / 12 / 16 / 20 / 24 / 32 / 48) covers padding and gaps. Several block margins (10, 14, 18, 22, 28, 40) sit off that scale, inherited from tuning against a real screen-share rather than from the token list. Treat the scale as the default for anything new and the off-scale values as measured exceptions, not precedent.
+**Sticky prompt band.** `.prompt-sticky` is `position: sticky; top: 0; z-index: 10`, filled with the same deep blue as the masthead so the two read as one continuous band as the page scrolls. Its `box-shadow` starts fully transparent (`rgba(0, 32, 51, 0)`) and transitions to `rgba(0, 32, 51, 0.18)` only once `.is-pinned` is toggled by an `IntersectionObserver` watching a 1px sentinel placed just above it — **the only shadow in the entire stylesheet**, and it is functional (it announces that the band has detached from normal flow), not decorative.
 
-**Grids.** Three grids carry the page, and each collapses once:
+**Vertical rhythm.** Roughly: masthead 22px top padding, prompt band 10px/18px padding with 28px margin below, count band 14px/20px padding with 28px margin below, callout 14px/20px padding with 22px margin below, demo bar 12px/16px padding with 16px margin above and below, roster rows 8px apart, footer 32px above, sponsor line 32px above that.
 
-- **Stats:** `repeat(3, 1fr)` with a 14px gap; below 640px the gap tightens to 8px, tile padding drops to 12px 14px, and the numerals step down to Numeric Compact. The three counts stay side by side at every width — they are the summary, and stacking them would bury the third.
-- **Roster row:** `40px 1fr auto auto auto` (position, name, timestamp, toggle, remove) with a 14px gap. Below 640px it becomes `28px 1fr auto auto`: the position column narrows, the gap tightens to 10px, padding drops to 12px 14px, and the timestamp is dropped outright rather than wrapped.
-- **Footer:** `1fr auto` (add-form, actions) with a 20px gap, collapsing to a single column below 640px with the actions left-aligned under the input.
+**The spacing scale** (4 / 8 / 12 / 16 / 20 / 24 / 32 / 48) covers the round values that recur. A number of block measurements (10, 14, 17–18, 22, 28) sit off that scale, tuned against a real screen-share rather than pulled from the token list — treat the scale as the default for new work and the off-scale values as measured exceptions.
 
-**Sticky prompt.** The prompt sits in a `position: sticky` band at `top: 0` (`z-index: 10`) filled with paper, with a negative top margin so it aligns flush when unpinned. Its bottom border is transparent until the band actually pins, then transitions to hairline — the only chrome that appears on scroll, and the only thing in the system that announces its own stickiness.
+**Grids.** Three grids carry the page, each collapsing once at the single breakpoint:
 
-**Truncation and measure.** Names truncate with an ellipsis on one line rather than wrapping — a two-line name would break the row grid the room is scanning. Prose is capped by measure, not by pixels: 42ch for the empty lede, 46ch for the footnote, 50ch for the first-run body, with `text-wrap: pretty` on the longest block.
+- **Count band:** a single flex row (`justify-content: space-between; align-items: baseline`), not a grid of tiles — see the Named Rule below. Below 640px each count stacks its label under its numeral, but the three stay in one shared surface and one row.
+- **Roster row:** `40px 1fr auto auto auto` (position, name, timestamp, toggle, remove) with a 14px gap. Below 640px it becomes `28px 1fr auto auto`: the position column narrows, the gap tightens to 10px, and the timestamp is dropped outright.
+- **Footer:** `1fr auto` (add-form, actions) with a 20px gap, collapsing to a single stacked column below 640px.
+
+**Truncation and measure.** Names truncate with an ellipsis on one line rather than wrapping. Prose is capped by measure: 42ch for the empty-state lede, 46ch for its footnote, 50ch for the first-run body, with `text-wrap: pretty` on the longest block.
 
 ### Named Rules: Layout
 
-**The One Breakpoint Rule.** The system has exactly one breakpoint: 640px. Everything above it is one layout that flexes; everything below is the same layout with one column removed per grid. A second breakpoint means the column was never right.
+**The Counts-Are-a-Band Rule.** The three counts render as one continuous flex row on a shared baseline, never as three separate tiles. This is a direct rejection of PRODUCT.md's named anti-reference — "hero metric tiles with gradient accents" is exactly the generic-SaaS-dashboard look the product explicitly refuses.
 
-**The Row-Never-Wraps Rule.** A roster row is one line at every width. When space runs out, drop something — never wrap, never shrink the name below Title size. The give-up order is fixed: **timestamp first, then the up-next tag**, and the name never. Anything `flex: none` sitting inside the name column is a candidate for that list, because it does not shrink — it evicts.
+**The One Breakpoint Rule.** The system has exactly one breakpoint: 640px. Above it, one layout flexes; below it, the same layout drops columns.
+
+**The Row-Never-Wraps Rule.** A roster row stays one line at every width. Below 640px, the timestamp and the up-next tag are both dropped (simultaneously — there is no intermediate width where only one goes) so the row keeps its shape; the name never shrinks below Title size and never wraps.
 
 ## Elevation & Depth
 
-Flat by default, and now literally so: the stylesheet contains **no `box-shadow` declarations at all**. Depth is conveyed entirely through tonal layering: the canvas is paper, the second layer is surface (a 2% darker warm neutral), and that is the full vocabulary. The previous tracker leaned on radial-gradient atmosphere; that, too, is retired.
+Flat by default, with one narrowly-scoped exception. The stylesheet contains exactly one `box-shadow` pair — the sticky prompt band's pinned state — and nothing else. Depth everywhere else is tonal: ground → surface → card is the entire layering vocabulary, plus the gold wash as a fourth, chroma-carrying surface reserved for celebration.
 
-The live dot's halo used to be the single exception — an animated `box-shadow` spreading to 9px. It now rides a pseudo-element that scales and fades instead (`scale(1)` → `scale(3.6)`, opacity 0.45 → 0), which looks identical and composites on the GPU rather than repainting the dot every frame. That distinction earns its keep on this surface specifically: the page is screen-shared, and a region that repaints forever denies the video encoder anything static to skip.
+The live dot's halo is not a shadow: it rides a pseudo-element that scales and fades (`scale(1) → scale(3.6)`, opacity `0.45 → 0`), which composites on the GPU instead of repainting the dot every frame. That distinction matters specifically because this page is screen-shared — a region that repaints forever denies the video encoder a static area to skip.
 
 ### Named Rules: Elevation
 
-**The Flat-By-Default Rule.** Surfaces are flat at rest. If something needs to read as raised, switch its background from paper to surface (tonal layering), don't apply a shadow.
+**The One Functional Shadow Rule.** The system's only shadow exists to announce that the sticky prompt band has detached from normal flow. It is not decorative, it does not appear anywhere else, and a second shadow anywhere in the system needs to justify itself the same way this one does — as a signal, not a lighting effect.
 
-**The No-Decorative-Glow Rule.** Backdrop blurs, soft radial-gradient bloom behind hero text, "glow-on-hover" effects: forbidden. They survive a Figma file; they don't survive a screen-share.
+**The No-Decorative-Glow Rule.** Backdrop blurs, ambient bloom behind hero text, hover glows: none survive a screen-share, so none are in the system.
 
 ## Shapes
 
-Two radii and one hairline do all the work. The form language is rectangular and calm: nothing is circular except the two status dots, and nothing is sharp-cornered at all.
+Two radii and a hairline-first border system.
 
-- **10px (`{rounded.sm}`)** — *containers*: roster rows, stat tiles, the coming-up callout, the demo-mode bar, the empty state. Anything that holds content.
-- **6px (`{rounded.xs}`)** — *controls*: buttons, the introduced toggle, the input, the remove button, the text link's focus ring, the up-next tag. Anything you click, plus the one tag that reads as a control-sized object.
-- **999px (`{rounded.pill}`)** — used exactly twice: the `[left]` tag, where a pill reads as an annotation rather than a control, and the 7px/8px status dots.
+- **10px (`{rounded.sm}`)** — *containers*: roster rows, the count band, the callout, the demo-mode bar, the empty state.
+- **6px (`{rounded.xs}`)** — *controls*: buttons, the toggle, inputs, the up-next tag, the focus radius on the prompt.
+- **999px (`{rounded.pill}`)** — used twice: the `[left]` tag and the live/demo dots.
 
-**Borders carry more meaning than radius here.** Every border is 1px, and its color is the signal:
+**Borders escalate in three steps**, and the color is the signal:
 
-- **Hairline** — the default edge: rows, toggles, inputs, tags, the sponsor link.
-- **Soft Line** — emphasis: the host row's ring, the demo-mode bar, and the hover state of a toggle or ghost button.
-- **Clay** — attention: the up-next row, a focused input, the drag insertion line, the sponsor link on hover.
-- **Dashed hairline** — the one dashed edge in the system: the ordinary empty roster, where a dashed container reads as "space waiting to be filled". The first-run welcome deliberately switches to a *solid* border, because it is content, not an absence.
+- **Hairline** — the default edge: rows, toggles, inputs, tags.
+- **Soft Line** — emphasis: the host row's ring, the scrollbar thumb.
+- **Deep Blue** — attention and structure: the up-next row's 2px frame, every focus ring except the prompt's, the drag insertion line.
+- **Dashed hairline** — the ordinary empty roster only, reading as "space waiting to be filled"; the first-run state switches to solid because it is content, not an absence.
 
 ### Named Rules: Shapes
 
-**The Two-Radius Rule.** Containers get 10px, controls get 6px. A third radius means a component is confused about which it is. The pill is reserved for annotations and dots.
+**The Two-Radius Rule.** Containers get 10px, controls get 6px. The pill is reserved for annotations and dots.
 
-**The Border-Carries-State Rule.** Reach for border color before background color when marking attention: hairline → soft-line → clay is the escalation ladder, and it survives compressed video better than a fill change of the same magnitude.
+**The Border Escalation Rule.** Reach for border color before background color when marking attention: hairline → soft-line → deep-blue is the fixed ladder. Up-next skips straight to deep-blue at 2px because it is the page's single most important signal, not an incremental emphasis.
 
 ## Components
 
+### Masthead & Sticky Prompt Band
+
+The signature device. A full-bleed deep-blue field carries the live-status meta line and the display-size editable prompt as one continuous band, with a single functional shadow that appears only once the band pins to the top of the viewport on scroll. Placeholder and caret are gold-bright; the live dot is gold on the blue field with a composited pulse halo. See Layout for the full-bleed mechanism and Elevation for the shadow.
+
 ### Roster Row
 
-The signature component. One row per participant.
+One row per participant, and every state pairs at least two signals.
 
-- **Shape:** 10px radius (`{rounded.sm}`), 1px hairline border.
-- **Default state:** paper background, ink name, muted-ink timestamp. Reads as a plain ledger entry.
-- **Introduced state:** surface background (the 2% darker tonal layer), name shifts to muted-ink with a leading checkmark icon, and the position number and timestamp hold at muted-ink. *No green border, no celebratory color.* The shift in tone is enough to read across the room. The numerals used to drop to soft-line, which read as quieting but measured 1.62:1 — quieting a number until it cannot be read is deleting it.
-- **Left state:** paper background, name in dim-ink with a `[left]` pill tag to the right. No opacity tricks.
-- **Up-next state:** up-next tint background, clay border, vertical padding grows to 18px, the position number steps to Numeric Emphasis in clay, the name steps to 1.25rem/600, and an uppercase clay-deep tag sits at the end of the row. The roster carries the whole "who's next" signal — this row is why the page needs no separate up-next callout. **The tag is dropped below 640px**: it is `flex: none` inside the name column, so on a narrow row it took the entire column and left the up-next person nameless — the one row that cannot afford it. The tint, the border and the enlarged numeral already say "up next" three times; the name is the part that cannot be inferred.
-- **Internal padding:** 14px vertical, 18px horizontal. Column gap: 14px.
-- **Host row treatment:** a 1px soft-line ring instead of hairline, plus a small lowercase "host" label in clay-deep after the name, and `cursor: default` because the host is never reorderable. Identity, not status. The ring is reinforcement — the word "host" is what actually carries it — which is why the ring is allowed to sit below the 3:1 non-text floor while the remove glyph is not.
-- **Reorder affordance:** reorderable rows carry `cursor: grab` (`grabbing` while dragging) and drop to 40% opacity while lifted. The drop target draws a 2px clay insertion line 5px above or below itself via a pseudo-element that only fades its opacity — the line never displaces a row.
-- **Focus:** 2px clay outline at 2px offset, since rows are keyboard-reorderable with ↑/↓.
+- **Shape:** 10px radius, 1px hairline border, `card` background.
+- **Default:** card background, ink name, muted-ink timestamp.
+- **Introduced:** surface background, name and numerals shift to muted-ink, and the toggle shows a drawn checkmark. No hue change; fill + ink + icon carry it.
+- **Left:** card background stays, name shifts to dim-ink, a `[left]` pill tag appears. No opacity trick.
+- **Up-next:** gold-wash background, 2px deep-blue border, padding compensates to 17px (18px minus the extra border pixel so rows stay visually aligned), position number steps to Numeric Emphasis in deep-blue, name steps to 1.25rem/700, and an uppercase gold-filled tag reads "you're up next." Dropped below 640px along with the timestamp.
+- **Host:** a 1px soft-line ring instead of hairline, a lowercase "host" label in deep-blue after the name, `cursor: default` (never reorderable).
+- **Reorder affordance:** `cursor: grab`/`grabbing`, 40% opacity while lifted, a 2px deep-blue insertion line drawn 5px above or below the drop target via a pseudo-element that only fades opacity.
+- **Focus:** 2px deep-blue outline, 2px offset — rows are keyboard-reorderable with ↑/↓.
 
 ### Toggle (Mark Introduced)
 
-The host's primary interaction. Always reachable, always cheap.
-
-- **Shape:** 6px radius (`{rounded.xs}`), 1px hairline border, 8px / 14px padding (7px / 10px below 640px).
-- **Default:** paper background, muted-ink "Mark introduced" label, label typography (12px, medium weight).
-- **Hover:** border darkens to soft-line, text shifts to ink. No color change.
-- **On (introduced):** ink fill, paper text and checkmark, ink border. Hover deepens to dim-ink. *The act of marking is unmistakable; the color is neutral.*
-- **Focus:** 2px clay outline at 2px offset. Visible against any surface in the system.
+- **Shape:** 6px radius, 1px hairline border, 8px/14px padding (7px/10px below 640px).
+- **Default:** card background, muted-ink "Mark introduced" label.
+- **Hover:** border to soft-line, text to ink.
+- **On:** deep-blue fill, white text and checkmark, deep-blue border; hover deepens to deep-blue-hover.
+- **Focus:** 2px deep-blue outline, 2px offset.
 
 ### Completion Gesture
 
-The one moment of celebration the system allows, and it is deliberately slow rather than loud. Marking someone introduced fires three coordinated animations:
+The per-person celebration. Marking someone introduced fires three coordinated beats — see Motion for exact timings: `mark-flash` on the row background, `draw-check` on the toggle's checkmark path, and — only when a new up-next emerges — `pos-cue` on their position number plus `tag-pop` on their tag, both delayed to land as the third beat.
 
-- **`mark-flash`** (3000ms): the row's background settles from clay-mixed surface (16% clay in OKLAB) through 7% to plain surface. A warm breath, not a flash — long enough that a viewer watching compressed video at 15fps still catches which row changed.
-- **`draw-check`** (1000ms, 800ms delay): the checkmark draws itself by animating `stroke-dashoffset` from 100 to 0, landing after the background has begun to settle.
-- **`pos-cue`** (520ms, delayed 1800ms): on the row that *becomes* up-next, the position number scales 1 → 1.22 → 1 from its right edge while rising from 55% to full opacity. The delay is what makes this the *third* beat rather than a simultaneous one — it waits out the checkmark (800ms delay + 1000ms draw) instead of racing it. The delay is scoped with `:has(.just-introduced)` to renders that actually contain an introduction, because up-next also changes on a reorder or a departure, and those carry no checkmark to follow: an unconditional delay would strand the cue 1.8s after the gesture that caused it.
+### Completion Callout
 
-**The Sequenced-Not-Simultaneous Rule.** These three fire in a staggered order (background, then check, then the next row's cue). Firing them together would read as a single blink; staggering them lets the room follow the handoff.
+The one whole-room celebration. When everyone present has introduced themselves, a gold-wash callout appears with a one-shot 1200ms `callout-settle` arrival (fading in from a richer gold-mixed tint to the flat wash). `app.js` only rewrites the callout's `innerHTML` when its content actually changes, so the settle never replays on a poller re-render that changed nothing.
 
-### Stat Tile
+### Count Band
 
-Three tiles at the top: present count, introduced count, still-to-go count.
-
-- **Shape:** 10px radius, surface background (not paper, so it reads as data rather than a duplicate row).
-- **Number:** numeric typography (Atkinson Mono, 36px, tabular). Always ink color; never tinted to match status.
-- **Label:** label typography 10px below the number, muted-ink, sentence case.
-- **No border.** Tonal contrast with paper is the only delimiter. *Bordered stat tiles read as dashboard; these read as a ledger summary.*
-- **Internal padding:** 16px vertical, 20px horizontal (12px / 14px below 640px).
+- **Shape:** 10px radius, surface background, no border — tonal contrast is the only delimiter.
+- **Layout:** one flex row, three groups, shared baseline. Never three separate tiles — see the Counts-Are-a-Band Rule.
+- **Number:** Numeric typography, deep-blue (not ink) — the counts carry the brand color directly.
+- **Label:** Label typography, muted-ink, below the number (beside it, stacked, below 640px).
 
 ### Buttons
 
-- **Primary (`Add`):** ink fill, ink border, paper text, 6px radius, 10px / 16px padding, label typography. Hover: dim-ink fill and border.
-- **Ghost (`Randomize order`, `Reset session`, `Exit demo`):** paper background, dim-ink text, 1px hairline border. Hover: surface background, ink text, soft-line border.
-- **Icon-only (remove):** no background or border, 6px padding at every width, which puts the target at exactly 24px. The glyph is hint-ink on a paper row, and **steps up to muted-ink on the introduced and up-next fills** — hint-ink is 3.01:1 on paper but only 2.79:1 on surface and 2.81:1 on the tint, so a single value cannot serve all three. Hover shifts the glyph to clay-deep over a **paper** chip: on those two rows the surface chip is invisible, because surface *is* the row, and the tint sits within 1% of its luminance. The only place a destructive action gets warm, and it stays a tint rather than a red.
-- **No fourth button variant.** If you need another level of emphasis, use the text link.
+- **Primary (`Add`):** deep-blue fill and border, white text, 6px radius, 10px/16px padding, Label Strong typography. Hover: deep-blue-hover.
+- **Ghost (`Randomize order`, `Reset session`, `Exit demo`):** card background, dim-ink text, hairline border. Hover: surface background, ink text, soft-line border.
+- **Icon-only (remove):** no fill or border, 6px padding around the 12px glyph (24px visual target, the WCAG 2.5.8 minimum). On coarse pointers an invisible `::after` extension grows the hit area to 44px without moving the visual chip or the row layout.
+- **No third button variant.** The text link covers the next emphasis level down.
 
 ### Text Link
 
-The third emphasis level, used to re-offer the demo after first run.
+Re-offers the demo after first run.
 
-- **Style:** clay-deep text at caption size (13px, 500), underlined with a 3px underline offset, no background or border, 4px padding — enough to put the hit area at 28px, clear of the 24px minimum.
-- **Hover:** darkens to ink, the same direction the sponsor link travels. It used to brighten to clay, which dropped it to 4.00:1 — a hover state should not be the moment a link stops being readable. **Focus:** 2px clay outline at 2px offset.
+- **Style:** deep-blue text at caption size, underlined with a 3px offset, 4px padding (28px hit area, clear of the 24px minimum).
+- **Hover:** darkens to ink. **Focus:** 2px deep-blue outline, 2px offset.
 
 ### Inputs
 
-- **Shape:** 6px radius, 1px **hint-ink** border, paper background. Unlike a button, which announces itself with its own label and fill, a field's boundary is the only thing saying "type here" — so it answers to the 3:1 non-text floor that hairline (1.39:1) cannot meet. This is the one place the system uses a border darker than soft-line.
-- **Default:** ink text at body size, muted-ink placeholder, 10px / 14px padding.
-- **Focus:** border shifts to clay; no outline ring. The single color shift is the entire focus treatment.
-- **Prompt (display-size input):** the exception. A borderless, transparent, non-resizable `textarea` at Display size with a soft-line placeholder at weight 500. Because it has no border to shift, its focus treatment is a 2px clay outline at a generous 6px offset — the ring has to clear 44px-tall type without touching it.
-- **No error or disabled states yet** because the surface has no form validation; document them when added.
-
-### Waiting Callout
-
-The "coming up" frame naming who has not been introduced yet.
-
-- **Shape:** 10px radius, surface background (not clay-tinted; that would spotlight the people listed). No border — the tonal step is the whole delimiter, consistent with the stat tiles.
-- **Padding:** 14px vertical, 20px horizontal.
-- **Text:** body typography in dim-ink. The lead phrase is neutral and present-tense ("Coming up:"), names follow inline at weight 500. Comma-separated; never bulleted.
-- **No counter, no time-elapsed, no warning glyph.** This is a prompt to the host, not a public shame board.
+- **Shape:** 6px radius, 1px hint-ink border (not hairline — a bare field's boundary is its only "type here" signal, so it answers to the 3:1 non-text floor that hairline's 1.4:1 can't meet), card background.
+- **Default:** ink text, muted-ink placeholder, 10px/14px padding.
+- **Focus:** border shifts to deep-blue on any focus; keyboard focus (`:focus-visible`) additionally gets the system's full 2px deep-blue ring at 2px offset — the border shift alone was thinner than the system's own focus bar.
+- **Prompt (display-size):** the exception. Borderless, transparent, non-resizable, gold-bright placeholder and caret, a 2px gold-bright outline at a 6px offset on focus (wide enough to clear 44px-tall type without touching it).
 
 ### Demo-Mode Bar
 
-A banner that makes sample data unmistakable, so the room never mistakes a demo for a real meeting.
-
-- **Shape:** 10px radius, surface background, 1px **soft-line** border — the emphasized weight, because this is the one message that must not be missed from the back of the room.
-- **Content:** an 8px clay dot, a body-size 600-weight title ("Demo mode"), and a caption-size muted-ink note ("Sample data you can play with. Nothing is saved."), with a ghost button to exit at the far end.
-- **Padding:** 12px / 16px, 24px below the bar. Wraps rather than truncates on narrow screens.
-- *No clay background.* The accent rule holds even here: the dot and the border weight carry the warning.
+- **Shape:** 10px radius, gold-wash background, 1px sun-ink border — the one border in the system that isn't hairline/soft-line/deep-blue, because this message must not be missed.
+- **Content:** an 8px sun-ink dot (gold itself would be invisible on the gold wash, 1.5:1), a 600-weight body-size title, a caption-size muted-ink note, a ghost "Exit demo" button.
 
 ### Empty & First-Run State
 
-The empty roster is the onboarding surface; it has two forms.
-
-- **Ordinary empty** (a session with nobody in it yet): centered column, muted-ink body text, 48px / 24px padding, 12px gap, and a **dashed** hairline border — space waiting to be filled. Lede capped at 42ch.
-- **First run** (this browser has never seen the page): the same block switches to a **solid** hairline border and 48px / 32px padding, because it is content rather than an absence. It carries a headline-size title at weight 500, a dim-ink body at 50ch with `text-wrap: pretty` and a slightly opened 1.55 line-height, a 46ch caption footnote, and the demo call to action.
+- **Ordinary empty:** centered column, muted-ink body, 48px/24px padding, dashed hairline border — space waiting to be filled.
+- **First run:** solid hairline border, 48px/32px padding, a Headline-size title, a dim-ink body at 50ch/1.55 line-height, a 46ch caption footnote, and the demo call-to-action button.
 
 ### Live Dot
 
-- **Shape:** 7px circle, clay fill.
-- **Behavior:** a pseudo-element halo scales from the dot to 3.6× and fades out (2.4s loop, ease-out-quint). The only intentional ambient motion in the system, and the only thing on the page that moves without being asked.
-- **Composited, not painted.** Transform and opacity keep the halo off the paint path. See Elevation & Depth for why that is a design decision here and not a micro-optimisation.
-- **Reduced motion:** the halo is removed entirely and the dot stays solid. Nothing is lost — connection state is also in the adjacent word ("live" / "reconnecting"), which is the only reason the halo is allowed to be decorative in the first place.
+- **Shape:** 7px circle, gold fill on the deep-blue masthead (4.5:1).
+- **Behavior:** a composited pseudo-element halo scales to 3.6× and fades, 2.4s loop on glide.
+- **Reduced motion:** the halo is removed; the dot stays solid. Connection state is also carried by the adjacent word ("live" / "reconnecting").
 
 ### Sponsor Link
 
-- **Style:** a caption-size, 500-weight muted-ink link in a 6px-radius hairline-bordered pill (6px / 12px padding), centered on its own line 32px below the footer.
-- **Hover:** text to ink, border to clay.
-- **Plain link only.** Never the GitHub sponsors iframe: an embed phones home on every page load, which the privacy promise rules out.
+A caption-size, muted-ink link in a hairline-bordered pill, centered below the footer. Hover: text to ink, border to deep-blue. Plain link only — never an embedded iframe, which would phone home on every load.
 
 ## Do's and Don'ts
 
 ### Do
 
-- **Do** use Paper (`#faf7f2`) for the canvas and default row; Surface (`#f3eee5`) as the only second tonal layer. That two-step palette is the entire elevation system.
-- **Do** carry the introduced-vs-waiting distinction in *fill density + weight + icon* (paper→surface, regular→muted-ink, no checkmark→checkmark). The state must be legible on a deuteranopic monitor.
-- **Do** keep Clay accent under 10% of any rendered screen. Use it for the live dot, focus outlines, the host identity label, the up-next border, and the drag insertion line. Nowhere else.
-- **Do** step clay down to clay-deep wherever clay meets text, in either direction — behind paper-coloured text, or set as text itself.
-- **Do** measure a colour against the surface it will actually sit on, not against paper by default. Muted-ink reads 4.90:1 on paper but 4.53:1 on surface, and surface is the constraint that sets its value.
-- **Do** protect the name before any badge that decorates it. A `flex: none` tag inside the name column does not shrink, it evicts.
-- **Do** render every live-updating number in Atkinson Mono with `font-feature-settings: 'tnum'`. Numbers must not reflow their container.
-- **Do** keep every transition and animation on `cubic-bezier(0.22, 1, 0.36, 1)`. One curve, varying durations.
-- **Do** drop a column before wrapping a roster row: the timestamp goes first, the name never shrinks below Title size.
-- **Do** test every screen by downsampling a screenshot to 1280×720 and reading it from 2m away. If you can't read a row name or a count, the type is too small.
-- **Do** treat reduced-motion as a hard mode switch: the live dot loses its halo, and every animation and transition is cut to 0.001ms — **delays included** — so the roster updates instantly rather than gently. Check that each animated element's *end* state is what remains; an animation whose meaning lives in its final frame must be pinned there, not left to a fill mode.
+- **Do** use Ground (`#f4f9fd`) for the canvas and Card (`#ffffff`) for content surfaces; Surface (`#e3eef7`) is the only second tonal layer.
+- **Do** carry introduced-vs-waiting-vs-up-next through at least two non-hue signals together: fill + ink color + icon, or wash + border + size.
+- **Do** treat gold as a response to something happening, never a resting-state color. Deep blue is what the page looks like when nothing has happened yet.
+- **Do** keep every state transition on `--glide`. Reserve `--spring` for `tag-pop` and `pos-cue` only.
+- **Do** render every live-updating number in Atkinson Mono with tabular figures.
+- **Do** drop the timestamp and the up-next tag together below 640px; the name never shrinks below Title size.
+- **Do** zero animation *delays* as well as durations under reduced motion, and pin any animation whose meaning lives in its end state (the drawn checkmark) explicitly rather than trusting fill-mode.
+- **Do** test every screen downsampled to 1280×720, read from 2m away.
 
 ### Don't
 
-- **Don't** ship a dark theme variant. The page is screen-shared into lit conference rooms during business hours; dark-mode-by-default is the previous tracker's mistake and a category reflex.
-- **Don't** use `#fff` or `#000`. Every neutral is tinted toward the clay hue (chroma 0.005–0.022). Pure gray reads cold against the accent.
-- **Don't** use the green-vs-amber state vocabulary the previous tracker shipped with. Color-blind viewers can't distinguish them.
-- **Don't** reach for the generic SaaS dashboard idioms PRODUCT.md names: hero-metric tiles with gradient accents, identical icon+heading+text card grids, navy-and-indigo reflex palette.
-- **Don't** introduce gamified-leaderboard chrome: avatars, points, badges, "🎉 first to introduce!" animations, ordering by speed. Introductions are not a race; PRODUCT.md is explicit.
-- **Don't** mimic Zoom or Slack chrome. The page is shared *inside* Zoom; it should feel like a separate, calmer artifact, not an extension of the host app's UI.
-- **Don't** use `border-left` or `border-right` greater than 1px as a colored stripe on rows or callouts. Use full hairline borders or tonal background shifts instead.
-- **Don't** put the "still to go" people in a warning-colored frame. PRODUCT.md's "No spotlight on absence" principle forbids it.
-- **Don't** add a second breakpoint or a second easing curve. One of each is the system.
-- **Don't** animate layout properties, and keep ordinary state transitions in the 140–200ms band. The four named animations (`pulse`, `mark-flash`, `draw-check`, `pos-cue`) are the only sanctioned exceptions to that band, and adding a fifth requires retiring this rule rather than quietly widening it.
-- **Don't** uppercase a second string. The up-next tag holds that slot.
-- **Don't** set text in hairline or soft-line. They are border colours (1.39:1 and 1.75:1). If text needs to recede, muted-ink is the floor, and hint-ink only when the text is large or the mark is a control.
-- **Don't** add an icon font, decorative SVG illustration, or hero image. The page is text and state, by design.
+- **Don't** ship a dark theme. `color-scheme: only light` is set specifically to stop the browser from force-inverting the palette.
+- **Don't** use gold as a default UI color on any surface that isn't tied to a happy moment (up-next, completion, demo mode, selection).
+- **Don't** set text in hairline or soft-line — they are border-only colors (1.4:1 and 1.8:1).
+- **Don't** reach for `--bright-blue`; it is declared but unused in the shipped stylesheet. Give it a real role before treating it as part of the working palette.
+- **Don't** put a warning color, countdown, or shaming microcopy on anyone still "to go." PRODUCT.md's no-spotlight-on-absence principle forbids it.
+- **Don't** reach for the generic SaaS dashboard idioms PRODUCT.md names by name: hero-metric tiles, identical icon+heading+text card grids, a navy-and-indigo reflex palette.
+- **Don't** introduce gamified-leaderboard chrome: avatars, points, badges, celebration animations tied to speed. Introductions are not a race.
+- **Don't** mimic Zoom or Slack chrome. The page is shared *inside* Zoom; it should feel like a separate artifact.
+- **Don't** add a second breakpoint, a third border-escalation color, or a third motion curve. One of each beyond what's documented here means a component is confused about its own role.
+- **Don't** add a shadow anywhere but the pinned prompt band without first asking whether it's signaling something or just decorating.

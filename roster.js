@@ -58,7 +58,7 @@ export function assignPositions(participants) {
 // themselves. Listing "Coming up: …" here just duplicated the list.
 export function calloutHtml(present, waiting) {
   if (waiting.length === 0 && present.length > 0) {
-    return `<div class="callout">Everyone has introduced themselves.</div>`;
+    return `<div class="callout">Everyone has introduced themselves. Enjoy the meeting!</div>`;
   }
   return "";
 }
@@ -95,7 +95,10 @@ export function rowHtml(p, { positionByPid, upNextPid, upNextChanged, prevIntrod
   const cls = rowClass(p, { isUpNext, upNextChanged, justIntroduced });
   const hostBit = p.is_host ? `<span class="host-pill">host</span>` : "";
   const leftTag = p.present ? "" : `<span class="tag">left</span>`;
-  const upNextTag = isUpNext && !p.is_host ? `<span class="up-next-tag">up next</span>` : "";
+  // "you're up next" speaks to the person reading their own name off the
+  // shared screen; the tests pin the "up next" substring, which it keeps.
+  const upNextTag =
+    isUpNext && !p.is_host ? `<span class="up-next-tag">you&rsquo;re up next</span>` : "";
   return `
     <li class="${cls}" data-pid="${p.id}" ${rowDragAttrs(p)}>
       <div class="pos">${num}</div>

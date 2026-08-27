@@ -1,491 +1,280 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-30T15:44:23Z",
+  "generatedAt": "2026-08-27T04:16:51Z",
   "title": "Design System: Zoom Icebreaker Tracker",
   "extensions": {
     "colorMeta": {
-      "paper": {
+      "deep-blue": {
+        "role": "primary",
+        "displayName": "Deep Blue",
+        "canonical": "oklch(43.0% 0.100 241.0)",
+        "tonalRamp": ["#000830", "#002750", "#004772", "#1f6794", "#4589b9", "#68adde", "#8cd2ff", "#b1f8ff"]
+      },
+      "deep-blue-hover": {
+        "role": "primary",
+        "displayName": "Deep Blue Hover",
+        "canonical": "oklch(49.9% 0.119 242.1)",
+        "tonalRamp": ["#000537", "#002658", "#00467a", "#00679e", "#348ac3", "#5bade9", "#80d2ff", "#a5f9ff"]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Gold",
+        "canonical": "oklch(82.2% 0.169 78.5)",
+        "tonalRamp": ["#2b0000", "#4d0600", "#6f2d00", "#934f00", "#b77100", "#dd9500", "#ffba1e", "#ffdf56"]
+      },
+      "gold-bright": {
+        "role": "secondary",
+        "displayName": "Gold Bright",
+        "canonical": "oklch(87.7% 0.180 93.1)",
+        "tonalRamp": ["#230000", "#421700", "#633800", "#845900", "#a77c00", "#cca000", "#f1c400", "#ffea3e"]
+      },
+      "gold-wash": {
+        "role": "secondary",
+        "displayName": "Gold Wash",
+        "canonical": "oklch(96.4% 0.050 92.2)",
+        "tonalRamp": ["#130a00", "#2e2404", "#4b4122", "#6b6140", "#8d8260", "#b0a582", "#d4c9a5", "#faeec9"]
+      },
+      "sun-ink": {
+        "role": "secondary",
+        "displayName": "Sun Ink",
+        "canonical": "oklch(51.0% 0.108 74.2)",
+        "tonalRamp": ["#220000", "#421700", "#633600", "#855600", "#a8782d", "#cd9b53", "#f3bf77", "#ffe49b"]
+      },
+      "bright-blue": {
+        "role": "secondary",
+        "displayName": "Bright Blue (declared, unused)",
+        "canonical": "oklch(63.9% 0.142 239.7)",
+        "tonalRamp": ["#00003f", "#002561", "#004684", "#0068a8", "#008bce", "#3caff4", "#66d5ff", "#8efbff"]
+      },
+      "ground": {
         "role": "neutral",
-        "displayName": "Paper",
-        "canonical": "oklch(97.7% 0.007 81)",
-        "tonalRamp": [
-          "#0c0b09",
-          "#262522",
-          "#44423e",
-          "#63615d",
-          "#84827e",
-          "#a7a5a1",
-          "#cac9c6",
-          "#efeeec"
-        ]
+        "displayName": "Ground",
+        "canonical": "oklch(98.0% 0.008 241.7)",
+        "tonalRamp": ["#080c0e", "#222628", "#3f4346", "#5e6265", "#7e8386", "#a1a6a9", "#c5cace", "#eaeff3"]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#0b0b0b", "#252525", "#424242", "#616161", "#828282", "#a5a5a5", "#c9c9c9", "#eeeeee"]
       },
       "surface": {
         "role": "neutral",
         "displayName": "Surface",
-        "canonical": "oklch(95.1% 0.013 82)",
-        "tonalRamp": [
-          "#0d0b08",
-          "#272520",
-          "#45423b",
-          "#656159",
-          "#86827b",
-          "#a8a59f",
-          "#cbc9c4",
-          "#f0eeea"
-        ]
+        "canonical": "oklch(94.4% 0.017 242.4)",
+        "tonalRamp": ["#050c12", "#1e262d", "#3a434a", "#59636a", "#7a848c", "#9ca7af", "#c0cbd3", "#e5f0f9"]
       },
       "hairline": {
         "role": "neutral",
         "displayName": "Hairline",
-        "canonical": "oklch(87.0% 0.025 81)",
-        "tonalRamp": [
-          "#0e0b05",
-          "#29241b",
-          "#484135",
-          "#696051",
-          "#898174",
-          "#aba499",
-          "#cec8bf",
-          "#f2eee7"
-        ]
+        "canonical": "oklch(88.5% 0.028 239.7)",
+        "tonalRamp": ["#020d16", "#182731", "#344450", "#536470", "#748592", "#96a8b5", "#b9ccda", "#def2ff"]
       },
       "soft-line": {
         "role": "neutral",
         "displayName": "Soft Line",
-        "canonical": "oklch(79.9% 0.033 83)",
-        "tonalRamp": [
-          "#0f0a04",
-          "#2b2418",
-          "#494131",
-          "#6a604c",
-          "#8b816f",
-          "#aca495",
-          "#cfc8bc",
-          "#f3eee4"
-        ]
+        "canonical": "oklch(79.3% 0.051 238.2)",
+        "tonalRamp": ["#000d1e", "#07283b", "#26465a", "#45667b", "#66879e", "#88aac2", "#abcfe7", "#d0f4ff"]
       },
       "hint-ink": {
         "role": "neutral",
         "displayName": "Hint Ink",
-        "canonical": "oklch(65.1% 0.033 82)",
-        "tonalRamp": [
-          "#0f0a04",
-          "#2b2418",
-          "#4a4131",
-          "#6b604c",
-          "#8b816f",
-          "#ada495",
-          "#cfc8bc",
-          "#f3eee4"
-        ]
+        "canonical": "oklch(56.2% 0.045 234.1)",
+        "tonalRamp": ["#000d1b", "#0a2838", "#294656", "#476677", "#68879a", "#8aaabd", "#adcfe3", "#d2f4ff"]
       },
       "muted-ink": {
         "role": "neutral",
         "displayName": "Muted Ink",
-        "canonical": "oklch(53.3% 0.026 78)",
-        "tonalRamp": [
-          "#0e0a05",
-          "#2a241b",
-          "#484135",
-          "#696051",
-          "#8a8174",
-          "#aca498",
-          "#cec8bf",
-          "#f2eee7"
-        ]
+        "canonical": "oklch(47.5% 0.041 229.4)",
+        "tonalRamp": ["#000e19", "#0c2935", "#2a4654", "#496674", "#698796", "#8baaba", "#afcfdf", "#d3f4ff"]
       },
       "dim-ink": {
         "role": "neutral",
         "displayName": "Dim Ink",
-        "canonical": "oklch(37.9% 0.022 67)",
-        "tonalRamp": [
-          "#0f0a06",
-          "#2a241d",
-          "#494038",
-          "#6a5f55",
-          "#8a8077",
-          "#aca39b",
-          "#cfc8c1",
-          "#f3ede8"
-        ]
+        "canonical": "oklch(34.7% 0.048 233.7)",
+        "tonalRamp": ["#000d1c", "#072939", "#264658", "#456679", "#66889b", "#88abbf", "#abcfe4", "#d0f5ff"]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "oklch(25.1% 0.017 59)",
-        "tonalRamp": [
-          "#0e0a08",
-          "#292420",
-          "#48403b",
-          "#695f58",
-          "#89807a",
-          "#aba39e",
-          "#cec8c3",
-          "#f2edea"
-        ]
+        "canonical": "oklch(23.2% 0.052 239.1)",
+        "tonalRamp": ["#000d1e", "#07283c", "#26465b", "#45667c", "#65879f", "#87aac3", "#abcfe8", "#cff4ff"]
       },
-      "clay": {
-        "role": "primary",
-        "displayName": "Clay",
-        "canonical": "oklch(59.7% 0.152 35)",
-        "tonalRamp": [
-          "#240000",
-          "#4c0400",
-          "#771d03",
-          "#a5371a",
-          "#c46249",
-          "#e08c76",
-          "#fbb6a3",
-          "#ffe0d2"
-        ]
-      },
-      "clay-deep": {
-        "role": "primary",
-        "displayName": "Clay Deep",
-        "canonical": "oklch(50.6% 0.137 35)",
-        "tonalRamp": [
-          "#220000",
-          "#490b00",
-          "#73240f",
-          "#9f3e25",
-          "#be6650",
-          "#db8f7b",
-          "#f7b8a7",
-          "#ffe2d5"
-        ]
-      },
-      "up-next-tint": {
-        "role": "tertiary",
-        "displayName": "Up-Next Tint",
-        "canonical": "oklch(96.5% 0.04 44)",
-        "tonalRamp": [
-          "#130805",
-          "#31211a",
-          "#523c33",
-          "#755a4f",
-          "#957c72",
-          "#b5a097",
-          "#d7c5be",
-          "#f9ebe6"
-        ]
+      "sky-text": {
+        "role": "neutral",
+        "displayName": "Sky Text",
+        "canonical": "oklch(86.0% 0.078 227.2)",
+        "tonalRamp": ["#000e24", "#002b42", "#004962", "#276a83", "#4b8ca7", "#6eafcb", "#92d4f1", "#b7faff"]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Display",
-        "purpose": "Page title only. One per page."
-      },
-      "headline": {
-        "displayName": "Headline",
-        "purpose": "Lead phrases that need to sit between display and body, e.g. callout intros."
-      },
-      "title": {
-        "displayName": "Title",
-        "purpose": "Roster names. Two points above body because these are the words the room reads through a compressed feed."
-      },
-      "body": {
-        "displayName": "Body",
-        "purpose": "Prose — empty-state copy and the completion callout. Default non-numeric text that isn't a name."
-      },
-      "caption": {
-        "displayName": "Caption",
-        "purpose": "Header meta line, joined-at timestamps, empty-state footnotes. Secondary information the room can ignore."
-      },
-      "label": {
-        "displayName": "Label",
-        "purpose": "Small role text on stat tiles, tags, buttons, badges."
-      },
-      "numeric": {
-        "displayName": "Numeric",
-        "purpose": "Live-updating counts and tabular figures. Atkinson Mono with font-feature 'tnum'."
-      },
-      "numeric-compact": {
-        "displayName": "Numeric Compact",
-        "purpose": "Stat-tile counts below 640px, where three full-size numerals would crowd the row."
-      },
-      "numeric-row": {
-        "displayName": "Numeric Row",
-        "purpose": "The standing position number on each roster row."
-      },
-      "numeric-emphasis": {
-        "displayName": "Numeric Emphasis",
-        "purpose": "Position number on the up-next row only. Half the up-next signal; the tint is the other half."
-      },
-      "label-loud": {
-        "displayName": "Label Loud",
-        "purpose": "The up-next tag only — the one uppercase string, and dropped below 640px."
-      },
-      "numeric-caption": {
-        "displayName": "Numeric Caption",
-        "purpose": "Joined-at timestamps on roster rows. First thing dropped below 640px."
-      }
+      "display": { "displayName": "Display", "purpose": "The icebreaker prompt only, set in white on the deep-blue masthead. One per page." },
+      "headline": { "displayName": "Headline", "purpose": "First-run welcome title only." },
+      "title": { "displayName": "Title", "purpose": "Roster names at rest — the words the room reads through compressed video." },
+      "body": { "displayName": "Body", "purpose": "Prose: empty-state copy, the completion callout, the demo-bar title." },
+      "caption": { "displayName": "Caption", "purpose": "Secondary information: the masthead meta line, demo-bar note, footnotes." },
+      "label": { "displayName": "Label", "purpose": "Small roles: count labels, toggle text, host pill, left tag." },
+      "label-strong": { "displayName": "Label Strong", "purpose": "Button text, primary and ghost alike." },
+      "label-loud": { "displayName": "Label Loud", "purpose": "The up-next tag only — the system's one uppercase string." },
+      "numeric": { "displayName": "Numeric", "purpose": "The three big counts, set in deep-blue with tabular figures." },
+      "numeric-compact": { "displayName": "Numeric Compact", "purpose": "The counts below 640px." },
+      "numeric-row": { "displayName": "Numeric Row", "purpose": "The standing position number on an ordinary roster row." },
+      "numeric-emphasis": { "displayName": "Numeric Emphasis", "purpose": "The position number on the up-next row only." },
+      "numeric-caption": { "displayName": "Numeric Caption", "purpose": "The joined-at timestamp; first thing dropped below 640px." }
     },
-    "shadows": [],
-    "motion": [
+    "shadows": [
       {
-        "name": "ease-out-quint",
-        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "The system's only easing curve. Every transition and animation uses it."
-      },
-      {
-        "name": "t-fast",
-        "value": "140ms cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Default transition: hover, focus, toggle, border, drop-indicator opacity."
-      },
-      {
-        "name": "t-medium",
-        "value": "200ms cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Row transforms, where a longer settle reads as deliberate rather than twitchy."
-      },
-      {
-        "name": "pulse",
-        "value": "2400ms cubic-bezier(0.22, 1, 0.36, 1) infinite",
-        "purpose": "Live-dot halo spreading to 9px and fading out. The only ambient motion."
-      },
-      {
-        "name": "mark-flash",
-        "value": "3000ms cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "Introduced row settles from 16% clay in OKLAB through 7% to plain surface."
-      },
-      {
-        "name": "draw-check",
-        "value": "1000ms cubic-bezier(0.22, 1, 0.36, 1) 800ms forwards",
-        "purpose": "Checkmark draws itself via stroke-dashoffset 100 → 0, after the flash begins."
-      },
-      {
-        "name": "pos-cue",
-        "value": "520ms cubic-bezier(0.22, 1, 0.36, 1)",
-        "purpose": "New up-next position number scales 1 → 1.22 → 1 from its right edge."
+        "name": "prompt-pinned",
+        "value": "0 4px 16px rgba(0, 32, 51, 0.18)",
+        "purpose": "The system's only box-shadow. Announces that the sticky prompt band has detached from normal flow and pinned to the viewport top; transitions in from 0 4px 16px rgba(0,32,51,0) over 140ms."
       }
     ],
+    "motion": [
+      { "name": "glide", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Every state transition and most animations: hover, focus, toggle, border, drop-indicator, row-position glide, the completion gesture's three beats, the live-dot pulse, the callout settle." },
+      { "name": "spring", "value": "cubic-bezier(0.34, 1.56, 0.64, 1)", "purpose": "Reserved for exactly two celebration animations tied to the baton arriving: tag-pop and pos-cue. Nothing else uses it." },
+      { "name": "t-fast", "value": "140ms cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Default duration for hover, focus, toggle, border, and drop-indicator transitions." },
+      { "name": "t-medium", "value": "200ms cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Row transform duration; matches the JS-driven FLIP reorder glide in app.js exactly." }
+    ],
     "breakpoints": [
-      {
-        "name": "sm",
-        "value": "640px"
-      }
+      { "name": "sm", "value": "640px" }
     ]
   },
   "components": [
     {
-      "name": "Roster Row (default)",
-      "kind": "custom",
-      "refersTo": "roster-row",
-      "description": "A participant who has not been introduced yet. The system's signature component.",
-      "html": "<div class=\"ds-row\" tabindex=\"0\"><span class=\"ds-pos\">3</span><span class=\"ds-name\">Priya Shah</span><span class=\"ds-when\">10:04</span><button class=\"ds-toggle\">Mark introduced</button></div>",
-      "css": ".ds-row { display:grid; grid-template-columns:40px 1fr auto auto; align-items:center; gap:14px; border-radius:var(--rounded-sm,10px); padding:14px 18px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; background:var(--paper,#faf7f2); border:1px solid var(--hairline,#ddd3c2); color:var(--ink,#28201a); cursor:grab; outline:none; } .ds-row:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; } .ds-row .ds-pos { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:1.125rem; font-weight:500; line-height:1; font-feature-settings:'tnum' 1; text-align:right; user-select:none; color:var(--muted-ink,#756b5c); } .ds-row .ds-name { font-size:1.0625rem; font-weight:500; letter-spacing:-0.005em; color:var(--ink,#28201a); } .ds-row .ds-when { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:0.8125rem; font-feature-settings:'tnum' 1; color:var(--muted-ink,#756b5c); } .ds-row .ds-toggle { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--paper,#faf7f2); color:var(--muted-ink,#756b5c); border:1px solid var(--hairline,#ddd3c2); } .ds-row .ds-toggle:hover { border-color:var(--soft-line,#9a8e79); color:var(--ink,#28201a); } .ds-row .ds-toggle:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; }"
-    },
-    {
-      "name": "Roster Row (introduced)",
-      "kind": "custom",
-      "refersTo": "roster-row-introduced",
-      "description": "Already spoken. Surface fill, quieted ink, leading checkmark — no celebratory color.",
-      "html": "<div class=\"ds-row-done\"><span class=\"ds-pos\">1</span><span class=\"ds-name\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Marcus Feld</span><span class=\"ds-when\">10:01</span><button class=\"ds-toggle ds-on\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Introduced</button></div>",
-      "css": ".ds-row-done { display:grid; grid-template-columns:40px 1fr auto auto; align-items:center; gap:14px; border-radius:var(--rounded-sm,10px); padding:14px 18px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; background:var(--surface,#f3eee5); border:1px solid var(--hairline,#ddd3c2); color:var(--muted-ink,#756b5c); } .ds-row-done .ds-pos { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:1.125rem; font-weight:500; line-height:1; font-feature-settings:'tnum' 1; text-align:right; user-select:none; color:var(--soft-line,#9a8e79); } .ds-row-done .ds-name { font-size:1.0625rem; font-weight:500; letter-spacing:-0.005em; color:var(--muted-ink,#756b5c); display:flex; align-items:baseline; gap:10px; } .ds-row-done .ds-when { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:0.8125rem; font-feature-settings:'tnum' 1; color:var(--soft-line,#9a8e79); } .ds-row-done .ds-check { width:14px; height:14px; flex:none; } .ds-row-done .ds-toggle { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--ink,#28201a); color:var(--paper,#faf7f2); border:1px solid var(--ink,#28201a); } .ds-row-done .ds-toggle:hover { background:var(--dim-ink,#4a4036); border-color:var(--dim-ink,#4a4036); }"
-    },
-    {
-      "name": "Roster Row (up next)",
-      "kind": "custom",
-      "refersTo": "roster-row-up-next",
-      "description": "The hand to the next speaker: warm tint, clay border, bigger numeral and name, one uppercase tag.",
-      "html": "<div class=\"ds-row-next\"><span class=\"ds-pos\">4</span><span class=\"ds-name\">Daniel Okonkwo-Williams</span><span class=\"ds-next-tag\">up next</span><button class=\"ds-toggle\">Mark introduced</button></div>",
-      "css": ".ds-row-next { display:grid; grid-template-columns:40px 1fr auto auto; align-items:center; gap:14px; border-radius:var(--rounded-sm,10px); padding:18px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; background:var(--up-next-tint,oklch(96.5% 0.04 44)); border:1px solid var(--clay,#c9573a); color:var(--ink,#28201a); } .ds-row-next .ds-pos { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:1.125rem; font-weight:500; line-height:1; font-feature-settings:'tnum' 1; text-align:right; user-select:none; font-size:1.5rem; font-weight:600; color:var(--clay,#c9573a); } .ds-row-next .ds-name { font-size:1.25rem; font-weight:600; letter-spacing:-0.01em; color:var(--ink,#28201a); } .ds-row-next .ds-next-tag { font-size:0.75rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; padding:3px 9px; border-radius:var(--rounded-xs,6px); flex:none; background:var(--clay-deep,#a44128); color:var(--paper,#faf7f2); } .ds-row-next .ds-toggle { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--paper,#faf7f2); color:var(--muted-ink,#756b5c); border:1px solid var(--hairline,#ddd3c2); } .ds-row-next .ds-toggle:hover { border-color:var(--soft-line,#9a8e79); color:var(--ink,#28201a); }"
-    },
-    {
-      "name": "Introduced Toggle",
-      "kind": "button",
-      "refersTo": "toggle-default",
-      "description": "The host's primary interaction, shown off and on. Neutral by design: the fill flips, the hue does not.",
-      "html": "<span class=\"ds-toggle-demo\"><button class=\"ds-tg\">Mark introduced</button><button class=\"ds-tg ds-tg-on\"><svg class=\"ds-check\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M3 8.5 L6.5 12 L13 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Introduced</button></span>",
-      "css": ".ds-toggle-demo { display:inline-flex; gap:10px; align-items:center; } .ds-tg { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:8px 14px; border-radius:var(--rounded-xs,6px); display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); background:var(--paper,#faf7f2); color:var(--muted-ink,#756b5c); border:1px solid var(--hairline,#ddd3c2); } .ds-tg:hover { border-color:var(--soft-line,#9a8e79); color:var(--ink,#28201a); } .ds-tg:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; } .ds-tg-on { background:var(--ink,#28201a); color:var(--paper,#faf7f2); border-color:var(--ink,#28201a); } .ds-tg-on:hover { background:var(--dim-ink,#4a4036); border-color:var(--dim-ink,#4a4036); } .ds-tg .ds-check { width:14px; height:14px; flex:none; }"
-    },
-    {
-      "name": "Stat Tile",
-      "kind": "card",
-      "refersTo": "stat-tile",
-      "description": "One of three counts above the roster. Borderless: the tonal step is the only delimiter.",
-      "html": "<div class=\"ds-stat\"><div class=\"ds-stat-n\">7</div><div class=\"ds-stat-l\">In the room</div></div>",
-      "css": ".ds-stat { background:var(--surface,#f3eee5); border-radius:var(--rounded-sm,10px); padding:16px 20px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; } .ds-stat-n { font-family:'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-size:2.25rem; font-weight:500; line-height:1; letter-spacing:-0.01em; font-feature-settings:'tnum' 1; color:var(--ink,#28201a); } .ds-stat-l { margin-top:10px; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; color:var(--muted-ink,#756b5c); }"
-    },
-    {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Ink fill, paper text. Used for Add — the only affirmative action in the footer.",
-      "html": "<button class=\"ds-btn\">Add</button>",
-      "css": ".ds-btn { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:10px 16px; border-radius:var(--rounded-xs,6px); background:var(--ink,#28201a); color:var(--paper,#faf7f2); border:1px solid var(--ink,#28201a); cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn:hover { background:var(--dim-ink,#4a4036); border-color:var(--dim-ink,#4a4036); } .ds-btn:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; }"
+      "description": "The Add button and every other primary action. Deep-blue fill, white text.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Add</button>",
+      "css": ".ds-btn-primary { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--deep-blue, #005581); background: var(--deep-blue, #005581); color: #ffffff; cursor: pointer; transition: background 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-primary:hover { background: var(--deep-blue-hover, #0069a0); border-color: var(--deep-blue-hover, #0069a0); } .ds-btn-primary:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
     },
     {
       "name": "Ghost Button",
       "kind": "button",
       "refersTo": "button-ghost",
-      "description": "Paper fill, hairline border. Randomize order, Reset session, Exit demo.",
-      "html": "<button class=\"ds-btn-ghost\">Reset session</button>",
-      "css": ".ds-btn-ghost { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.75rem; font-weight:500; letter-spacing:0.04em; padding:10px 16px; border-radius:var(--rounded-xs,6px); background:var(--paper,#faf7f2); color:var(--dim-ink,#4a4036); border:1px solid var(--hairline,#ddd3c2); cursor:pointer; transition:background 140ms cubic-bezier(0.22, 1, 0.36, 1), color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-ghost:hover { background:var(--surface,#f3eee5); color:var(--ink,#28201a); border-color:var(--soft-line,#9a8e79); } .ds-btn-ghost:focus-visible { outline:2px solid var(--clay,#c9573a); outline-offset:2px; }"
+      "description": "Secondary actions: Randomize order, Reset session, Exit demo.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">Randomize order</button>",
+      "css": ".ds-btn-ghost { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--dim-ink, #1e3e4f); cursor: pointer; transition: background 140ms cubic-bezier(0.22,1,0.36,1), color 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-btn-ghost:hover { background: var(--surface, #e3eef7); color: var(--ink, #002033); border-color: var(--soft-line, #9ec1d9); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
     },
     {
-      "name": "Input Field",
-      "kind": "input",
-      "refersTo": "input-field",
-      "description": "Focus is a border shift to clay — no outline ring. The single color change is the whole treatment.",
-      "html": "<input class=\"ds-input\" placeholder=\"Add someone manually…\" />",
-      "css": ".ds-input { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.9375rem; color:var(--ink,#28201a); background:var(--paper,#faf7f2); border:1px solid var(--hairline,#ddd3c2); border-radius:var(--rounded-xs,6px); padding:10px 14px; min-width:0; transition:border-color 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-input::placeholder { color:var(--muted-ink,#756b5c); } .ds-input:focus { outline:none; border-color:var(--clay,#c9573a); }"
+      "name": "Introduced Toggle",
+      "kind": "button",
+      "refersTo": "toggle-default",
+      "description": "The host's primary per-person interaction. Shown at rest; add .on for the introduced state (deep-blue fill, white text).",
+      "html": "<button class=\"ds-toggle\" type=\"button\" aria-pressed=\"false\"><span>Mark introduced</span></button>",
+      "css": ".ds-toggle { font-family: inherit; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; padding: 8px 14px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--muted-ink, #44616f); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 140ms cubic-bezier(0.22,1,0.36,1), color 140ms cubic-bezier(0.22,1,0.36,1), border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-toggle:hover { border-color: var(--soft-line, #9ec1d9); color: var(--ink, #002033); } .ds-toggle.on { background: var(--deep-blue, #005581); color: #ffffff; border-color: var(--deep-blue, #005581); } .ds-toggle:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
     },
     {
-      "name": "Waiting Callout",
+      "name": "Up-Next Roster Row",
       "kind": "custom",
-      "refersTo": "callout-waiting",
-      "description": "Who is still to go. Surface fill, no border, no counter — a prompt to the host, not a shame board.",
-      "html": "<div class=\"ds-waiting\"><span class=\"ds-waiting-lead\">Coming up:</span> <span class=\"ds-waiting-names\">Priya Shah, Marcus Feld, Zoe Adeyemi</span></div>",
-      "css": ".ds-waiting { background:var(--surface,#f3eee5); border-radius:var(--rounded-sm,10px); padding:14px 20px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.9375rem; line-height:1.5; color:var(--dim-ink,#4a4036); } .ds-waiting-names { font-weight:500; color:var(--ink,#28201a); }"
+      "refersTo": "roster-row-up-next",
+      "description": "The signature component. The baton lands on this row: gold wash, 2px deep-blue frame, enlarged type — three signals at once, never hue alone.",
+      "html": "<div class=\"ds-row-upnext\"><div class=\"ds-pos\">3</div><div class=\"ds-name\">Priya Shah<span class=\"ds-tag\">you&rsquo;re up next</span></div></div>",
+      "css": ".ds-row-upnext { display: flex; align-items: center; gap: 14px; background: var(--gold-wash, #fff3ce); border: 2px solid var(--deep-blue, #005581); border-radius: 10px; padding: 17px; } .ds-pos { font-family: \"Atkinson Hyperlegible Mono\", ui-monospace, monospace; font-size: 1.5rem; font-weight: 700; color: var(--deep-blue, #005581); font-feature-settings: 'tnum' 1; } .ds-name { display: flex; align-items: baseline; gap: 10px; font-size: 1.25rem; font-weight: 700; color: var(--ink, #002033); } .ds-tag { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink, #002033); background: var(--gold, #ffb511); padding: 3px 9px; border-radius: 6px; }"
     },
     {
-      "name": "Live Dot",
+      "name": "Count Band",
       "kind": "custom",
-      "refersTo": "live-dot",
-      "description": "Connection state. The only ambient motion in the system, and now composited rather than painted.",
-      "html": "<span class=\"ds-dot\" aria-hidden=\"true\"></span><span class=\"ds-dot-label\">live</span>",
-      "css": ".ds-dot { position:relative; display:inline-block; width:7px; height:7px; border-radius:999px; background:var(--clay,#c9573a); } .ds-dot::after { content:''; position:absolute; inset:0; border-radius:inherit; background:var(--clay,#c9573a); opacity:0.45; animation:ds-pulse 2400ms cubic-bezier(0.22, 1, 0.36, 1) infinite; } @keyframes ds-pulse { 0% { transform:scale(1); opacity:0.45; } 70%, 100% { transform:scale(3.6); opacity:0; } } .ds-dot-label { font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; font-size:0.8125rem; color:var(--muted-ink,#756b5c); margin-left:8px; } @media (prefers-reduced-motion: reduce) { .ds-dot::after { animation:none; opacity:0; } }"
+      "refersTo": "count-band",
+      "description": "The three roster counts as one continuous flex row, never separate tiles — a direct rejection of the hero-metric-tile pattern.",
+      "html": "<div class=\"ds-counts\"><div class=\"ds-stat\"><div class=\"ds-stat-n\">5</div><div class=\"ds-stat-l\">In the room</div></div><div class=\"ds-stat\"><div class=\"ds-stat-n\">2</div><div class=\"ds-stat-l\">Introduced</div></div><div class=\"ds-stat\"><div class=\"ds-stat-n\">3</div><div class=\"ds-stat-l\">Still to go</div></div></div>",
+      "css": ".ds-counts { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; background: var(--surface, #e3eef7); border-radius: 10px; padding: 14px 20px; } .ds-stat { display: flex; align-items: baseline; gap: 10px; min-width: 0; } .ds-stat-n { font-family: \"Atkinson Hyperlegible Mono\", ui-monospace, monospace; font-size: 2.25rem; font-weight: 600; line-height: 1; letter-spacing: -0.01em; font-feature-settings: 'tnum' 1; color: var(--deep-blue, #005581); } .ds-stat-l { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em; color: var(--muted-ink, #44616f); }"
+    },
+    {
+      "name": "Completion Callout",
+      "kind": "custom",
+      "refersTo": "callout",
+      "description": "The one whole-room celebration, shown when everyone present has introduced themselves. Wears the gold wash; arrives with a one-shot 1200ms settle.",
+      "html": "<div class=\"ds-callout\">Everyone has introduced themselves &mdash; that&rsquo;s the whole room. Enjoy the meeting!</div>",
+      "css": ".ds-callout { background: var(--gold-wash, #fff3ce); border-radius: 10px; padding: 14px 20px; font-size: 0.9375rem; line-height: 1.5; color: var(--ink, #002033); }"
     },
     {
       "name": "Demo-Mode Bar",
       "kind": "custom",
       "refersTo": "demo-bar",
-      "description": "Makes sample data unmistakable from the back of the room. Soft-line border carries the warning; no clay fill.",
-      "html": "<div class=\"ds-demo\"><span class=\"ds-demo-label\"><span class=\"ds-demo-dot\" aria-hidden=\"true\"></span><span class=\"ds-demo-title\">Demo mode</span><span class=\"ds-demo-note\">Sample data you can play with. Nothing is saved.</span></span><button class=\"ds-btn-ghost\">Exit demo</button></div>",
-      "css": ".ds-demo { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; background:var(--surface,#f3eee5); border:1px solid var(--soft-line,#9a8e79); border-radius:var(--rounded-sm,10px); padding:12px 16px; font-family:'Atkinson Hyperlegible Next', system-ui, sans-serif; } .ds-demo-label { display:flex; align-items:center; gap:10px; flex-wrap:wrap; } .ds-demo-dot { width:8px; height:8px; border-radius:999px; background:var(--clay,#c9573a); flex:none; } .ds-demo-title { font-size:0.9375rem; font-weight:600; letter-spacing:-0.01em; color:var(--ink,#28201a); } .ds-demo-note { font-size:0.8125rem; color:var(--muted-ink,#756b5c); }"
+      "description": "Makes sample data unmistakable. The one border in the system that isn't hairline, soft-line, or deep-blue.",
+      "html": "<div class=\"ds-demo-bar\"><div class=\"ds-demo-label\"><span class=\"ds-demo-dot\" aria-hidden=\"true\"></span><span class=\"ds-demo-title\">Demo mode</span><span class=\"ds-demo-note\">Sample data you can play with. Nothing is saved.</span></div><button class=\"ds-demo-exit\" type=\"button\">Exit demo</button></div>",
+      "css": ".ds-demo-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; background: var(--gold-wash, #fff3ce); border: 1px solid var(--sun-ink, #8a5b00); border-radius: 10px; padding: 12px 16px; } .ds-demo-label { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } .ds-demo-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--sun-ink, #8a5b00); } .ds-demo-title { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; color: var(--ink, #002033); } .ds-demo-note { font-size: 0.8125rem; color: var(--muted-ink, #44616f); } .ds-demo-exit { font-family: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; padding: 10px 16px; border-radius: 6px; border: 1px solid var(--hairline, #c9dcea); background: var(--card, #ffffff); color: var(--dim-ink, #1e3e4f); cursor: pointer; } .ds-demo-exit:hover { background: var(--surface, #e3eef7); color: var(--ink, #002033); border-color: var(--soft-line, #9ec1d9); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Add-someone field. Border answers the 3:1 non-text floor since the field has no label of its own to lean on.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Add someone by name&hellip;\" />",
+      "css": ".ds-input { font-family: inherit; font-size: 0.9375rem; color: var(--ink, #002033); background: var(--card, #ffffff); border: 1px solid var(--hint-ink, #5b7a8c); padding: 10px 14px; border-radius: 6px; transition: border-color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-input::placeholder { color: var(--muted-ink, #44616f); } .ds-input:focus { outline: none; border-color: var(--deep-blue, #005581); }"
+    },
+    {
+      "name": "Text Link",
+      "kind": "custom",
+      "refersTo": "text-link",
+      "description": "The third emphasis level. Re-offers the demo after first run.",
+      "html": "<button class=\"ds-text-link\" type=\"button\">Try the demo</button>",
+      "css": ".ds-text-link { font-family: inherit; font-size: 0.8125rem; font-weight: 500; color: var(--deep-blue, #005581); background: none; border: 0; padding: 4px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; border-radius: 6px; transition: color 140ms cubic-bezier(0.22,1,0.36,1); } .ds-text-link:hover { color: var(--ink, #002033); } .ds-text-link:focus-visible { outline: 2px solid var(--deep-blue, #005581); outline-offset: 2px; }"
+    },
+    {
+      "name": "Masthead Live Meta",
+      "kind": "custom",
+      "refersTo": "masthead-band",
+      "description": "The live-status line on the full-bleed deep-blue masthead: a gold dot with a composited pulse halo, plus sky-text meta.",
+      "html": "<div class=\"ds-meta\"><span class=\"ds-dot\" aria-hidden=\"true\"></span><span>live</span></div>",
+      "css": ".ds-meta { display: inline-flex; align-items: center; gap: 14px; font-size: 0.8125rem; color: var(--sky-text, #9adcf9); background: var(--deep-blue, #005581); padding: 10px 16px; border-radius: 6px; } .ds-dot { position: relative; width: 7px; height: 7px; border-radius: 999px; background: var(--gold, #ffb511); } .ds-dot::after { content: \"\"; position: absolute; inset: 0; border-radius: inherit; background: var(--gold, #ffb511); opacity: 0.45; animation: ds-pulse 2.4s cubic-bezier(0.22,1,0.36,1) infinite; } @keyframes ds-pulse { 0% { transform: scale(1); opacity: 0.45; } 70%, 100% { transform: scale(3.6); opacity: 0; } }"
     }
   ],
   "narrative": {
-    "northStar": "The Quiet Operator",
-    "overview": "A small, considered utility that helps the host of a meeting without performing. Every choice on the page is in service of two simultaneous audiences: the host clicking up close, and the whole room watching the screen-share from across a Zoom feed. Nothing is decorative; nothing competes with the conversation in the room.\n\nThe system is light, warm, and restrained. Paper-coded neutrals (faintly warm, never bleached white) carry the canvas. A single sans-serif (Atkinson Hyperlegible Next) handles every text role; tabular numerics use its matching mono. One accent, clay terracotta, exists for moments of attention (live indicator, focus outlines, identity badges) and is deliberately absent from the state vocabulary itself. State is read through fill density and weight, not color. The design wants to be remembered for *not* getting in the way.\n\nThis system explicitly rejects the gravitational pulls of its category: the dark-navy-and-amber dashboard look the current tracker shipped with, the gamified leaderboard chrome (avatars, points, badges), and the generic SaaS hero-metric template. It also rejects the obvious icebreaker-orange reflex; the warm accent here is clay, not pumpkin.",
+    "northStar": "Clear Sky, Gold Baton",
+    "overview": "A round-robin tracker rebuilt as a clear California day. One deep-blue masthead — the band that holds the live indicator and the icebreaker prompt — bleeds full-width across the top of the page and owns every primary control below it. Gold appears nowhere as decoration; it exists for exactly one job, marking whoever holds the baton right now: the up-next row, the completion callout, the demo-mode bar, text selection. Everything else on the page is sky-tinted blue-on-white, calm enough to sit in the corner of a meeting without competing with the conversation in the room.\n\nThis system explicitly retires two prior worlds rather than blending with either: the beige-ledger warm-paper system it replaced (clay accent, paper neutrals, no blue at all), and the navy-dashboard reflex the category defaults to. Neither survives in any token here. The palette is airy and blue rather than warm and paper-toned; the accent is a genuine gold rather than a clay terracotta; and for the first time the system gives its primary color — deep blue — a full-bleed structural role (the masthead) rather than confining it to small controls.\n\nState is still never read through hue alone. Introduced vs. waiting pairs a fill change with an ink-color shift and a checkmark icon; up-next pairs a wash, a 2px deep-blue frame, and larger type, three signals at once. Motion carries exactly two curves: a glide that moves every piece of state, and a spring reserved for precisely two celebration animations. The design wants the room to find the next speaker in one glance and the host to never wonder what a color means.",
     "keyCharacteristics": [
-      "Light theme, warm paper neutrals, never #fff",
-      "Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics",
-      "Type is self-hosted, never fetched: the face is part of the build, not a CDN request",
-      "One accent (clay), used sparingly and never as a state carrier",
-      "Flat by default: no shadows, tonal layering only",
-      "Restrained motion: state transitions, plus three short completion gestures — never decoration",
-      "Screen-share legibility is the design's first audience"
+      "Sky-tinted ground (#f4f9fd), never gray, never warm paper",
+      "Full-bleed deep-blue masthead owns the live indicator, the prompt, and every primary button",
+      "Gold is reserved for happy moments only: up-next, completion, demo mode, selection — never a default UI color",
+      "Single sans family (Atkinson Hyperlegible Next), single mono (Atkinson Hyperlegible Mono) for numerics, both self-hosted",
+      "One functional shadow in the entire stylesheet (the pinned prompt band); everything else is flat",
+      "Two motion curves: glide for all state, spring for exactly two one-shot celebrations",
+      "No dark theme, ever — the page ships color-scheme: only light specifically to stop browsers from force-inverting it",
+      "Screen-share legibility at 720p is the design's first audience"
     ],
     "rules": [
-      {
-        "name": "The One Curve Rule",
-        "body": "Every transition and animation in the system uses cubic-bezier(0.22, 1, 0.36, 1). A second easing curve is a second voice; add duration instead.",
-        "section": "overview"
-      },
-      {
-        "name": "The Restrained Accent Rule",
-        "body": "Clay covers ≤10% of any rendered screen. If you find yourself reaching for a second accent, you're solving the wrong problem. Add weight, label, or tone instead.",
-        "section": "colors"
-      },
-      {
-        "name": "The Tinted-Neutral Rule",
-        "body": "Every neutral carries chroma between 0.007 and 0.033 in OKLCH, in a hue band of 59–83 — warmer and yellower than clay itself, which sits at hue 35. Pure-gray neutrals are forbidden; they break the warm-paper feel and read as cold against the accent. The Up-Next Tint (chroma 0.04, hue 44) is the one sanctioned exception and is not a neutral: it is a state surface, and adding a second one requires retiring this rule rather than quietly widening it.",
-        "section": "colors"
-      },
-      {
-        "name": "The No-Hue-Borne-State Rule",
-        "body": "Introduced vs. waiting is never carried by hue alone. State pairs fill density (paper vs. surface), weight (regular vs. medium), and an explicit icon. A deuteranopic viewer must distinguish the two on first glance.",
-        "section": "colors"
-      },
-      {
-        "name": "The Clay-Deep-For-Text Rule",
-        "body": "Wherever clay meets text — behind it or as it — the darker step does the work. Paper text on plain clay fails 4.5:1, and plain clay as 12px text is 4.00:1, which is the same failure wearing the other hat. Clay-deep passes both directions (5.84:1 on paper), and the two are close enough in hue that nothing reads as a second accent. Plain clay is therefore reserved for what it was always for: borders, the live dot, focus rings, and the up-next numeral at display size, where the 3:1 floor applies.",
-        "section": "colors"
-      },
-      {
-        "name": "The Three-Ink Floor Rule",
-        "body": "Text answers to exactly three inks, and which one is legal depends only on size and role: ink and dim-ink anywhere, muted-ink for anything secondary, and hint-ink only for large text or a graphical control. Hairline and soft-line are borders. If a design needs a fourth, lighter ink, what it actually needs is less text.",
-        "section": "colors"
-      },
-      {
-        "name": "The One-Family Rule",
-        "body": "Atkinson Hyperlegible Next (plus Atkinson Hyperlegible Mono for numerics) is the entire type system. No serif display, no second sans, no icon font carrying glyph weight. Two pairings are retired and must not return: Fraunces + IBM Plex Mono, and the Geist pair that replaced it — the latter was declared but never actually delivered, so the design only existed on machines that happened to have it installed.",
-        "section": "typography"
-      },
-      {
-        "name": "The Tabular Numerics Rule",
-        "body": "Every number that updates live (counts on stat tiles, position numbers, the joined-at timestamp) is rendered in Atkinson Mono with font-feature-settings: 'tnum'. Numbers must not reflow their container when they tick.",
-        "section": "typography"
-      },
-      {
-        "name": "The Self-Hosted Type Rule",
-        "body": "The face ships from this repo (fonts/, latin subset, ~50KB) and is never fetched from a CDN. Two reasons, and both are binding: a webfont request would break the promise that nothing leaves your machine, and a face that is merely named renders only for whoever already has it. If you change the typeface, you ship the file — declaring a family you do not deliver is the bug this rule exists to prevent.",
-        "section": "typography"
-      },
-      {
-        "name": "The Screen-Share Floor Rule",
-        "body": "Body type never goes below 15px. Labels never go below 12px. Anything smaller dies in the 1080p video pipeline. Test by downsampling a screenshot to 1280×720 and reading from 2m away.",
-        "section": "typography"
-      },
-      {
-        "name": "The One Uppercase Rule",
-        "body": "Exactly one string in the system is uppercase: the up-next tag. Uppercase is a shout, and a page shared into a meeting gets one.",
-        "section": "typography"
-      },
-      {
-        "name": "The One Breakpoint Rule",
-        "body": "The system has exactly one breakpoint: 640px. Everything above it is one layout that flexes; everything below is the same layout with one column removed per grid. A second breakpoint means the column was never right.",
-        "section": "layout"
-      },
-      {
-        "name": "The Row-Never-Wraps Rule",
-        "body": "A roster row is one line at every width. When space runs out, drop something — never wrap, never shrink the name below Title size. The give-up order is fixed: timestamp first, then the up-next tag, and the name never. Anything flex: none sitting inside the name column is a candidate for that list, because it does not shrink — it evicts.",
-        "section": "layout"
-      },
-      {
-        "name": "The Flat-By-Default Rule",
-        "body": "Surfaces are flat at rest. If something needs to read as raised, switch its background from paper to surface (tonal layering), don't apply a shadow.",
-        "section": "elevation"
-      },
-      {
-        "name": "The No-Decorative-Glow Rule",
-        "body": "Backdrop blurs, soft radial-gradient bloom behind hero text, \"glow-on-hover\" effects: forbidden. They survive a Figma file; they don't survive a screen-share.",
-        "section": "elevation"
-      },
-      {
-        "name": "The Two-Radius Rule",
-        "body": "Containers get 10px, controls get 6px. A third radius means a component is confused about which it is. The pill is reserved for annotations and dots.",
-        "section": "shapes"
-      },
-      {
-        "name": "The Border-Carries-State Rule",
-        "body": "Reach for border color before background color when marking attention: hairline → soft-line → clay is the escalation ladder, and it survives compressed video better than a fill change of the same magnitude.",
-        "section": "shapes"
-      },
-      {
-        "name": "The Sequenced-Not-Simultaneous Rule",
-        "body": "These three fire in a staggered order (background, then check, then the next row's cue). Firing them together would read as a single blink; staggering them lets the room follow the handoff.",
-        "section": "components"
-      }
+      { "name": "The Glide-Everywhere, Spring-Once Rule", "body": "If it isn't tag-pop or pos-cue, it moves on glide. A third animation reaching for spring needs a reason as strong as \"the baton just landed here\".", "section": "motion" },
+      { "name": "The Sequenced-Not-Simultaneous Rule", "body": "Marking someone introduced fires three beats in order, not at once: background settle, then checkmark draw, then — only if a new person becomes up-next — their position number and tag, delayed to 1800ms and scoped with :has(.just-introduced).", "section": "motion" },
+      { "name": "The Gold-Under-Ink Rule", "body": "Gold never carries text on a light ground by itself. It is either a surface that ink sits on top of, or a mark against deep blue — never the text color itself against a light background.", "section": "colors" },
+      { "name": "The No-Hue-Alone Rule", "body": "Introduced vs. waiting vs. up-next is never read through color alone. Each state pairs a fill change with an ink-color shift and an icon, or a wash with a border and a size change.", "section": "colors" },
+      { "name": "Blue Owns the Structure, Gold Owns the Moment", "body": "Deep blue is the default state of every primary control and the masthead field, present at rest. Gold only appears in response to something happening. A new element with nothing to celebrate reaches for deep blue or a neutral, never gold.", "section": "colors" },
+      { "name": "The Three-Ink Floor Rule", "body": "Text answers to exactly three inks depending on role: ink and dim-ink anywhere, muted-ink for secondary text, hint-ink only for a graphical control glyph or where the 3:1 floor applies. Hairline and soft-line are borders only.", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Atkinson Hyperlegible Next plus Atkinson Hyperlegible Mono is the entire type system. No serif, no second sans, no icon font carrying glyph weight.", "section": "typography" },
+      { "name": "The Tabular Numerics Rule", "body": "Every number that updates live renders in Atkinson Mono with font-feature-settings: 'tnum' 1. Numbers must not reflow their container.", "section": "typography" },
+      { "name": "The Self-Hosted Type Rule", "body": "Both faces ship from fonts/ as the latin subset, preloaded from index.html, and are never fetched from a CDN.", "section": "typography" },
+      { "name": "The Screen-Share Floor Rule", "body": "Body type never goes below 15px; labels never go below 12px. Test by downsampling a screenshot to 1280x720 and reading it from 2m away.", "section": "typography" },
+      { "name": "The One Uppercase Rule", "body": "Exactly one string in the system is uppercase: the up-next tag, also the single heaviest label weight (700) in the scale.", "section": "typography" },
+      { "name": "The Counts-Are-a-Band Rule", "body": "The three counts render as one continuous flex row on a shared baseline, never as three separate tiles — a direct rejection of PRODUCT.md's named hero-metric-tile anti-reference.", "section": "layout" },
+      { "name": "The One Breakpoint Rule", "body": "The system has exactly one breakpoint: 640px. Above it, one layout flexes; below it, the same layout drops columns.", "section": "layout" },
+      { "name": "The Row-Never-Wraps Rule", "body": "A roster row stays one line at every width. Below 640px, the timestamp and the up-next tag are both dropped simultaneously so the row keeps its shape; the name never shrinks below Title size.", "section": "layout" },
+      { "name": "The One Functional Shadow Rule", "body": "The system's only shadow exists to announce that the sticky prompt band has detached from normal flow. It is not decorative and does not appear anywhere else.", "section": "elevation" },
+      { "name": "The No-Decorative-Glow Rule", "body": "Backdrop blurs, ambient bloom, hover glows: none survive a screen-share, so none are in the system.", "section": "elevation" },
+      { "name": "The Two-Radius Rule", "body": "Containers get 10px, controls get 6px. The pill is reserved for annotations and dots.", "section": "shapes" },
+      { "name": "The Border Escalation Rule", "body": "Reach for border color before background color when marking attention: hairline to soft-line to deep-blue is the fixed ladder. Up-next skips straight to deep-blue at 2px because it is the page's single most important signal.", "section": "shapes" }
     ],
     "dos": [
-      "Do use Paper (#faf7f2) for the canvas and default row; Surface (#f3eee5) as the only second tonal layer. That two-step palette is the entire elevation system.",
-      "Do carry the introduced-vs-waiting distinction in *fill density + weight + icon* (paper→surface, regular→muted-ink, no checkmark→checkmark). The state must be legible on a deuteranopic monitor.",
-      "Do keep Clay accent under 10% of any rendered screen. Use it for the live dot, focus outlines, the host identity label, the up-next border, and the drag insertion line. Nowhere else.",
-      "Do step clay down to clay-deep wherever clay meets text, in either direction — behind paper-coloured text, or set as text itself.",
-      "Do measure a colour against the surface it will actually sit on, not against paper by default. Muted-ink reads 4.90:1 on paper but 4.53:1 on surface, and surface is the constraint that sets its value.",
-      "Do protect the name before any badge that decorates it. A flex: none tag inside the name column does not shrink, it evicts.",
-      "Do render every live-updating number in Atkinson Mono with font-feature-settings: 'tnum'. Numbers must not reflow their container.",
-      "Do keep every transition and animation on cubic-bezier(0.22, 1, 0.36, 1). One curve, varying durations.",
-      "Do drop a column before wrapping a roster row: the timestamp goes first, the name never shrinks below Title size.",
-      "Do test every screen by downsampling a screenshot to 1280×720 and reading it from 2m away. If you can't read a row name or a count, the type is too small.",
-      "Do treat reduced-motion as a hard mode switch: the live dot loses its halo, and every animation and transition is cut to 0.001ms — delays included — so the roster updates instantly rather than gently. Check that each animated element's *end* state is what remains; an animation whose meaning lives in its final frame must be pinned there, not left to a fill mode."
+      "Do use Ground (#f4f9fd) for the canvas and Card (#ffffff) for content surfaces; Surface (#e3eef7) is the only second tonal layer.",
+      "Do carry introduced-vs-waiting-vs-up-next through at least two non-hue signals together: fill + ink color + icon, or wash + border + size.",
+      "Do treat gold as a response to something happening, never a resting-state color. Deep blue is what the page looks like when nothing has happened yet.",
+      "Do keep every state transition on --glide. Reserve --spring for tag-pop and pos-cue only.",
+      "Do render every live-updating number in Atkinson Mono with tabular figures.",
+      "Do drop the timestamp and the up-next tag together below 640px; the name never shrinks below Title size.",
+      "Do zero animation delays as well as durations under reduced motion, and pin any animation whose meaning lives in its end state explicitly rather than trusting fill-mode.",
+      "Do test every screen downsampled to 1280x720, read from 2m away."
     ],
     "donts": [
-      "Don't ship a dark theme variant. The page is screen-shared into lit conference rooms during business hours; dark-mode-by-default is the previous tracker's mistake and a category reflex.",
-      "Don't use #fff or #000. Every neutral is tinted toward the clay hue (chroma 0.005–0.022). Pure gray reads cold against the accent.",
-      "Don't use the green-vs-amber state vocabulary the previous tracker shipped with. Color-blind viewers can't distinguish them.",
-      "Don't reach for the generic SaaS dashboard idioms PRODUCT.md names: hero-metric tiles with gradient accents, identical icon+heading+text card grids, navy-and-indigo reflex palette.",
-      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, \"🎉 first to introduce!\" animations, ordering by speed. Introductions are not a race; PRODUCT.md is explicit.",
-      "Don't mimic Zoom or Slack chrome. The page is shared *inside* Zoom; it should feel like a separate, calmer artifact, not an extension of the host app's UI.",
-      "Don't use border-left or border-right greater than 1px as a colored stripe on rows or callouts. Use full hairline borders or tonal background shifts instead.",
-      "Don't put the \"still to go\" people in a warning-colored frame. PRODUCT.md's \"No spotlight on absence\" principle forbids it.",
-      "Don't add a second breakpoint or a second easing curve. One of each is the system.",
-      "Don't animate layout properties, and keep ordinary state transitions in the 140–200ms band. The four named animations (pulse, mark-flash, draw-check, pos-cue) are the only sanctioned exceptions to that band, and adding a fifth requires retiring this rule rather than quietly widening it.",
-      "Don't uppercase a second string. The up-next tag holds that slot.",
-      "Don't set text in hairline or soft-line. They are border colours (1.39:1 and 1.75:1). If text needs to recede, muted-ink is the floor, and hint-ink only when the text is large or the mark is a control.",
-      "Don't add an icon font, decorative SVG illustration, or hero image. The page is text and state, by design."
+      "Don't ship a dark theme. color-scheme: only light is set specifically to stop the browser from force-inverting the palette.",
+      "Don't use gold as a default UI color on any surface that isn't tied to a happy moment (up-next, completion, demo mode, selection).",
+      "Don't set text in hairline or soft-line — they are border-only colors (1.4:1 and 1.8:1).",
+      "Don't reach for --bright-blue; it is declared but unused in the shipped stylesheet. Give it a real role before treating it as part of the working palette.",
+      "Don't put a warning color, countdown, or shaming microcopy on anyone still \"to go.\" PRODUCT.md's no-spotlight-on-absence principle forbids it.",
+      "Don't reach for the generic SaaS dashboard idioms PRODUCT.md names by name: hero-metric tiles, identical icon+heading+text card grids, a navy-and-indigo reflex palette.",
+      "Don't introduce gamified-leaderboard chrome: avatars, points, badges, celebration animations tied to speed.",
+      "Don't mimic Zoom or Slack chrome. The page is shared inside Zoom; it should feel like a separate artifact.",
+      "Don't add a second breakpoint, a third border-escalation color, or a third motion curve.",
+      "Don't add a shadow anywhere but the pinned prompt band without first asking whether it's signaling something or just decorating."
     ]
   }
 }
