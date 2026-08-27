@@ -375,6 +375,18 @@ describe("accessibility of dynamic updates", () => {
     expect(document.activeElement.className).toContain("toggle");
   });
 
+  // Marking someone introduced re-ranks their row below everyone still waiting.
+  // A bare focus() would scroll that new position into view, dragging the
+  // shared screen to the bottom of the roster mid-meeting.
+  it("restores focus without scrolling the page to the row's new position", () => {
+    seed();
+    document.querySelector('.toggle[data-pid="b"]').focus();
+    const focusSpy = vi.spyOn(HTMLElement.prototype, "focus");
+    renderWith(introduce("b"));
+    // Exactly one focus call, and it opts out of scrolling.
+    expect(focusSpy.mock.calls).toEqual([[{ preventScroll: true }]]);
+  });
+
   it("leaves focus alone when it was never inside the roster", () => {
     seed();
     document.getElementById("addName").focus();
