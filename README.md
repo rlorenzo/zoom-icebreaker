@@ -72,6 +72,9 @@ you tap one button per person as they speak.
 - **A prompt and the order you want** — set an icebreaker prompt at the top of
   the page, drag a still-to-go row (or focus it and press ↑/↓) to move someone,
   or hit **Randomize order**. People who have already gone keep their number.
+- **Four themes** — Clear sky (the default), Dawn, Golden hour, and After
+  dark, picked from the row below the roster. Your choice is remembered in
+  this browser (localStorage) for next time.
 - **Private by design** — no account, no history, and nothing sent anywhere.
   In the local app, state lives only in memory and is gone when you stop the
   process; the hosted version keeps it in your browser (localStorage) so a

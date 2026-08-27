@@ -9,6 +9,7 @@ import {
   sortForDisplay,
 } from "./roster.js";
 import { isReorderable, permuteReorderable } from "./session.js";
+import { initTheme } from "./theme.js";
 
 // ---- state cache & helpers --------------------------------------
 let state = { participants: [], prompt: "", startedAt: Date.now() };
@@ -580,6 +581,7 @@ export async function init() {
   wirePrompt();
   wireRosterActions();
   wireFooter();
+  initTheme();
   activeTransport = (await hasServer()) ? serverTransport() : localTransport(createEngine());
   markTransportReady(activeTransport);
   activeTransport.subscribe(onLiveSnapshot);

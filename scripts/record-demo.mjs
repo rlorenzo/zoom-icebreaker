@@ -47,10 +47,12 @@ await page.reload({ waitUntil: "domcontentloaded" });
 await page.getByRole("button", { name: "Try a demo" }).click();
 
 // Clean "real app" framing: drop the demo banner (it's just a recording aid),
-// the footer, and the external sponsor so the clip is all live roster.
+// the footer, the theme picker, and the external sponsor so the clip is all
+// live roster.
 await page.evaluate(() => {
   document.getElementById("demoBar")?.style.setProperty("display", "none");
   document.querySelector("footer")?.style.setProperty("display", "none");
+  document.querySelector(".theme-bar")?.style.setProperty("display", "none");
   document.querySelector(".sponsor-bar")?.style.setProperty("display", "none");
 });
 
