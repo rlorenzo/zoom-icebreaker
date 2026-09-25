@@ -1022,14 +1022,19 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _read_json(self) -> dict[str, Any]:
-        # In every branch below, the body (if any) is left unread, so the
-        # connection is closed rather than kept alive: an un-consumed body
-        # would desync whatever request comes next on this socket.
+    def _content_length(self, *, required: bool) -> int:
+        # In every error branch below, the body (if any) is left unread, so
+        # the connection is closed rather than kept alive: an un-consumed
+        # body would desync whatever request comes next on this socket.
+        # `required=False` lets a bodyless endpoint treat "no header at
+        # all" as "nothing to read" while still rejecting a malformed or
+        # oversized one instead of silently ignoring it.
         raw = self.headers.get("Content-Length")
         if raw is None:
-            self.close_connection = True
-            raise _RequestError(400, "missing Content-Length")
+            if required:
+                self.close_connection = True
+                raise _RequestError(400, "missing Content-Length")
+            return 0
         try:
             n = int(raw)
         except ValueError:
@@ -1041,11 +1046,22 @@ class Handler(BaseHTTPRequestHandler):
         if n > 1024 * 1024:  # 1MB limit
             self.close_connection = True
             raise _RequestError(413, "payload too large")
+        return n
+
+    def _read_json(self) -> dict[str, Any]:
+        n = self._content_length(required=True)
         try:
             data = json.loads(self.rfile.read(n) or b"{}")
             return data if isinstance(data, dict) else {}
         except Exception:
             return {}
+
+    def _discard_body(self) -> None:
+        """Drain any body sent to an endpoint that doesn't use one, so
+        leftover bytes can't desync the next request on this socket."""
+        n = self._content_length(required=False)
+        if n:
+            self.rfile.read(n)
 
     def _serve_index(self) -> bool:
         if self.path != "/" and not self.path.startswith("/index"):
@@ -1142,6 +1158,7 @@ class Handler(BaseHTTPRequestHandler):
         self._json(200, {"ok": True})
 
     def _post_randomize(self) -> None:
+        self._discard_body()
         STATE.randomize()
         self._json(200, {"ok": True})
 
@@ -1153,6 +1170,7 @@ class Handler(BaseHTTPRequestHandler):
         self._json(200, {"ok": True})
 
     def _post_reset(self) -> None:
+        self._discard_body()
         STATE.reset()
         self._json(200, {"ok": True})
 
@@ -1162,6 +1180,7 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "host":
             ok = STATE.set_host(pid, bool(self._read_json().get("host")))
         else:  # remove
+            self._discard_body()
             STATE.remove(pid)
             ok = True
         self._json(200 if ok else 404, {"ok": ok})

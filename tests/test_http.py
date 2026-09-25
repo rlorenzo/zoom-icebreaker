@@ -75,6 +75,44 @@ def _get_full(url):
         return resp.status, resp.headers.get("Content-Type"), resp.read()
 
 
+def _read_status_line(sock):
+    """Read from a raw socket until the first CRLF: a single recv() can
+    return a partial line, so splitting on the first recv() alone is
+    flaky on a slow or segmented connection."""
+    buf = b""
+    while b"\r\n" not in buf:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        buf += chunk
+    return buf.split(b"\r\n", 1)[0]
+
+
+def _read_one_response(sock, buf=b""):
+    """Read one full HTTP response (status line + headers + body) off a
+    raw keep-alive socket, returning (status_line, body, leftover) where
+    leftover is any already-buffered bytes belonging to the *next*
+    response on the same connection."""
+    while b"\r\n\r\n" not in buf:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        buf += chunk
+    head, _, rest = buf.partition(b"\r\n\r\n")
+    status_line, *header_lines = head.split(b"\r\n")
+    length = 0
+    for line in header_lines:
+        name, _, value = line.partition(b":")
+        if name.strip().lower() == b"content-length":
+            length = int(value.strip())
+    while len(rest) < length:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        rest += chunk
+    return status_line, rest[:length], rest[length:]
+
+
 class TestGetRoot:
     def test_serves_index_html(self, server):
         code, raw = _get(server + "/")
@@ -264,6 +302,32 @@ class TestPostRandomizeAndReset:
         assert code == 200
         assert body == {"ok": True}
         assert STATE.snapshot()["participants"] == []
+
+    def test_body_on_bodyless_endpoint_does_not_desync_keepalive(self, server):
+        """/api/randomize ignores its body, but the bytes must still be
+        drained off the socket -- otherwise they get parsed as the start
+        of the next request on this keep-alive connection."""
+        import socket
+        from urllib.parse import urlsplit
+
+        parts = urlsplit(server)
+        junk = b'{"unexpected": "body"}'
+        with socket.create_connection((parts.hostname, parts.port), timeout=5) as sock:
+            sock.sendall(
+                b"POST /api/randomize HTTP/1.1\r\n"
+                b"Host: " + parts.netloc.encode() + b"\r\n"
+                b"Content-Type: application/json\r\n"
+                b"Content-Length: " + str(len(junk)).encode() + b"\r\n"
+                b"\r\n" + junk
+            )
+            status1, _, leftover = _read_one_response(sock)
+            assert status1 == b"HTTP/1.1 200 OK"
+
+            sock.sendall(
+                b"GET / HTTP/1.1\r\nHost: " + parts.netloc.encode() + b"\r\n\r\n"
+            )
+            status2, _, _ = _read_one_response(sock, leftover)
+            assert status2 == b"HTTP/1.1 200 OK"
 
 
 class TestParticipantRoutes:
@@ -570,7 +634,7 @@ class TestContentLength:
                 b"\r\n"
                 b'{"name": "x"}'
             )
-            status_line = sock.recv(4096).split(b"\r\n", 1)[0]
+            status_line = _read_status_line(sock)
         assert status_line == b"HTTP/1.1 400 Bad Request"
 
     def test_rejected_body_closes_connection(self, server):
@@ -593,14 +657,19 @@ class TestSecurityHeaders:
         for path in ("/", "/api/state"):
             req = urllib.request.Request(server + path)
             try:
-                resp = _open(req)
+                with _open(req) as resp:
+                    h = resp.headers
+                    self._assert_security_headers(h)
             except urllib.error.HTTPError as e:
-                resp = e
-            h = resp.headers
-            assert h.get("X-Content-Type-Options") == "nosniff"
-            assert h.get("Referrer-Policy") == "no-referrer"
-            assert h.get("X-Frame-Options") == "DENY"
-            assert "frame-ancestors 'none'" in (h.get("Content-Security-Policy") or "")
+                with e:
+                    self._assert_security_headers(e.headers)
+
+    @staticmethod
+    def _assert_security_headers(h):
+        assert h.get("X-Content-Type-Options") == "nosniff"
+        assert h.get("Referrer-Policy") == "no-referrer"
+        assert h.get("X-Frame-Options") == "DENY"
+        assert "frame-ancestors 'none'" in (h.get("Content-Security-Policy") or "")
 
     def test_headers_on_default_error_response(self, server):
         # Handler only defines do_GET/do_POST, so any other verb falls
