@@ -329,6 +329,25 @@ class TestPostRandomizeAndReset:
             status2, _, _ = _read_one_response(sock, leftover)
             assert status2 == b"HTTP/1.1 200 OK"
 
+    def test_chunked_body_on_bodyless_endpoint_is_rejected(self, server):
+        """We don't decode chunked encoding, so a chunked body has no
+        Content-Length and would otherwise be silently treated as empty
+        and left on the socket, desyncing the next request."""
+        import socket
+        from urllib.parse import urlsplit
+
+        parts = urlsplit(server)
+        with socket.create_connection((parts.hostname, parts.port), timeout=5) as sock:
+            sock.sendall(
+                b"POST /api/randomize HTTP/1.1\r\n"
+                b"Host: " + parts.netloc.encode() + b"\r\n"
+                b"Transfer-Encoding: chunked\r\n"
+                b"\r\n"
+                b"5\r\nhello\r\n0\r\n\r\n"
+            )
+            status = _read_status_line(sock)
+        assert status == b"HTTP/1.1 400 Bad Request"
+
 
 class TestParticipantRoutes:
     def test_set_introduced(self, server):

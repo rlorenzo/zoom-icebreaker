@@ -1029,6 +1029,12 @@ class Handler(BaseHTTPRequestHandler):
         # `required=False` lets a bodyless endpoint treat "no header at
         # all" as "nothing to read" while still rejecting a malformed or
         # oversized one instead of silently ignoring it.
+        if "Transfer-Encoding" in self.headers:
+            # We don't decode chunked (or any other) transfer encoding, so
+            # a request framed that way has no Content-Length and its body
+            # would otherwise be left on the socket as if there were none.
+            self.close_connection = True
+            raise _RequestError(400, "Transfer-Encoding not supported")
         raw = self.headers.get("Content-Length")
         if raw is None:
             if required:
