@@ -124,6 +124,16 @@ describe("rowHtml", () => {
     expect(html).not.toContain("<img");
   });
 
+  it("escapes a participant id containing quotes or markup (XSS guard)", () => {
+    // Server/engine ids are hex or m<base36> today, but a localStorage
+    // session on a shared origin can hand us anything (see engine.js
+    // isParticipant), so the id must be escaped just like the name.
+    const evil = '"><script>alert(1)</script>';
+    const html = rowHtml(P({ id: evil }), ctx({ positionByPid: new Map() }));
+    expect(html).not.toContain(evil);
+    expect(html).not.toContain("<script>");
+  });
+
   it("shows a blank position when the participant has no number", () => {
     const html = rowHtml(P({ id: "ghost" }), ctx({ upNextPid: null }));
     expect(html).toContain('<div class="pos"></div>');

@@ -489,3 +489,82 @@ class TestRequestOriginGuard:
         except urllib.error.HTTPError as e:
             code = e.code
         assert code == 403
+
+    def test_cross_site_get_is_rejected(self, server):
+        # No Origin header at all (an <iframe src> or <img src> navigation
+        # doesn't send one), but Sec-Fetch-Site says another site issued it.
+        req = urllib.request.Request(
+            server + "/events", headers={"Sec-Fetch-Site": "cross-site"}
+        )
+        try:
+            with _open(req) as resp:
+                code = resp.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403
+
+    @pytest.mark.parametrize("site", ["same-origin", "same-site", "none"])
+    def test_non_cross_site_fetch_site_still_works(self, server, site):
+        req = urllib.request.Request(server + "/", headers={"Sec-Fetch-Site": site})
+        with _open(req) as resp:
+            assert resp.status == 200
+
+
+class TestContentLength:
+    """_read_json must reject a malformed Content-Length before touching
+    rfile.read(): a negative value passes Python's int() but blocks
+    rfile.read(-1) forever, parking the handler thread."""
+
+    def _post_raw(self, url, content_length):
+        req = urllib.request.Request(
+            url,
+            data=b'{"name": "x"}',
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Content-Length": content_length,
+            },
+        )
+        try:
+            with _open(req) as resp:
+                return resp.status
+        except urllib.error.HTTPError as e:
+            return e.code
+
+    def test_negative_content_length_is_rejected(self, server):
+        assert self._post_raw(server + "/api/participant", "-1") == 400
+
+    def test_non_numeric_content_length_is_rejected(self, server):
+        assert self._post_raw(server + "/api/participant", "nope") == 400
+
+    def test_oversized_content_length_is_rejected(self, server):
+        assert self._post_raw(server + "/api/participant", str(2 * 1024 * 1024)) == 413
+
+    def test_rejected_body_closes_connection(self, server):
+        req = urllib.request.Request(
+            server + "/api/participant",
+            data=b"{}",
+            method="POST",
+            headers={"Content-Type": "application/json", "Content-Length": "-1"},
+        )
+        try:
+            _open(req)
+        except urllib.error.HTTPError as e:
+            assert e.headers.get("Connection") == "close"
+        else:
+            raise AssertionError("expected 400")
+
+
+class TestSecurityHeaders:
+    def test_headers_on_json_and_static(self, server):
+        for path in ("/", "/api/state"):
+            req = urllib.request.Request(server + path)
+            try:
+                resp = _open(req)
+            except urllib.error.HTTPError as e:
+                resp = e
+            h = resp.headers
+            assert h.get("X-Content-Type-Options") == "nosniff"
+            assert h.get("Referrer-Policy") == "no-referrer"
+            assert h.get("X-Frame-Options") == "DENY"
+            assert "frame-ancestors 'none'" in (h.get("Content-Security-Policy") or "")
