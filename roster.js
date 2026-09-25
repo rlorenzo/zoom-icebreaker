@@ -100,7 +100,7 @@ export function rowHtml(p, { positionByPid, upNextPid, upNextChanged, prevIntrod
   const upNextTag =
     isUpNext && !p.is_host ? `<span class="up-next-tag">you&rsquo;re up next</span>` : "";
   return `
-    <li class="${cls}" data-pid="${p.id}" ${rowDragAttrs(p)}>
+    <li class="${cls}" data-pid="${escapeHtml(p.id)}" ${rowDragAttrs(p)}>
       <div class="pos">${num}</div>
       <div class="name">
         <span class="who">${escapeHtml(p.name)}</span>
@@ -110,11 +110,11 @@ export function rowHtml(p, { positionByPid, upNextPid, upNextChanged, prevIntrod
       </div>
       <div class="when">${fmtTime(p.joinTime)}</div>
       <button class="toggle ${p.introduced ? "on" : ""}" type="button"
-              data-act="toggle" data-pid="${p.id}" data-val="${!p.introduced}"
+              data-act="toggle" data-pid="${escapeHtml(p.id)}" data-val="${!p.introduced}"
               aria-pressed="${p.introduced}">
         ${toggleLabelHtml(p)}
       </button>
-      <button class="x" type="button" data-act="remove" data-pid="${p.id}"
+      <button class="x" type="button" data-act="remove" data-pid="${escapeHtml(p.id)}"
               aria-label="Remove ${escapeHtml(p.name)}">${ICON_X}</button>
     </li>`;
 }
