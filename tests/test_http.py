@@ -540,6 +540,25 @@ class TestContentLength:
     def test_oversized_content_length_is_rejected(self, server):
         assert self._post_raw(server + "/api/participant", str(2 * 1024 * 1024)) == 413
 
+    def test_missing_content_length_is_rejected(self, server):
+        """A body sent without Content-Length (e.g. chunked) must not be
+        silently treated as an empty body: that would leave the real bytes
+        unread on the socket and desync the next request."""
+        import socket
+        from urllib.parse import urlsplit
+
+        parts = urlsplit(server)
+        with socket.create_connection((parts.hostname, parts.port), timeout=5) as sock:
+            sock.sendall(
+                b"POST /api/participant HTTP/1.1\r\n"
+                b"Host: " + parts.netloc.encode() + b"\r\n"
+                b"Content-Type: application/json\r\n"
+                b"\r\n"
+                b'{"name": "x"}'
+            )
+            status_line = sock.recv(4096).split(b"\r\n", 1)[0]
+        assert status_line == b"HTTP/1.1 400 Bad Request"
+
     def test_rejected_body_closes_connection(self, server):
         req = urllib.request.Request(
             server + "/api/participant",

@@ -1022,7 +1022,10 @@ class Handler(BaseHTTPRequestHandler):
         # In every branch below, the body (if any) is left unread, so the
         # connection is closed rather than kept alive: an un-consumed body
         # would desync whatever request comes next on this socket.
-        raw = self.headers.get("Content-Length", "0")
+        raw = self.headers.get("Content-Length")
+        if raw is None:
+            self.close_connection = True
+            raise _RequestError(400, "missing Content-Length")
         try:
             n = int(raw)
         except ValueError:
