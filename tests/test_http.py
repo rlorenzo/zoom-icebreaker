@@ -503,6 +503,20 @@ class TestRequestOriginGuard:
             code = e.code
         assert code == 403
 
+    def test_cross_site_with_trailing_whitespace_is_still_rejected(self, server):
+        # A header parser strips leading OWS around "Name: value" but not
+        # trailing whitespace before the CRLF, so "cross-site " must not
+        # slip past a bare `== "cross-site"` comparison.
+        req = urllib.request.Request(
+            server + "/events", headers={"Sec-Fetch-Site": "cross-site "}
+        )
+        try:
+            with _open(req) as resp:
+                code = resp.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403
+
     @pytest.mark.parametrize("site", ["same-origin", "same-site", "none"])
     def test_non_cross_site_fetch_site_still_works(self, server, site):
         req = urllib.request.Request(server + "/", headers={"Sec-Fetch-Site": site})
@@ -587,3 +601,16 @@ class TestSecurityHeaders:
             assert h.get("Referrer-Policy") == "no-referrer"
             assert h.get("X-Frame-Options") == "DENY"
             assert "frame-ancestors 'none'" in (h.get("Content-Security-Policy") or "")
+
+    def test_headers_on_default_error_response(self, server):
+        # Handler only defines do_GET/do_POST, so any other verb falls
+        # through to BaseHTTPRequestHandler's own send_error(501) path,
+        # which must carry the same headers as every other response.
+        req = urllib.request.Request(server + "/", method="PUT")
+        try:
+            _open(req)
+            raise AssertionError("expected an HTTPError")
+        except urllib.error.HTTPError as e:
+            assert e.code == 501
+            assert e.headers.get("X-Content-Type-Options") == "nosniff"
+            assert e.headers.get("X-Frame-Options") == "DENY"

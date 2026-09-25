@@ -986,16 +986,22 @@ class Handler(BaseHTTPRequestHandler):
         # see. "cross-site" is the one value that always means another site
         # is driving us; same-origin/same-site/none (and absent, for older
         # clients and curl) are all fine.
-        if self.headers.get("Sec-Fetch-Site", "").lower() == "cross-site":
+        if self.headers.get("Sec-Fetch-Site", "").strip().lower() == "cross-site":
             return False
         origin = self.headers.get("Origin")
         return origin is None or self._origin_is_ours(origin)
 
-    def _send_security_headers(self) -> None:
+    def end_headers(self) -> None:
+        # Every response funnels through end_headers(), including
+        # BaseHTTPRequestHandler's own send_error() (e.g. a 501 for an
+        # unsupported method), so adding the security headers here rather
+        # than at each call site guarantees they land on every response,
+        # not just the ones that remember to add them.
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Content-Security-Policy", "frame-ancestors 'none'")
+        super().end_headers()
 
     def _json(self, code: int, obj: object) -> None:
         body = json.dumps(obj).encode()
@@ -1006,7 +1012,6 @@ class Handler(BaseHTTPRequestHandler):
             # Tell the client too; otherwise it may reuse a socket we are
             # about to close (400/413 leave the body unread, see _read_json).
             self.send_header("Connection", "close")
-        self._send_security_headers()
         self.end_headers()
         self.wfile.write(body)
 
@@ -1014,7 +1019,6 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
-        self._send_security_headers()
         self.end_headers()
         self.wfile.write(body)
 
@@ -1077,7 +1081,6 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "text/event-stream")
             self.send_header("Cache-Control", "no-cache")
             self.send_header("Connection", "keep-alive")
-            self._send_security_headers()
             self.end_headers()
             q: queue.Queue[str] = queue.Queue(maxsize=SSE_QUEUE_MAX)
             with STATE.lock:
