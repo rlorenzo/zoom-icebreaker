@@ -911,6 +911,19 @@ class QuietHTTPServer(ThreadingHTTPServer):
         super().handle_error(request, client_address)
 
 
+class _RequestError(Exception):
+    """A request body problem that should short-circuit to an HTTP status.
+
+    Raised by _read_json and caught once in do_POST, so every POST handler
+    gets consistent 400/413 handling without repeating the check itself.
+    """
+
+    def __init__(self, code: int, message: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -967,14 +980,38 @@ class Handler(BaseHTTPRequestHandler):
         """
         if self._hostname(self.headers.get("Host", "")) not in ALLOWED_HOSTS:
             return False
+        # Sec-Fetch-Site is sent by every modern browser on requests that can
+        # carry credentials/cookies-equivalent local access, including the
+        # Origin-less iframe/img/navigation GETs the Origin check above can't
+        # see. "cross-site" is the one value that always means another site
+        # is driving us; same-origin/same-site/none (and absent, for older
+        # clients and curl) are all fine.
+        if self.headers.get("Sec-Fetch-Site", "").strip().lower() == "cross-site":
+            return False
         origin = self.headers.get("Origin")
         return origin is None or self._origin_is_ours(origin)
+
+    def end_headers(self) -> None:
+        # Every response funnels through end_headers(), including
+        # BaseHTTPRequestHandler's own send_error() (e.g. a 501 for an
+        # unsupported method), so adding the security headers here rather
+        # than at each call site guarantees they land on every response,
+        # not just the ones that remember to add them.
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Content-Security-Policy", "frame-ancestors 'none'")
+        super().end_headers()
 
     def _json(self, code: int, obj: object) -> None:
         body = json.dumps(obj).encode()
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
+        if self.close_connection:
+            # Tell the client too; otherwise it may reuse a socket we are
+            # about to close (400/413 leave the body unread, see _read_json).
+            self.send_header("Connection", "close")
         self.end_headers()
         self.wfile.write(body)
 
@@ -985,18 +1022,52 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _read_json(self) -> dict[str, Any]:
-        try:
-            n = int(self.headers.get("Content-Length", 0))
-            if n > 1024 * 1024:  # 1MB limit
-                # Body is left unread; close the connection so the unconsumed
-                # bytes can't desync the next request on this keep-alive socket.
+    def _content_length(self, *, required: bool) -> int:
+        # In every error branch below, the body (if any) is left unread, so
+        # the connection is closed rather than kept alive: an un-consumed
+        # body would desync whatever request comes next on this socket.
+        # `required=False` lets a bodyless endpoint treat "no header at
+        # all" as "nothing to read" while still rejecting a malformed or
+        # oversized one instead of silently ignoring it.
+        if "Transfer-Encoding" in self.headers:
+            # We don't decode chunked (or any other) transfer encoding, so
+            # a request framed that way has no Content-Length and its body
+            # would otherwise be left on the socket as if there were none.
+            self.close_connection = True
+            raise _RequestError(400, "Transfer-Encoding not supported")
+        raw = self.headers.get("Content-Length")
+        if raw is None:
+            if required:
                 self.close_connection = True
-                return {}
+                raise _RequestError(400, "missing Content-Length")
+            return 0
+        try:
+            n = int(raw)
+        except ValueError:
+            self.close_connection = True
+            raise _RequestError(400, "invalid Content-Length") from None
+        if n < 0:
+            self.close_connection = True
+            raise _RequestError(400, "invalid Content-Length")
+        if n > 1024 * 1024:  # 1MB limit
+            self.close_connection = True
+            raise _RequestError(413, "payload too large")
+        return n
+
+    def _read_json(self) -> dict[str, Any]:
+        n = self._content_length(required=True)
+        try:
             data = json.loads(self.rfile.read(n) or b"{}")
             return data if isinstance(data, dict) else {}
         except Exception:
             return {}
+
+    def _discard_body(self) -> None:
+        """Drain any body sent to an endpoint that doesn't use one, so
+        leftover bytes can't desync the next request on this socket."""
+        n = self._content_length(required=False)
+        if n:
+            self.rfile.read(n)
 
     def _serve_index(self) -> bool:
         if self.path != "/" and not self.path.startswith("/index"):
@@ -1065,13 +1136,20 @@ class Handler(BaseHTTPRequestHandler):
         # Strip any query string before route matching (see do_GET).
         self.path = urlsplit(self.path).path
         if not self._is_local_request():
+            # Body left unread: close so the bytes cannot desync the next
+            # request on this keep-alive socket (see _read_json).
+            self.close_connection = True
             return self._json(403, {"error": "forbidden"})
-        handler = self._STATIC_POST.get(self.path)
-        if handler:
-            return handler(self)
-        m = self.PARTICIPANT_ROUTE.match(self.path)
-        if m:
-            return self._participant_action(m.group(1), m.group(2))
+        try:
+            handler = self._STATIC_POST.get(self.path)
+            if handler:
+                return handler(self)
+            m = self.PARTICIPANT_ROUTE.match(self.path)
+            if m:
+                return self._participant_action(m.group(1), m.group(2))
+        except _RequestError as e:
+            return self._json(e.code, {"error": e.message})
+        self.close_connection = True
         self._json(404, {"error": "not found"})
 
     def _post_add_participant(self) -> None:
@@ -1086,6 +1164,7 @@ class Handler(BaseHTTPRequestHandler):
         self._json(200, {"ok": True})
 
     def _post_randomize(self) -> None:
+        self._discard_body()
         STATE.randomize()
         self._json(200, {"ok": True})
 
@@ -1097,6 +1176,7 @@ class Handler(BaseHTTPRequestHandler):
         self._json(200, {"ok": True})
 
     def _post_reset(self) -> None:
+        self._discard_body()
         STATE.reset()
         self._json(200, {"ok": True})
 
@@ -1106,6 +1186,7 @@ class Handler(BaseHTTPRequestHandler):
         elif action == "host":
             ok = STATE.set_host(pid, bool(self._read_json().get("host")))
         else:  # remove
+            self._discard_body()
             STATE.remove(pid)
             ok = True
         self._json(200 if ok else 404, {"ok": ok})

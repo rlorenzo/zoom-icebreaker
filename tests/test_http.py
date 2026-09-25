@@ -75,6 +75,44 @@ def _get_full(url):
         return resp.status, resp.headers.get("Content-Type"), resp.read()
 
 
+def _read_status_line(sock):
+    """Read from a raw socket until the first CRLF: a single recv() can
+    return a partial line, so splitting on the first recv() alone is
+    flaky on a slow or segmented connection."""
+    buf = b""
+    while b"\r\n" not in buf:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        buf += chunk
+    return buf.split(b"\r\n", 1)[0]
+
+
+def _read_one_response(sock, buf=b""):
+    """Read one full HTTP response (status line + headers + body) off a
+    raw keep-alive socket, returning (status_line, body, leftover) where
+    leftover is any already-buffered bytes belonging to the *next*
+    response on the same connection."""
+    while b"\r\n\r\n" not in buf:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        buf += chunk
+    head, _, rest = buf.partition(b"\r\n\r\n")
+    status_line, *header_lines = head.split(b"\r\n")
+    length = 0
+    for line in header_lines:
+        name, _, value = line.partition(b":")
+        if name.strip().lower() == b"content-length":
+            length = int(value.strip())
+    while len(rest) < length:
+        chunk = sock.recv(4096)
+        if not chunk:
+            break
+        rest += chunk
+    return status_line, rest[:length], rest[length:]
+
+
 class TestGetRoot:
     def test_serves_index_html(self, server):
         code, raw = _get(server + "/")
@@ -264,6 +302,51 @@ class TestPostRandomizeAndReset:
         assert code == 200
         assert body == {"ok": True}
         assert STATE.snapshot()["participants"] == []
+
+    def test_body_on_bodyless_endpoint_does_not_desync_keepalive(self, server):
+        """/api/randomize ignores its body, but the bytes must still be
+        drained off the socket -- otherwise they get parsed as the start
+        of the next request on this keep-alive connection."""
+        import socket
+        from urllib.parse import urlsplit
+
+        parts = urlsplit(server)
+        junk = b'{"unexpected": "body"}'
+        with socket.create_connection((parts.hostname, parts.port), timeout=5) as sock:
+            sock.sendall(
+                b"POST /api/randomize HTTP/1.1\r\n"
+                b"Host: " + parts.netloc.encode() + b"\r\n"
+                b"Content-Type: application/json\r\n"
+                b"Content-Length: " + str(len(junk)).encode() + b"\r\n"
+                b"\r\n" + junk
+            )
+            status1, _, leftover = _read_one_response(sock)
+            assert status1 == b"HTTP/1.1 200 OK"
+
+            sock.sendall(
+                b"GET / HTTP/1.1\r\nHost: " + parts.netloc.encode() + b"\r\n\r\n"
+            )
+            status2, _, _ = _read_one_response(sock, leftover)
+            assert status2 == b"HTTP/1.1 200 OK"
+
+    def test_chunked_body_on_bodyless_endpoint_is_rejected(self, server):
+        """We don't decode chunked encoding, so a chunked body has no
+        Content-Length and would otherwise be silently treated as empty
+        and left on the socket, desyncing the next request."""
+        import socket
+        from urllib.parse import urlsplit
+
+        parts = urlsplit(server)
+        with socket.create_connection((parts.hostname, parts.port), timeout=5) as sock:
+            sock.sendall(
+                b"POST /api/randomize HTTP/1.1\r\n"
+                b"Host: " + parts.netloc.encode() + b"\r\n"
+                b"Transfer-Encoding: chunked\r\n"
+                b"\r\n"
+                b"5\r\nhello\r\n0\r\n\r\n"
+            )
+            status = _read_status_line(sock)
+        assert status == b"HTTP/1.1 400 Bad Request"
 
 
 class TestParticipantRoutes:
@@ -489,3 +572,133 @@ class TestRequestOriginGuard:
         except urllib.error.HTTPError as e:
             code = e.code
         assert code == 403
+
+    def test_cross_site_get_is_rejected(self, server):
+        # No Origin header at all (an <iframe src> or <img src> navigation
+        # doesn't send one), but Sec-Fetch-Site says another site issued it.
+        req = urllib.request.Request(
+            server + "/events", headers={"Sec-Fetch-Site": "cross-site"}
+        )
+        try:
+            with _open(req) as resp:
+                code = resp.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403
+
+    def test_cross_site_with_trailing_whitespace_is_still_rejected(self, server):
+        # A header parser strips leading OWS around "Name: value" but not
+        # trailing whitespace before the CRLF, so "cross-site " must not
+        # slip past a bare `== "cross-site"` comparison.
+        req = urllib.request.Request(
+            server + "/events", headers={"Sec-Fetch-Site": "cross-site "}
+        )
+        try:
+            with _open(req) as resp:
+                code = resp.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403
+
+    @pytest.mark.parametrize("site", ["same-origin", "same-site", "none"])
+    def test_non_cross_site_fetch_site_still_works(self, server, site):
+        req = urllib.request.Request(server + "/", headers={"Sec-Fetch-Site": site})
+        with _open(req) as resp:
+            assert resp.status == 200
+
+
+class TestContentLength:
+    """_read_json must reject a malformed Content-Length before touching
+    rfile.read(): a negative value passes Python's int() but blocks
+    rfile.read(-1) forever, parking the handler thread."""
+
+    def _post_raw(self, url, content_length):
+        req = urllib.request.Request(
+            url,
+            data=b'{"name": "x"}',
+            method="POST",
+            headers={
+                "Content-Type": "application/json",
+                "Content-Length": content_length,
+            },
+        )
+        try:
+            with _open(req) as resp:
+                return resp.status
+        except urllib.error.HTTPError as e:
+            return e.code
+
+    def test_negative_content_length_is_rejected(self, server):
+        assert self._post_raw(server + "/api/participant", "-1") == 400
+
+    def test_non_numeric_content_length_is_rejected(self, server):
+        assert self._post_raw(server + "/api/participant", "nope") == 400
+
+    def test_oversized_content_length_is_rejected(self, server):
+        assert self._post_raw(server + "/api/participant", str(2 * 1024 * 1024)) == 413
+
+    def test_missing_content_length_is_rejected(self, server):
+        """A body sent without Content-Length (e.g. chunked) must not be
+        silently treated as an empty body: that would leave the real bytes
+        unread on the socket and desync the next request."""
+        import socket
+        from urllib.parse import urlsplit
+
+        parts = urlsplit(server)
+        with socket.create_connection((parts.hostname, parts.port), timeout=5) as sock:
+            sock.sendall(
+                b"POST /api/participant HTTP/1.1\r\n"
+                b"Host: " + parts.netloc.encode() + b"\r\n"
+                b"Content-Type: application/json\r\n"
+                b"\r\n"
+                b'{"name": "x"}'
+            )
+            status_line = _read_status_line(sock)
+        assert status_line == b"HTTP/1.1 400 Bad Request"
+
+    def test_rejected_body_closes_connection(self, server):
+        req = urllib.request.Request(
+            server + "/api/participant",
+            data=b"{}",
+            method="POST",
+            headers={"Content-Type": "application/json", "Content-Length": "-1"},
+        )
+        try:
+            _open(req)
+        except urllib.error.HTTPError as e:
+            assert e.headers.get("Connection") == "close"
+        else:
+            raise AssertionError("expected 400")
+
+
+class TestSecurityHeaders:
+    def test_headers_on_json_and_static(self, server):
+        for path in ("/", "/api/state"):
+            req = urllib.request.Request(server + path)
+            try:
+                with _open(req) as resp:
+                    h = resp.headers
+                    self._assert_security_headers(h)
+            except urllib.error.HTTPError as e:
+                with e:
+                    self._assert_security_headers(e.headers)
+
+    @staticmethod
+    def _assert_security_headers(h):
+        assert h.get("X-Content-Type-Options") == "nosniff"
+        assert h.get("Referrer-Policy") == "no-referrer"
+        assert h.get("X-Frame-Options") == "DENY"
+        assert "frame-ancestors 'none'" in (h.get("Content-Security-Policy") or "")
+
+    def test_headers_on_default_error_response(self, server):
+        # Handler only defines do_GET/do_POST, so any other verb falls
+        # through to BaseHTTPRequestHandler's own send_error(501) path,
+        # which must carry the same headers as every other response.
+        req = urllib.request.Request(server + "/", method="PUT")
+        try:
+            _open(req)
+            raise AssertionError("expected an HTTPError")
+        except urllib.error.HTTPError as e:
+            assert e.code == 501
+            assert e.headers.get("X-Content-Type-Options") == "nosniff"
+            assert e.headers.get("X-Frame-Options") == "DENY"
