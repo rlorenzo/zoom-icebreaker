@@ -1108,6 +1108,9 @@ class Handler(BaseHTTPRequestHandler):
         # Strip any query string before route matching (see do_GET).
         self.path = urlsplit(self.path).path
         if not self._is_local_request():
+            # Body left unread: close so the bytes cannot desync the next
+            # request on this keep-alive socket (see _read_json).
+            self.close_connection = True
             return self._json(403, {"error": "forbidden"})
         try:
             handler = self._STATIC_POST.get(self.path)
@@ -1118,6 +1121,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._participant_action(m.group(1), m.group(2))
         except _RequestError as e:
             return self._json(e.code, {"error": e.message})
+        self.close_connection = True
         self._json(404, {"error": "not found"})
 
     def _post_add_participant(self) -> None:
