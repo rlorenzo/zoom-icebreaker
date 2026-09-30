@@ -21,3 +21,5 @@ htmlcov/
 node_modules/
 coverage/
 .rec-tmp/
+.impeccable/review/
+.playwright-mcp/
