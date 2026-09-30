@@ -166,6 +166,16 @@ class TestStaticAssets:
         assert "javascript" in ctype
         assert raw
 
+    def test_serves_every_module_app_js_imports(self, server):
+        # theme.js once shipped without a route; the 404 killed app.js whole.
+        with open(tracker.APP_JS, encoding="utf-8") as f:
+            src = f.read()
+        for name in re.findall(r'from "\./([\w.-]+\.js)"', src):
+            code, ctype, raw = _get_full(server + "/" + name)
+            assert code == 200, name
+            assert "javascript" in ctype
+            assert raw
+
     def test_serves_styles_css(self, server):
         code, ctype, raw = _get_full(server + "/styles.css")
         assert code == 200
