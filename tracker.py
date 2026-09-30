@@ -89,6 +89,7 @@ ROSTER_JS = os.path.join(HERE, "roster.js")
 DEMO_JS = os.path.join(HERE, "demo.js")
 ENGINE_JS = os.path.join(HERE, "engine.js")
 SESSION_JS = os.path.join(HERE, "session.js")
+THEME_JS = os.path.join(HERE, "theme.js")
 STYLES_CSS = os.path.join(HERE, "styles.css")
 # Self-hosted so the page makes no third-party request; see styles.css.
 FONT_SANS = os.path.join(HERE, "fonts", "atkinson-next-var-latin.woff2")
@@ -122,6 +123,7 @@ PAGES: dict[str, tuple[bytes | None, str]] = {
     "/demo.js": (_load_bytes(DEMO_JS), JS_CONTENT_TYPE),
     "/engine.js": (_load_bytes(ENGINE_JS), JS_CONTENT_TYPE),
     "/session.js": (_load_bytes(SESSION_JS), JS_CONTENT_TYPE),
+    "/theme.js": (_load_bytes(THEME_JS), JS_CONTENT_TYPE),
     "/styles.css": (_load_bytes(STYLES_CSS), CSS_CONTENT_TYPE),
     "/fonts/atkinson-next-var-latin.woff2": (
         _load_bytes(FONT_SANS),

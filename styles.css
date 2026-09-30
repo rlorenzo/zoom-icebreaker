@@ -363,7 +363,7 @@ header {
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.015em;
-  color: var(--on-deep);
+  color: var(--baton-bright); /* typed text matches the placeholder */
   background: transparent;
   border: 0;
   padding: 0;
